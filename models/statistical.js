@@ -11,4 +11,4 @@ const statisticalSchema = new Schema({
 
 const Statistical = new mongoose.model('Statisticals', statisticalSchema);
 
-export default Statistical;
+module.exports = Statistical;

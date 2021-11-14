@@ -10,6 +10,6 @@ const archivedSchema = new Schema({
 });
 
 
-const Report = new mongoose.model('Reports', archivedSchema);
+const Archive = new mongoose.model('Archives', archivedSchema);
 
-export default Report;
+module.exports = Archive;

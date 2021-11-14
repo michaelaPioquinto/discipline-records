@@ -6,7 +6,7 @@ const studentSchema = new Schema({
 	studentID: { type: String, required: true },
 	firstName: { type: String, required: true },
 	lastName: { type: String, required: true },
-	MiddleName: { type: String, required: true },
+	middleName: { type: String, required: true },
 	course: { type: String, required: true },
 	yearSection: { type: String, required: true }
 });
@@ -14,4 +14,4 @@ const studentSchema = new Schema({
 
 const Student = new mongoose.model('Students', studentSchema);
 
-export default Student;
+module.exports = Student;

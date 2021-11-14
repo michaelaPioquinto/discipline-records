@@ -18,7 +18,7 @@ const VIEWS = [
 	ROOT + 'sign-in',
 	ROOT + 'admin',
 	ROOT + 'student',
-	ROOT + 'system-admi',
+	ROOT + 'system-admin',
 	ROOT + 'administrative-staff'
 ];
 
@@ -28,37 +28,39 @@ const Authentication = props => {
 
 	const [allow, setAllow] = React.useState( null );
 	const [view, setView] = React.useState( null );
+	const [role, setRole] = React.useState( '' );
+	const [name, setName] = React.useState( '' );
 
 	const setToThisView = ( viewPath ) => {
 	    setView(() => <Redirect to={viewPath} />);
 	    runAuth();
 	}
 
+	const tools = {
+		setView: setToThisView
+	}
+
 	const runAuth = () => {
 	    const token = Cookies.get('token');
 	    const rtoken = Cookies.get('rtoken');
 
-	    // axios.get('http://localhost:3000/verify-me', {
-	    //   headers: {
-	    //     'authentication': `Bearer ${ token }`
-	    //   }
-	    // })
-	    // .then( res => {
-	    //   setName( res.data.user.name );
-	    //   setAllow(() => true);
-	    // })
-	    // .catch( err => {
-	    //   axios.post('http://localhost:3500/auth/refresh-token', { rtoken })
-	    //   .then( res => {
-	    //     Cookies.set('token', res.data.accessToken);
-	    //     runAuth();
-	    //   })
-	    //   .catch( err => setAllow(() => false));
-	    // }); 
-
-	    // setAllow(() => true);
-
-	    setAllow(() => true);
+	    axios.get('http://localhost:3000/verify-me', {
+	      headers: {
+	        'authorization': `Bearer ${ token }`
+	      }
+	    })
+	    .then( res => {
+	      setName( res.data.user.name );
+	      setAllow(() => true);
+	    })
+	    .catch( err => {
+	      axios.post('http://localhost:3500/auth/refresh-token', { rtoken })
+	      .then( res => {
+	        Cookies.set('token', res.data.accessToken);
+	        runAuth();
+	      })
+	      .catch( err => setAllow(() => false));
+	    });
 	}
 
 
@@ -83,7 +85,7 @@ const Authentication = props => {
 	          setToThisView( path.pathname );
 	          break;
 
-			case '/system-admin':
+					case '/system-admin':
 	          setToThisView( path.pathname );
 	          break;
 
@@ -118,7 +120,7 @@ const Authentication = props => {
 	                    <>
 	                      <Route exact path="/admin">
 	                        {/*<Appbar tools={tools}/>*/}
-	                        <Admin />
+	                        <Admin tools={tools}/>
 	                      </Route>
 
 	                      <Route exact path="/administrative-staff">
@@ -133,7 +135,7 @@ const Authentication = props => {
 
 	                      <Route exact path="/student">
 	                        {/*<Appbar tools={tools}/>*/}
-	                        <Student />
+	                        <Student setView={setToThisView} setRole={setRole}/>
 	                      </Route>
 	                    </>
 	                  )
@@ -163,6 +165,7 @@ const SignIn = props => {
 	const [username, setUsername] = React.useState('');
 	const [password, setPassword] = React.useState('');
 	const [signin, setSignin] = React.useState( false );
+	const [role, setRole] = React.useState( props.role ?? 'student' );
 
 	const handleUsername = e => {
 		// setUsername( )
@@ -180,12 +183,18 @@ const SignIn = props => {
 
 	React.useEffect(() => {
 		if( signin ){
-			axios.post('http://localhost:3000/signin', { username, password })
+			axios.post('http://localhost:3000/sign-in', { username, password })
 			.then( res => {
-				console.log( res.data.message );
+				Cookies.set('token', res.data.accessToken);
+				Cookies.set('rtoken', res.data.refreshToken);
+
+				props.setRole( res.data.role );
+				props.setView( res.data.path );
+
+				setSignin( false );
 			})
 			.catch( err => {
-				console.log( err );
+				setSignin( false );
 			})
 		}
 	}, [signin, username, password]);

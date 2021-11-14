@@ -10,4 +10,4 @@ const sanctionSchema = new Schema({
 
 const Sanction = new mongoose.model('Sanctions', sanctionSchema);
 
-export default Sanction;
+module.exports = Sanction;

@@ -10,9 +10,10 @@ import Divider from '@mui/material/Divider';
 import { DataGrid } from '@mui/x-data-grid';
 
 const columns = [
-  { field: 'id', headerName: 'ID', width: 150 },
+  { field: 'studentID', headerName: 'ID', width: 150 },
   { field: 'firstName', headerName: 'First name', width: 200 },
   { field: 'lastName', headerName: 'Last name', width: 200 },
+  { field: 'middleName', headerName: 'Middle name', width: 200 },
   {
     field: 'fullName',
     headerName: 'Full name',
@@ -25,7 +26,7 @@ const columns = [
       }`,
   },
   { field: 'course', headerName: 'Course', width: 200 },
-  { field: 'yrsection', headerName: 'Year & Section', width: 200 }
+  { field: 'yearSection', headerName: 'Year & Section', width: 200 }
 ];
 
 
@@ -38,7 +39,12 @@ const Dashboard = props => {
 		const fetchStudentData = async() => {
       axios.get('http://localhost:3000/student-data')
       .then( res => {
-        setRow( res.data );
+        if( res.data ){
+          const modifiedData = res.data.map( datum => ({ id: datum._id, ...datum}));
+          console.log( modifiedData );
+          setRow( modifiedData );
+        }
+
       })
       .catch( err => {
         console.log( err );
