@@ -22,8 +22,6 @@ import Skeleton from '@mui/material/Skeleton';
 import Paper from '@mui/material/Paper';
 import Divider from '@mui/material/Divider';
 
-import TableSkeleton from '../../../components/TableSkeleton';
-
 const Item = props => {
   return(
     <>

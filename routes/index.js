@@ -38,7 +38,7 @@ router.get('/verify-me', authentication, async (req, res, next) => {
   // If a request came here then it is authorized
  	console.log( req.user );
  	
-  return res.json({ user: req.user, message: `Welcome ${ req.user.username }`});
+  return res.json({ username: req.user.name, role: req.user.role, message: `Welcome ${ req.user.username }`});
 });
 
 
@@ -49,12 +49,9 @@ router.post('/sign-in', async (req, res, next) => {
     if( err ) return res.sendStatus( 500 );
 
     if( doc ){
-    	console.log( doc );
-  		if( doc.status === 'active' ){
-  			console.log('here');
-  			console.log(doc.status === 'active');
+  		if( doc.status === 'activated' ){
 
-	      const user = { name: username };
+	      const user = { name: username, role: doc.role };
 	      const accessToken = requestAccessToken( user );
 	      const refreshToken = jwt.sign( user, process.env.REFRESH_TOKEN_SECRET );
 
@@ -91,8 +88,7 @@ router.post('/sign-in', async (req, res, next) => {
 	      });
   		}
   		else{
-  			console.log('here2');
-  			return res.sendStatus( 403 );
+  			return res.status( 403 ).json({ message: 'This account is deactivated.'});
   		}
     }
     else{
@@ -172,7 +168,7 @@ router.post('/sign-up', async (req, res, next) => {
 });
 
 
-router.delete('/sign-out', authentication, async ( req, res ) => {
+router.delete('/sign-out', async ( req, res ) => {
   Token.deleteOne({ code: req.body.token }, (err) => {
     if( err ) return res.sendStatus( 503 );
 
@@ -204,12 +200,48 @@ router.post('/auth/refresh-token', async ( req, res ) => {
   });
 });
 
-/* GET home page. */
-router.get('/', async (req, res, next) => {
-  res.render('index', { title: 'Express' });
+
+// ===========================================================
+router.get('/violation-list', async ( req, res ) => {
+	Sanction.find({}, (err, list) => {
+		if( err ) return res.sendStatus( 503 );
+
+		return res.json( list );
+	});
 });
 
+router.post('/save-violation', async ( req, res ) => {
+	Sanction.create({ ...req.body }, err => {
+		if( err ) return res.sendStatus( 503 );
 
+		return res.sendStatus( 200 );
+	});
+});
+
+router.delete('/delete-violation/:id', async ( req, res ) => {
+
+	Sanction.deleteOne({ _id: req.params.id }, err => {
+		if( err ) return res.sendStatus( 503 );
+
+		return res.sendStatus( 200 );
+	});
+});
+
+router.put('/edit-violation/:id', async ( req, res ) => {
+	const {
+		violationName,
+		firstOffense,
+		secondOffense,
+		thirdOffense
+	} = req.body.item;
+
+	console.log(req.body.item);
+	Sanction.updateOne({ _id: req.params.id }, { violationName, firstOffense, secondOffense, thirdOffense }, err => {
+		if( err ) return res.sendStatus( 503 );
+
+		return res.sendStatus( 200 );
+	});
+});
 // router.post('/signin', async( req, res ) => {
 // 	const { username, password } = req.body;
 
@@ -225,6 +257,8 @@ router.get('/', async (req, res, next) => {
 // });
 
 
+// ================= GLOBAL ACCESS ==================
+
 router.get('/student-data', async( req, res ) => {
 	Student.find({}, (err, doc) => {
 		if( err ) return res.sendStatus( 503 );
@@ -233,5 +267,121 @@ router.get('/student-data', async( req, res ) => {
 	});
 });
 
+router.put('/change-user-status', async( req, res ) => {
+  const { username, status } = req.body;
+
+  console.log( status );
+
+  User.findOneAndUpdate({ username: username }, { status: status }, err => {
+    if( err ) return res.sendStatus( 503 );
+
+    return res.sendStatus( 200 );
+  });
+});
+
+router.delete('/delete-user/:username', async( req, res ) => {
+  User.deleteOne({ username: req.params.username }, err => {
+    if( err ) return res.sendStatus( 503 );
+
+    return res.sendStatus( 200 );
+  });
+});
+
+// ================= ADMINISTRATOR ===================
+
+router.get('/accounts/admin', async( req, res ) => {
+  try{
+    let result = await User.find().$where(function() {
+      return this.role === 'sysadmin' || this.role === 'adminstaff';
+    });
+
+    return res.json( result );
+  }
+  catch (err) {
+    return res.sendStatus( 503 );
+  }
+});
+
+router.post('/create-user/admin', async( req, res ) => {
+  User.create({ ...req.body }, err => {
+    if( err ) return res.sendStatus( 503 );
+
+    return res.sendStatus( 200 );
+  });
+});
+
+router.post('/edit-user/admin', async( req, res ) => {
+  User.findOneAndUpdate({ _id: req.body.id }, { ...req.body }, err => {
+    if( err ) return res.sendStatus( 503 );
+
+    return res.sendStatus( 200 );
+  });
+});
+
+
+
+
+// ============== SYSTEM ADMINISTRATOR ================
+
+router.get('/accounts/system-admin', async( req, res ) => {
+    User.find({ role: 'admin' }, (err, list) => {
+      if( err ) return res.sendStatus( 503 );
+
+      return res.json( list );
+    });
+});
+
+
+// =============== ADMINISTRATOR STAFF =================
+
+router.put('/archive-student', async( req, res ) => {
+  console.log( req.body );
+  Student.findOne({ studentID: req.body.studentID }, async (err, doc) => {
+    if( err ) return res.sendStatus( 503 );
+
+    console.log( doc );
+    if( doc ){
+      console.log( !doc.archived );
+      doc.archived = !doc.archived;
+
+      try{
+        await doc.save();
+        return res.sendStatus( 200 );
+      }
+      catch( err ) {
+        throw err
+        return res.sendStatus( 503 );
+      }
+    }
+    else{
+      return res.sendStatus( 404 );
+    }
+  })
+});
+
+router.post('/create-student', async( req, res ) => {
+  console.log( req.body );
+  Student.create({ ...req.body }, err => {
+    if( err ) throw err;
+
+    return res.sendStatus( 200 );
+  });
+});
+
+router.put('/edit-student/:studentID', async( req, res ) => {
+  User.findOneAndUpdate({ studentID: req.params.studentID }, { ...req.body }, err => {
+    if( err ) return res.sendStatus( 503 );
+
+    return res.sendStatus( 200 );
+  });
+});
+
+router.delete('/delete-student/:studentID', async( req, res ) => {
+  Student.deleteOne({ studentID: req.params.studentID }, err => {
+    if( err ) return res.sendStatus( 503 );
+
+    return res.sendStatus( 200 );
+  });
+});
 
 module.exports = router;

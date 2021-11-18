@@ -1,41 +1,39 @@
 import React from 'react';
 import Appbar from '../components/Appbar';
-import Dashboard from './pages/admin/Dashboard';
 import axios from 'axios';
 
+import TableSkeleton from '../components/TableSkeleton';
 
-const AdminStaff = (props) => {
-	
-	// React.useEffect(() => {
-	// 	const fetchStudentData = async() => {
-	//      axios.get('http://localhost:3000/student-data')
-	//      .then( res => {
-	//        setRow( res.data );
-	//      })
-	//      .catch( err => {
-	//        console.log( err );
-	//      });
-	//    }
+import LinearProgress from '@mui/material/LinearProgress';
 
-	//    fetchStudentData();
-	// }, []);
+const Dashboard = React.lazy(() => import('./pages/admin-staff/Dashboard'));
+const Violation = React.lazy(() => import('./pages/admin-staff/Violation'));
+const Accounts = React.lazy(() => import('./pages/admin-staff/Accounts'));
+
+const AdminStaff = props => {
+	const [content, setContent] = React.useState({ name: 'Dashboard', cont: <Dashboard/> });
 
 	return(
 		<div style={{ width: '100%', height: '100%'}}>
 			<Appbar 
-				title="Administrative Staff" 
+				tools={props.tools}
+				title="Administrator Staff" 
 				listItems={[
-					{ title: 'Dashboard', onClick: () => console.log('Dashboard') },
-					{ title: 'Statistical', onClick: () => console.log('Statistical') },
-					{ title: 'Handbook', onClick: () => console.log('Handbook') },
-					{ title: 'Make Report', onClick: () => console.log('Make Report') },
+					{ title: 'Dashboard', onClick: () => content.name === 'Dashboard' ? null : setContent({ name: 'Dashboard', cont: <Dashboard/> }) },
+					{ title: 'Violation', onClick: () =>  content.name === 'Validation' ? null : setContent({ name: 'Violation', cont: <Violation/> })},
+					{ title: 'Account', onClick: () => content.name === 'Account' ? null : setContent({ name: 'Account', cont: <Accounts/> }) },
+					// { title: 'Statistical', onClick: () => content.name === 'Statistical' ? null : setContent({ name: 'Statistical', cont: <Statistical/> }) },
+					// { title: 'Handbook', onClick: () => content.name === 'Handbook' ? null : setContent({ name: 'Handbook', cont: <Handbook/> }) },
 				]}
 			/>
-			<Dashboard/>
-		</div>	
-	);
+			<React.Suspense 
+				fallback={<LinearProgress color="success"/>}
+			>
+				{ content.cont }
+			</React.Suspense>
+		</div>
+	)
 }
-
 
 
 

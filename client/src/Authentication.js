@@ -6,6 +6,20 @@ import { Route, Switch, Redirect } from 'react-router-dom';
 import LinearProgress from '@mui/material/LinearProgress';
 import { SnackbarProvider } from 'notistack';
 
+import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Alert from '@mui/material/Alert';
+import Divider from '@mui/material/Divider';
+
+import OutlinedInput from '@mui/material/OutlinedInput';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Admin = React.lazy(() => import('./view/Admin'));
@@ -37,8 +51,11 @@ const Authentication = props => {
 	}
 
 	const tools = {
-		setView: setToThisView
+		setView: setToThisView,
+		setAllow,
+		setRole
 	}
+
 
 	const runAuth = () => {
 	    const token = Cookies.get('token');
@@ -50,7 +67,8 @@ const Authentication = props => {
 	      }
 	    })
 	    .then( res => {
-	      setName( res.data.user.name );
+	      setName( res.data.username );
+	      setRole( res.data.role );
 	      setAllow(() => true);
 	    })
 	    .catch( err => {
@@ -74,23 +92,42 @@ const Authentication = props => {
 	    if( allow ){
 	      switch( path.pathname ){
 	        case '/admin':
+	        	if( role !== 'admin' ) return;
+	          
 	          setToThisView( path.pathname );
 	          break;
 
 	        case '/student':
+	        	if( role !== 'student' ) return;
+
 	          setToThisView( path.pathname );
 	          break;
 
 	        case '/administrative-staff':
+	        	if( role !== 'adminstaff' ) return;
+	          
 	          setToThisView( path.pathname );
 	          break;
 
 					case '/system-admin':
+	        	if( role !== 'sysadmin' ) return;
+	          
 	          setToThisView( path.pathname );
 	          break;
 
 	        default:
-	          setToThisView( '/admin' );
+	        	if( role === 'admin' ){
+		          setToThisView( '/admin' );
+	        	}
+	        	else if( role === 'sysadmin' ){
+		          setToThisView( '/system-admin' );
+	        	}
+	        	else if( role === 'adminstaff' ){
+		          setToThisView( '/administrative-staff' );
+	        	}
+	        	else if( role === 'student' ){
+		          setToThisView( '/student' );
+	        	}
 	          break;
 	      }     
 	      // return setAllow(() => null);
@@ -107,7 +144,7 @@ const Authentication = props => {
 	      }
 	      // return setAllow(() => null);
 	    }
-	}, [allow]);
+	}, [allow, role]);
 
 	return(
 		<SnackbarProvider maxSnack={3}>
@@ -119,35 +156,30 @@ const Authentication = props => {
 	                ? (
 	                    <>
 	                      <Route exact path="/admin">
-	                        {/*<Appbar tools={tools}/>*/}
 	                        <Admin tools={tools}/>
 	                      </Route>
 
 	                      <Route exact path="/administrative-staff">
-	                        {/*<Appbar tools={tools}/>*/}
-	                        <AdministrativeStaff />
+	                        <AdministrativeStaff tools={tools} />
 	                      </Route>
 
 	                      <Route exact path="/system-admin">
-	                        {/*<Appbar tools={tools}/>*/}
-	                        <SystemAdmin />
+	                        <SystemAdmin tools={tools} />
 	                      </Route>
 
 	                      <Route exact path="/student">
-	                        {/*<Appbar tools={tools}/>*/}
-	                        <Student setView={setToThisView} setRole={setRole}/>
+	                        <Student tools={tools}/>
 	                      </Route>
 	                    </>
 	                  )
 	                : null
 	            }
-
 	            {
 	              allow === false 
 	                ? (
 	                    <>
 	                      <Route path="/sign-in">
-	                        <SignIn />
+	                        <SignIn tools={tools}/>
 	                      </Route>
 	                    </>
 	                  )
@@ -162,66 +194,132 @@ const Authentication = props => {
 }
 
 const SignIn = props => {
-	const [username, setUsername] = React.useState('');
-	const [password, setPassword] = React.useState('');
-	const [signin, setSignin] = React.useState( false );
+	const [user, setUser] = React.useState({ username: '', password: '', showPassword: false });
+	const [signingIn, setSigningIn] = React.useState( false );
 	const [role, setRole] = React.useState( props.role ?? 'student' );
+	const [btnMsg, setBtnMsg] = React.useState('sign me in');
+	const [errMsg, setErrMsg] = React.useState( null );
 
-	const handleUsername = e => {
-		// setUsername( )
-		setUsername( e.target.value );
+	const handleClickShowPassword = () => {
+		setUser({
+		  ...user,
+		  showPassword: !user.showPassword,
+		});
+	};
+
+	const handleMouseDownPassword = event => {
+		event.preventDefault();
+	};
+
+	const setUsername = e => {
+		setUser(user => ({
+			username: e.target.value,
+			password: user.password,
+			showPassword: user.showPassword
+		}));
 	}
 
-	const handlePassword = e => {
-		// setUsername( )
-		setPassword( e.target.value );
+	const setPassword = e => {
+		setUser(user => ({
+			username: user.username,
+			password: e.target.value,
+			showPassword: user.showPassword
+		}));
 	}
 
 	const handleSignin = async () => {
-		setSignin( true );
+		setBtnMsg('loading');
+		setSigningIn( true );
 	}
 
 	React.useEffect(() => {
-		if( signin ){
-			axios.post('http://localhost:3000/sign-in', { username, password })
+		if( signingIn ){
+			axios.post('http://localhost:3000/sign-in', { username: user.username, password: user.password })
 			.then( res => {
 				Cookies.set('token', res.data.accessToken);
 				Cookies.set('rtoken', res.data.refreshToken);
 
-				props.setRole( res.data.role );
-				props.setView( res.data.path );
+				props.tools.setRole(() => res.data.role);
+				props.tools.setAllow(() => true);
+				props.tools.setView(() => res.data.path);
 
-				setSignin( false );
+				setSigningIn( false );
 			})
 			.catch( err => {
-				setSignin( false );
+				setErrMsg( err?.response?.data?.message );
+				setSigningIn( false );
+				setBtnMsg('sign me in');
 			})
 		}
-	}, [signin, username, password]);
+	}, [signingIn, user]);
 
 	return(
-		<div className="auth-wrapper">
-			<div className="auth-content">
-				<div className="card">
-					<div className="row align-items-center text-center">
-						<div className="col-md-12">
-							<div className="card-body">
-								<h4 className="mb-3 f-w-400">Signin</h4>
-								<div className="form-group mb-3">
-									<label className="floating-label" htmlFor="Email">Email address</label>
-									<input onChange={handleUsername} type="text" className="form-control" id="Email" placeholder=""/>
-								</div>
-								<div className="form-group mb-4">
-									<label className="floating-label" htmlFor="Password">Password</label>
-									<input onChange={handlePassword} type="password" className="form-control" id="Password" placeholder=""/>
-								</div>
-								
-								<button onClick={handleSignin} className="btn btn-block btn-primary mb-4">Signin</button>
-							</div>
-						</div>
-					</div>
-				</div>
+		<div 
+			style={{ width: '100%', height: '100vh' }} 
+			className="sign-in d-flex flex-column justify-content-center align-items-center"
+		>
+			{
+				errMsg 
+					? <Alert variant="outlined" severity="error">
+						{ errMsg }
+					</Alert> 
+					: null
+			}
+			<div className="d-flex justify-content-center">
+				<Typography 
+					variant="h3" 
+					sx={{ 
+						color: 'black', 
+						fontFamily: 'Poppins',
+						letterSpacing: '5px'
+					}}
+				>
+					SIGN-IN
+				</Typography>
 			</div>
+			<br/>
+			<div 
+				style={{
+					width: '100%',
+					height: '30%'
+				}} 
+				className="d-flex flex-column justify-content-around align-items-center"
+			>
+				<TextField sx={{width: '25ch' }} onChange={setUsername} id="sign-in-uname" label="username" variant="outlined" />
+				<Divider/>
+				<FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
+					<InputLabel htmlFor="sign-in-pass">Password</InputLabel>
+					<OutlinedInput 
+						id="outlined-adornment-password" 
+						type={ user.showPassword ? "text" : "password" }
+						value={ user.password } 
+						onChange={setPassword} 
+						endAdornment={
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="toggle password visibility"
+                  onClick={handleClickShowPassword}
+                  onMouseDown={handleMouseDownPassword}
+                  edge="end"
+                >
+                  { user.showPassword ? <VisibilityOff sx={{ color: 'black' }}/> : <Visibility sx={{ color: 'black' }}/> }
+                </IconButton>
+              </InputAdornment>
+            }
+					/>
+				</FormControl>
+				<div className="d-flex flex-row justify-content-between align-items-center"> 
+					<Button 
+						onClick={handleSignin} 
+						disabled={ btnMsg === 'loading' ? true : false } 
+						sx={{borderColor: 'black', color: 'black'}} 
+						variant="outlined"
+						autoFocus
+					> 
+						{ btnMsg } 
+					</Button>
+				</div>
+			</div>			
 		</div>
 	);
 }

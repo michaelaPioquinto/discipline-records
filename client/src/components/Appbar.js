@@ -1,6 +1,7 @@
 import React from 'react';
 import uniqid from 'uniqid';
-
+import axios from 'axios';
+import Cookies from 'js-cookie';
 
 import { styled, alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -103,6 +104,19 @@ const Appbar = props => {
 		setMobileMoreAnchorEl(event.currentTarget);
 	};
 
+	const handleSignout = async () => {
+		axios.delete('http://localhost:3000/sign-out')
+		.then(() => {
+			Cookies.remove('token');
+			Cookies.remove('rtoken');
+
+			props.tools.setView('/sign-in')
+		})
+		.catch( err => {
+			setTimeout(() => handleSignout(), 5000);
+		});
+	}
+
 	const mobileMenuId = 'primary-search-account-menu-mobile';
 	const renderMobileMenu = (
 		<Menu
@@ -139,10 +153,11 @@ const Appbar = props => {
 						aria-controls="primary-search-account-menu"
 						aria-haspopup="true"
 						color="inherit"
+						onClick={handleSignout}
 					>
 						<MeetingRoomIcon/>
 					</IconButton>
-					<p>Logout</p>
+					<p>Sign-out</p>
 				</Stack>
 			</MenuItem>
 		</Menu>
@@ -167,7 +182,7 @@ const Appbar = props => {
 	    >
 	    	<Stack sx={{padding: '2px 10px 2px 10px'}}>
 		     	<MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-		     	<MenuItem onClick={handleMenuClose}>Sign-out</MenuItem>
+		     	<MenuItem onClick={handleSignout}>Sign-out</MenuItem>
 	    	</Stack>
 	    </Menu>
 	);
@@ -182,7 +197,7 @@ const Appbar = props => {
 	    >
 			<List>
 				{props?.listItems?.map?.((item, index) => (
-					<ListItem button onClick={item.onClick}>
+					<ListItem key={uniqid()} button onClick={item.onClick}>
 						<ListItemIcon>
 							<ArrowForwardIosIcon fontSize="small" />
 						</ListItemIcon>
@@ -195,8 +210,8 @@ const Appbar = props => {
 	
 	return(
 		<>
-			<AppBar position="static" sx={{ backgroundColor: 'black' }}>
-		        <Toolbar>
+			<AppBar id="main-app-bar" position="static" sx={{ backgroundColor: 'black !important', color: 'white !important' }}>
+	        <Toolbar>
 					<IconButton
 						size="large"
 						edge="start"
@@ -219,24 +234,24 @@ const Appbar = props => {
 						<SearchIconWrapper>
 						  <SearchIcon />
 						</SearchIconWrapper>
-					<StyledInputBase
-						placeholder="Search…"
-						inputProps={{ 'aria-label': 'search' }}
-					/>
+						<StyledInputBase
+							placeholder="Search…"
+							inputProps={{ 'aria-label': 'search' }}
+						/>
 					</Search>
 					<Box sx={{ flexGrow: 1 }} />
 					<Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-					<IconButton
-						size="large"
-						edge="end"
-						aria-label="account of current user"
-						aria-controls={menuId}
-						aria-haspopup="true"
-						onClick={handleProfileMenuOpen}
-						color="inherit"
-					>
-						<AccountCircle />
-					</IconButton>
+						<IconButton
+							size="large"
+							edge="end"
+							aria-label="account of current user"
+							aria-controls={menuId}
+							aria-haspopup="true"
+							onClick={handleProfileMenuOpen}
+							color="inherit"
+						>
+							<AccountCircle />
+						</IconButton>
 					</Box>
 					<Box sx={{ display: { xs: 'flex', md: 'none' } }}>
 						<IconButton
@@ -255,13 +270,13 @@ const Appbar = props => {
 		    {renderMobileMenu}
 		    {renderMenu}
 		    <Drawer
-	            anchor="left"
-	            open={drawer}
-	            onClose={toggleDrawer(false)}
-	        >
-	            { list() }
-	        </Drawer>
-	        { props.children }
+          anchor="left"
+          open={drawer}
+          onClose={toggleDrawer(false)}
+        >
+            { list() }
+        </Drawer>
+        { props.children }
 		</>
 	)
 }

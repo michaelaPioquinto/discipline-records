@@ -11,3 +11,24 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.App{
+  background-color: #f8c291;
+  width:  100vw;
+  height:  100vh;
+  overflow: hidden;
+}
+
+.sign-in{
+  color: black !important;
+}
+
+.item{
+  transition: 0.2s ease-in-out;
+}
+
+.item:hover{
+  cursor: pointer;
+  opacity: 0.6;
+}
+
