@@ -6,9 +6,12 @@ import TableSkeleton from '../components/TableSkeleton';
 
 import LinearProgress from '@mui/material/LinearProgress';
 
+const MakeReport = React.lazy(() => import('./pages/admin-staff/MakeReport'));
 const Dashboard = React.lazy(() => import('./pages/admin-staff/Dashboard'));
 const Violation = React.lazy(() => import('./pages/admin-staff/Violation'));
 const Accounts = React.lazy(() => import('./pages/admin-staff/Accounts'));
+const Archived = React.lazy(() => import('./pages/admin-staff/Archived'));
+
 
 const AdminStaff = props => {
 	const [content, setContent] = React.useState({ name: 'Dashboard', cont: <Dashboard/> });
@@ -22,6 +25,8 @@ const AdminStaff = props => {
 					{ title: 'Dashboard', onClick: () => content.name === 'Dashboard' ? null : setContent({ name: 'Dashboard', cont: <Dashboard/> }) },
 					{ title: 'Violation', onClick: () =>  content.name === 'Validation' ? null : setContent({ name: 'Violation', cont: <Violation/> })},
 					{ title: 'Account', onClick: () => content.name === 'Account' ? null : setContent({ name: 'Account', cont: <Accounts/> }) },
+					{ title: 'Make Report', onClick: () => content.name === 'Make Report' ? null : setContent({ name: 'Make Report', cont: <MakeReport/> }) },
+					{ title: 'Archived', onClick: () => content.name === 'Archived' ? null : setContent({ name: 'Archived', cont: <Archived/> }) },
 					// { title: 'Statistical', onClick: () => content.name === 'Statistical' ? null : setContent({ name: 'Statistical', cont: <Statistical/> }) },
 					// { title: 'Handbook', onClick: () => content.name === 'Handbook' ? null : setContent({ name: 'Handbook', cont: <Handbook/> }) },
 				]}

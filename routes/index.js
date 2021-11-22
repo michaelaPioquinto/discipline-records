@@ -260,11 +260,16 @@ router.put('/edit-violation/:id', async ( req, res ) => {
 // ================= GLOBAL ACCESS ==================
 
 router.get('/student-data', async( req, res ) => {
-	Student.find({}, (err, doc) => {
-		if( err ) return res.sendStatus( 503 );
+	try{
+    const result = await Student.find().$where(function() {
+      return this.archived.isArchived === false;
+    });
 
-		return res.json( doc );
-	});
+		return res.json( result );
+  }
+  catch( err ){
+    return res.sendStatus( 503 );
+  }
 });
 
 router.put('/change-user-status', async( req, res ) => {
@@ -291,7 +296,7 @@ router.delete('/delete-user/:username', async( req, res ) => {
 
 router.get('/accounts/admin', async( req, res ) => {
   try{
-    let result = await User.find().$where(function() {
+    const result = await User.find().$where(function() {
       return this.role === 'sysadmin' || this.role === 'adminstaff';
     });
 
@@ -333,16 +338,16 @@ router.get('/accounts/system-admin', async( req, res ) => {
 
 
 // =============== ADMINISTRATOR STAFF =================
-
 router.put('/archive-student', async( req, res ) => {
-  console.log( req.body );
   Student.findOne({ studentID: req.body.studentID }, async (err, doc) => {
     if( err ) return res.sendStatus( 503 );
 
-    console.log( doc );
     if( doc ){
-      console.log( !doc.archived );
-      doc.archived = !doc.archived;
+      const isArchived = doc.archived.isArchived;
+      doc.archived = {
+        isArchived: !isArchived,
+        year: new Date().getFullYear()
+      };
 
       try{
         await doc.save();
@@ -359,8 +364,51 @@ router.put('/archive-student', async( req, res ) => {
   })
 });
 
+
+router.put('/unarchive-student', async( req, res ) => {
+  Student.findOne({ studentID: req.body.studentID }, async (err, doc) => {
+    if( err ) return res.sendStatus( 503 );
+
+    if( doc ){
+      const isArchived = doc.archived.isArchived;
+      doc.archived = {
+        isArchived: !isArchived,
+        year: new Date().getFullYear()
+      };
+
+      try{
+        await doc.save();
+        return res.sendStatus( 200 );
+      }
+      catch( err ) {
+        throw err
+        return res.sendStatus( 503 );
+      }
+    }
+    else{
+      return res.sendStatus( 404 );
+    }
+  })
+});
+
+
+router.get('/archived-students', async( req, res ) => {
+  try{
+    const result = await Student.find().$where(function() {
+      return this.archived.isArchived === true;
+    });
+
+    return res.json( result );
+  }
+  catch (err) {
+    console.log( err );
+    return res.sendStatus( 503 );
+  }
+});
+
+
+
 router.post('/create-student', async( req, res ) => {
-  console.log( req.body );
   Student.create({ ...req.body }, err => {
     if( err ) throw err;
 
@@ -368,16 +416,18 @@ router.post('/create-student', async( req, res ) => {
   });
 });
 
-router.put('/edit-student/:studentID', async( req, res ) => {
-  User.findOneAndUpdate({ studentID: req.params.studentID }, { ...req.body }, err => {
+
+router.put('/edit-student/:id', async( req, res ) => {
+  Student.findOneAndUpdate({ _id: req.params.id }, { ...req.body }, err => {
     if( err ) return res.sendStatus( 503 );
 
     return res.sendStatus( 200 );
   });
 });
 
-router.delete('/delete-student/:studentID', async( req, res ) => {
-  Student.deleteOne({ studentID: req.params.studentID }, err => {
+
+router.delete('/delete-student/:id', async( req, res ) => {
+  Student.deleteOne({ _id: req.params.id }, err => {
     if( err ) return res.sendStatus( 503 );
 
     return res.sendStatus( 200 );

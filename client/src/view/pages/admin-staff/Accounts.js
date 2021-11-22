@@ -23,6 +23,8 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
 
+import TableRow from '@mui/material/TableRow';
+import TableCell from '@mui/material/TableCell';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -31,11 +33,13 @@ import UnarchiveIcon from '@mui/icons-material/Unarchive';
 import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
 
+
+import Table from '../../../components/Table';
+
 const Item = props => {
-	const [archive, setArchive] = React.useState( props.archived );
+	const [bgColor, setBgColor] = React.useState('white');
 
 	const handleArchive = e => {
-		setArchive( archive => !archive );
 		debouncedChangeStatus();
 	}
 
@@ -52,63 +56,24 @@ const Item = props => {
 	const debouncedChangeStatus = debounce(changeStatus, 500);
 
 	return(
-		<>
-			<div id="account-item" style={{ width: '100%' }} className="rounded item" onDoubleClick ={() => props.onDoubleClick ({ editingMode: true, ...props })}>
-				<Paper elevation={2} sx={{ backgroundColor: 'rgba(0, 0, 0, 0.1)' }}>
-					<Stack 
-						direction="row" 
-						alignItems="center" 
-						justifyContent="center"
-						sx={{ height: '45px' }}
-					>
-						<div className="col-1">
-							<p className="p-0 m-0"> { props.studentID } </p>
-						</div>
-
-						<div className="col-2">
-							<p className="p-0 m-0"> { props.firstName } </p>
-						</div>
-
-						<div className="col-2">
-							<p className="p-0 m-0"> { props.lastname } </p>
-						</div>
-
-						<div className="col-2">
-							<p className="p-0 m-0"> { props.middleName } </p>
-						</div>
-
-						<div className="col-1">
-							<p className="p-0 m-0"> { props.course } </p>
-						</div>
-
-						<div className="col-2">
-							<p className="p-0 m-0"> { props.yearSection } </p>
-						</div>
-
-						<div className="col-2">
-							{
-								!archive
-									? (
-										<Button variant="outlined" onClick={handleArchive} startIcon={<ArchiveIcon fontSize="small"/>}>
-											Archive
-										</Button>
-									)
-									: (
-										<Button 
-											variant="outlined" 
-											onClick={handleArchive} sx={{ color: 'black', borderColor: 'black' }} 
-											startIcon={<UnarchiveIcon sx={{ color: 'black' }} 
-											fontSize="small"/>}
-										>
-											Unarchive
-										</Button>
-									)
-							}
-						</div>
-					</Stack>
-				</Paper>
-			</div>
-		</>
+		<TableRow 
+			sx={{ backgroundColor: bgColor, transition: '.1s ease-in-out' }} 
+			onPointerEnter={() => setBgColor('rgba(0, 0, 0, 0.2)')}
+			onPointerLeave={() => setBgColor('white')}
+			onDoubleClick={() => props.onDoubleClick({ editingMode: true, ...props })}
+		>
+			<TableCell> { props.studentID } </TableCell>
+			<TableCell> { props.firstName } </TableCell>
+			<TableCell> { props.lastname } </TableCell>
+			<TableCell> { props.middleName } </TableCell>
+			<TableCell> { props.course } </TableCell>
+			<TableCell> { props.yearSection } </TableCell>
+			<TableCell> 
+				<IconButton onClick={() => handleArchive( props.studentID )}>
+					<ArchiveIcon fontSize="small"/>
+				</IconButton>
+			</TableCell>
+		</TableRow>
 	);
 }
 
@@ -122,7 +87,7 @@ const Accounts = props => {
 	const fetchAccounts = async () => {
 		axios.get('http://localhost:3000/student-data')
 		.then( res => {
-			setAccounts( res.data );
+			setAccounts([ ...res.data ]);
 		})
 		.catch( err => {
 			setTimeout(() => fetchAccounts(), 5000);
@@ -162,78 +127,13 @@ const Accounts = props => {
 	}, [addForm]);
 
 	return(
-		<div style={{ width: '100%', height: '80vh', overflowX: 'auto'}} className="p-3 text-center">
-			<Paper 
-				elevation={3} 
-				sx={{ 
-					backgroundColor: 'rgba(0, 0, 0, 0.8)', 
-					color: 'white',
-					width: '100%', 
-					height: '50px', 
-					padding: '10px',
-					marginBottom: '10px',
-				}}
-			>
-				<Stack
-					direction="row" 
-					divider={
-						<Divider 
-							sx={{ width: 2, height: '30px !important' }} 
-							orientation="vertical" 
-							flexItem 
-						/>
-					} 
-					justifyContent="center"
-					alignItems="center"
-				>	
-					<div className="col-1">
-						<Typography variant="h6">
-							ID
-						</Typography>
-					</div>
-					
-					<div className="col-2">
-						<Typography variant="h6">
-							First Name
-						</Typography>
-					</div>
-					
-					<div className="col-2">
-						<Typography variant="h6">
-							Middle Name
-						</Typography>
-					</div>
-					
-					<div className="col-2">
-						<Typography variant="h6">
-							Last Name
-						</Typography>
-					</div>
-
-					<div className="col-1">
-						<Typography variant="h6">
-							Course
-						</Typography>
-					</div>
-
-					<div className="col-2">
-						<Typography variant="h6">
-							Year & Section
-						</Typography>
-					</div>
-
-					<div className="col-2">
-						<Typography variant="h6">
-							Archive
-						</Typography>
-					</div>
-				</Stack>
-			</Paper>
-			<div style={{ width: '100%', height: '90%', overflowY: 'auto' }}>
-				<Stack spacing={1}>
-					{ items }
-				</Stack>
-			</div>
+		<div style={{ width: '100%', height: '80vh', overflow: 'hidden'}} className="p-3 text-center">
+			<Table
+				maxHeight={ 500 }
+				style={{ width: '100%' }}
+				head={['ID', 'First Name', 'Middle Name', 'Last Name', 'Course', 'Year & Section', 'Archive']}
+				content={ items }
+			/>
 			<AddUser 
 				open={addForm} 
 				setOpen={handleAddForm}
@@ -261,7 +161,7 @@ const AddUser = props => {
 	const [password, setPassword] = React.useState( props.password ?? '' );
 	const [yearSection, setYearSection] = React.useState( props.yearSection ?? '' );
 	const [course, setCourse] = React.useState( props.course ?? '' );
-	const [archived, setArchived] = React.useState( props.archived ?? false );
+	const [archived, setArchived] = React.useState( props.archived ?? { isArchived: false, date: new Date().getFullYear() });
 
 	const { enqueueSnackbar } = useSnackbar();
 
@@ -402,11 +302,11 @@ const AddUser = props => {
 									<Button 
 										autoFocus
 										onClick={() => {
-											axios.delete(`http://localhost:3000/delete-student/${ studentID }`)
+											axios.delete(`http://localhost:3000/delete-student/${ props._id }`)
 											.then(() => {
 												props.fetchAccounts();
 												props.setOpen();
-												enqueueSnackbar('Successfully deleted a user', { variant: 'success' });
+												enqueueSnackbar('Successfully deleted a student', { variant: 'success' });
 											})
 											.catch(() => {
 												enqueueSnackbar('Please try again', { variant: 'error' });
@@ -418,7 +318,7 @@ const AddUser = props => {
 									<Button 
 										autoFocus
 										onClick={() => {
-											axios.put(`http://localhost:3000/edit-student/${ studentID }`, { 
+											axios.put(`http://localhost:3000/edit-student/${ props._id }`, { 
 												studentID, 
 												firstName, 
 												lastname: lastName, 
@@ -431,7 +331,7 @@ const AddUser = props => {
 											.then(() => {
 												props.fetchAccounts();
 												props.setOpen();
-												enqueueSnackbar('Successfully edited a user', { variant: 'success' });
+												enqueueSnackbar('Successfully edited a student', { variant: 'success' });
 											})
 											.catch(() => {
 												enqueueSnackbar('Please try again', { variant: 'error' });

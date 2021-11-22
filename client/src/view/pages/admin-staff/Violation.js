@@ -22,40 +22,18 @@ import { useTheme } from '@mui/material/styles';
 
 import { useSnackbar } from 'notistack';
 
-const Item = props => {
-  return(
-    <>
-      <div style={{ width: '100%' }} className="rounded">
-        <Paper elevation={2} sx={{ backgroundColor: 'rgba(0, 0, 0, 0.1)' }}>
-          <Stack 
-            direction="row" 
-            alignItems="center" 
-          >
-            <div style={{ height: '40px' }} className="col-2 text-center d-flex justify-content-center align-items-center">
-              <p className="p-0 m-0"> { props.id } </p>
-            </div>
+import Table from '../../../components/Table';
+import TableRow from '@mui/material/TableRow';
+import TableCell from '@mui/material/TableCell';
 
-            <div style={{ height: '40px' }} className="col-4 text-center d-flex justify-content-center align-items-center">
-              <p className="p-0 m-0"> { props.violationName } </p>
-            </div>
-
-            <div style={{ height: '40px' }} className="col-2 text-center d-flex justify-content-center align-items-center">
-              <p className="p-0 m-0"> { props.firstOffense } </p>
-            </div>
-
-            <div style={{ height: '40px' }} className="col-2 text-center d-flex justify-content-center align-items-center">
-              <p className="p-0 m-0"> { props.secondOffense } </p>
-            </div>
-
-            <div style={{ height: '40px' }} className="col-2 text-center d-flex justify-content-center align-items-center">
-              <p className="p-0 m-0"> { props.thirdOffense } </p>
-            </div>
-          </Stack>
-        </Paper>
-      </div>
-    </>
-  );
-}
+const Item = props => (
+  <TableRow>
+      <TableCell> { props.violationName } </TableCell>
+      <TableCell> { props.firstOffense } </TableCell>
+      <TableCell> { props.secondOffense } </TableCell>
+      <TableCell> { props.thirdOffense } </TableCell>
+  </TableRow>
+);
 
 const Violation = props => {
 	const [violationList, setViolationList] = React.useState([]);
@@ -111,7 +89,6 @@ const Violation = props => {
 	// 		let modifiedViolations = violationList.filter( viol => viol.id !== deleteViol.id );
 
 	// 		if( modifiedViolations.length ){
-	// 			setViolationList([ ...modifiedViolations ]);
 	// 		}
 
 	// 		setDeleteViol( null );
@@ -120,73 +97,20 @@ const Violation = props => {
 
 	return(
 		<div style={{ width: '100%', height: '80vh' }} className="p-3 d-flex flex-column">
-			<Paper 
-        elevation={3} 
-        sx={{ 
-          backgroundColor: 'rgba(0, 0, 0, 0.8)', 
-          color: 'white',
-          width: '100%', 
-          height: '50px', 
-          padding: '10px',
-          marginBottom: '10px',
-        }}
-      >
-        <Stack
-          direction="row" 
-          divider={
-            <Divider 
-              sx={{ width: 2, alignSelf: 'stretch', height: '30px !important' }} 
-              orientation="vertical" 
-              flexItem 
+      <Table
+        style={{ width: '100%' }}
+        maxWidth={580}
+        head={['Violation Name', 'First Offense', 'Second Offense', 'Third Offense']}
+        content={
+          violationList.map( item => (
+            <Item
+              key={uniqid()}
+              onClick={setEditForm}
+              {...item}
             />
-          } 
-          spacing={0}
-          alignItems="center"
-        > 
-          <div className="col-2 text-center">
-            <p className="db-table-header-label m-0 p-0">
-              ID
-            </p>
-          </div>
-          
-          <div className="col-4 text-center">
-            <p className="db-table-header-label m-0 p-0">
-              Violation Name
-            </p>
-          </div>
-
-          <div className="col-2 text-center">
-            <p className="db-table-header-label m-0 p-0">
-              First Offense
-            </p>
-          </div>
-
-          <div className="col-2 text-center">
-            <p className="db-table-header-label m-0 p-0">
-              Second Offense
-            </p>
-          </div>
-
-          <div className="col-2 text-center">
-            <p className="db-table-header-label m-0 p-0">
-              third Offense
-            </p>
-          </div>
-        </Stack>
-      </Paper>
-      <div style={{ width: '100%', height: '90%' }}>
-          <Stack spacing={1}>
-            {
-              violationList.map( item => (
-                <Item
-                	key={uniqid()}
-                  onClick={setEditForm}
-                  {...item}
-                />
-              ))
-            }
-          </Stack>
-      </div>
+          ))
+        }
+      />
 		</div>
 	)
 }

@@ -22,46 +22,32 @@ import Skeleton from '@mui/material/Skeleton';
 import Paper from '@mui/material/Paper';
 import Divider from '@mui/material/Divider';
 
+import Table from '../../../components/Table';
 import TableSkeleton from '../../../components/TableSkeleton';
 
+import TableRow from '@mui/material/TableRow';
+import TableCell from '@mui/material/TableCell';
+
 const Item = props => {
+  const [bgColor, setBgColor] = React.useState('white');
+
   return(
-    <>
-      <div style={{ width: '100%' }} className="rounded item" onDoubleClick={() => props.onClick({ isOpen: true, item: {...props} })}>
-        <Paper elevation={2} sx={{ backgroundColor: 'rgba(0, 0, 0, 0.1)' }}>
-          <Stack 
-            direction="row" 
-            alignItems="center" 
-          >
-            <div style={{ height: '40px' }} className="col-2 text-center d-flex justify-content-center align-items-center">
-              <p className="p-0 m-0"> { props.studentID } </p>
-            </div>
-
-            <div style={{ height: '40px' }} className="col-2 text-center d-flex justify-content-center align-items-center">
-              <p className="p-0 m-0"> { props.firstName } </p>
-            </div>
-
-            <div style={{ height: '40px' }} className="col-2 text-center d-flex justify-content-center align-items-center">
-              <p className="p-0 m-0"> { props.lastname } </p>
-            </div>
-
-            <div style={{ height: '40px' }} className="col-2 text-center d-flex justify-content-center align-items-center">
-              <p className="p-0 m-0"> { props.middleName } </p>
-            </div>
-
-            <div style={{ height: '40px' }} className="col-2 text-center d-flex justify-content-center align-items-center">
-              <p className="p-0 m-0"> { props.course } </p>
-            </div>
-
-            <div style={{ height: '40px' }} className="col-2 text-center d-flex justify-content-center align-items-center">
-              <p className="p-0 m-0"> { props.yearSection } </p>
-            </div>            
-          </Stack>
-        </Paper>
-      </div>
-    </>
+    <TableRow
+      sx={{ backgroundColor: bgColor, transition: '.1s ease-in-out' }} 
+      onPointerEnter={() => setBgColor('rgba(0, 0, 0, 0.2)')}
+      onPointerLeave={() => setBgColor('white')}
+      onDoubleClick={() => props.onClick({ isOpen: true, item: {...props} })}
+    >
+      <TableCell> { props.studentID } </TableCell>
+      <TableCell> { props.firstName } </TableCell>
+      <TableCell> { props.lastname } </TableCell>
+      <TableCell> { props.middleName } </TableCell>
+      <TableCell> { props.course } </TableCell>
+      <TableCell> { props.yearSection } </TableCell>
+    </TableRow>
   );
 }
+
 
 const Dashboard = props => {
 	// Fetch user data
@@ -93,79 +79,20 @@ const Dashboard = props => {
 	return(
 		<div style={{ width: '100%', height: 'fit-content' }}>
       <div style={{ width: '100%', height: '100%' }} className="d-flex flex-column justify-content-center align-items-start p-1">
-        <Paper 
-          elevation={3} 
-          sx={{ 
-            backgroundColor: 'rgba(0, 0, 0, 0.8)', 
-            color: 'white',
-            width: '100%', 
-            height: '50px', 
-            padding: '10px',
-            marginBottom: '10px',
-          }}
-        >
-          <Stack
-            direction="row" 
-            divider={
-              <Divider 
-                sx={{ width: 2, alignSelf: 'stretch', height: '30px !important' }} 
-                orientation="vertical" 
-                flexItem 
+        <Table
+          style={{ width: '100%' }}
+          maxHeight={ 580 }
+          head={['Student ID', 'First Name', 'Last Name', 'Middle Name', 'Course', 'Year & Section']}
+          content={
+            row.map( item => (
+              <Item
+                key={uniqid()}
+                onClick={setEditForm}
+                {...item}
               />
-            } 
-            spacing={0}
-            alignItems="center"
-          > 
-            <div className="col-2 text-center">
-              <p className="db-table-header-label m-0 p-0">
-                Student ID
-              </p>
-            </div>
-            
-            <div className="col-2 text-center">
-              <p className="db-table-header-label m-0 p-0">
-                First Name
-              </p>
-            </div>
-
-            <div className="col-2 text-center">
-              <p className="db-table-header-label m-0 p-0">
-                Last Name
-              </p>
-            </div>
-
-            <div className="col-2 text-center">
-              <p className="db-table-header-label m-0 p-0">
-                Middle Name
-              </p>
-            </div>
-
-            <div className="col-2 text-center">
-              <p className="db-table-header-label m-0 p-0">
-                Course
-              </p>
-            </div>
-
-            <div className="col-2 text-center">
-              <p className="db-table-header-label m-0 p-0">
-                Year & Section
-              </p>
-            </div>
-          </Stack>
-        </Paper>
-        <div style={{ width: '100%', height: '100%' }}>
-            <Stack spacing={1}>
-              {
-                row.map( item => (
-                  <Item
-                    key={uniqid()}
-                    onClick={setEditForm}
-                    {...item}
-                  />
-                ))
-              }
-            </Stack>
-        </div>
+            ))
+          }
+        />
         <StudentForm setOpen={setOpen} item={editForm.item} isOpen={editForm.isOpen} />
       </div>
 		</div>

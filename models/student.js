@@ -9,7 +9,7 @@ const studentSchema = new Schema({
 	password: { type: String, required: true },
 	course: { type: String, required: true },
 	yearSection: { type: String, required: true },
-	archived: { type: Boolean, required: true }
+	archived: { isArchived: Boolean, year: String }
 });
 
 

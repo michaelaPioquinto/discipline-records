@@ -3,12 +3,26 @@ const { Schema } = mongoose;
 
 
 const reportsSchema = new Schema({
-	studentID: { type: String, required: true },
-	duty: { type: String, required: true },
-	report: { type: String, required: true },
-	evidence: { type: String, required: true },
-	year: { type: String, required: true },
-	semester: { type: String, required: true }
+	reportedBy: String,
+	role: String,
+	dateOfReport: String,
+	incidentNo: Number,
+	studentName: String,
+	dateOfIncident: String,
+	courseYearSection: String,
+	timeOfIncident: String,
+	location: String,
+	specificArea: String,
+	images: [ String ],
+	additionalPersonInvolved: String,
+	witnesses: String,
+	incidentDescription: String,
+	descriptionOfUnacceptable: String,
+	resultingActionExecuted: String,
+	employeeName: String,
+	employeeDate: String,
+	headName: String,
+	headDate: String
 });
 
 
