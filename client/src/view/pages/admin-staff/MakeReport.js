@@ -1,4 +1,6 @@
 import React from 'react';
+import axios from 'axios';
+import uniqid from 'uniqid';
 
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -6,6 +8,9 @@ import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
 import Chip from '@mui/material/Chip';
 import { styled } from '@mui/material/styles';
+import { useSnackbar } from 'notistack';
+
+import ImageUpload from '../../../components/ImageUpload';
 
 const Root = styled('div')(({ theme }) => ({
   width: '100%',
@@ -15,7 +20,160 @@ const Root = styled('div')(({ theme }) => ({
   },
 }));
 
+const renderDate = date => {
+	if( !date ) return '';
+
+	const _parsedDate = new Date( date );
+	const _date = _parsedDate.getDate();
+	const _month = _parsedDate.getMonth() + 1;
+	const _year = _parsedDate.getFullYear();
+
+	return `${_year}-${_month}-${_date}`;
+}
+
 const MakeReport = props => {
+  const { enqueueSnackbar } = useSnackbar();
+  const [button, setButton] = React.useState({ msg: 'Submit', isDisabled: false });
+
+  const [image, setImage] = React.useState( null );
+	const initState = {
+		reportedBy: '', 
+		role: '', 
+		dateOfReport: '', 
+		incidentNo: '', 
+		studentName: '', 
+		dateOfIncident: '', 
+		courseYrSection: '', 
+		timeOfIncident: '', 
+		location: '', 
+		specificAreaLocation: '', 
+		additionalPersonInvolved: '', 
+		witnesses: '', 
+		incidentDescription: '', 
+		images: [],
+		descriptionOfUnacceptable: '',
+		resultingActionExecuted: '',
+		employeeName: '',
+		date1: '',
+		chairpersonName: '',
+		date2: ''
+	}
+
+	const reducer = (state, action) => {
+		switch( action.type ){
+			case 'reportedBy':
+				state.reportedBy = action.data;
+				return state;
+
+			case 'role':
+				state.role = action.data;		
+				return state;
+
+			case 'dateOfReport':
+				state.dateOfReport = renderDate(action.data);
+				return state;
+
+			case 'incidentNo':
+				state.incidentNo = action.data;
+				return state;
+
+			case 'studentName':
+				state.studentName = action.data;
+				return state;
+
+			case 'dateOfIncident':
+				state.dateOfIncident = action.data;
+				return state;
+
+			case 'courseYrSection':
+				state.courseYrSection = renderDate(action.data);
+				return state;
+
+			case 'timeOfIncident':
+				state.timeOfIncident = action.data;
+				return state;
+
+			case 'location':
+				state.location = action.data;
+				return state;
+
+			case 'specificAreaLocation':
+				state.specificAreaLocation = action.data;
+				return state;
+
+			case 'additionalPersonInvolved':
+				state.additionalPersonInvolved = action.data;
+				return state;
+
+			case 'witnesses':
+				state.witnesses = action.data;
+				return state;
+
+			case 'incidentDescription':
+				state.incidentDescription = action.data;
+				return state;
+
+			case 'images':			
+				state.images = action.data ? ['/images/reports/' + action.data.name] : [];
+				return state;
+
+			case 'descriptionOfUnacceptable':
+				state.descriptionOfUnacceptable = action.data;
+				return state;
+
+			case 'resultingActionExecuted':
+				state.resultingActionExecuted = action.data;
+				return state;
+
+			case 'employeeName':
+				state.employeeName = action.data;
+				return state;
+
+			case 'date1':
+				state.date1 = renderDate( action.data );
+				return state;
+
+			case 'chairpersonName':
+				state.chairpersonName = action.data;
+				return state;
+
+			case 'date2':
+				state.date2 = renderDate( action.data );
+				return state;
+
+			default:
+				return state;
+		}
+	}
+
+	const handleSubmitReport = async() => {
+		setButton({ msg: 'Loading', isDisabled: true });
+
+		axios.post('http://localhost:3000/save-report', state)
+		.then( async res => {
+			if( image ){
+				const formData = new FormData();
+				formData.append('reportImage', image );
+
+				try{
+					await axios.post(`http://localhost:3000/save-report-image`, formData)
+				}
+				catch( err ){
+					throw err;
+				}				
+			}
+
+
+			setButton({ msg: 'Submit', isDisabled: false });
+			enqueueSnackbar( res.data.message, { variant: 'success' });
+		})
+		.catch( err => {
+			throw err;
+		});
+	}
+
+	const [state, dispatch] = React.useReducer( reducer, initState );
+
 	return(
 		<div style={{ width: '100%', height: '90%', overflowY: 'auto' }} className="d-flex flex-column align-items-center">
 			<div className="col-12 d-flex flex-column justify-content-start align-items-start p-5">
@@ -28,14 +186,14 @@ const MakeReport = props => {
 			<div className="row container-fluid d-flex justify-content-around align-items-center">
 				<div className="col-md-6 d-flex	justify-content-center align-items-center my-5">
 					<Stack spacing={2}>
-						<TextField sx={{ width: '300px' }} label="Reported By" variant="standard"/>
-						<TextField sx={{ width: '300px' }} label="Title/Role" variant="standard"/>
+						<TextField sx={{ width: '300px' }} label="Reported By" onChange={e => dispatch({ type: 'reportedBy', data: e.target.value })} variant="standard"/>
+						<TextField sx={{ width: '300px' }} label="Title/Role" onChange={e => dispatch({ type: 'role', data: e.target.value })} variant="standard"/>
 					</Stack>
 				</div>
 				<div className="col-md-6 d-flex	justify-content-center align-items-center my-5">
 					<Stack spacing={2}>
-						<TextField sx={{ width: '300px' }} helperText="Date of Report" type="date" variant="standard"/>
-						<TextField sx={{ width: '300px' }} label="Incident no." type="number" variant="standard"/>
+						<TextField sx={{ width: '300px' }} helperText="Date of Report" onChange={e => dispatch({ type: 'dateOfReport', data: e.target.value })} type="date" variant="standard"/>
+						<TextField sx={{ width: '300px' }} label="Incident no." onChange={e => dispatch({ type: 'incidentNo', data: e.target.value })} type="number" variant="standard"/>
 					</Stack>
 				</div>
 			</div>
@@ -49,33 +207,33 @@ const MakeReport = props => {
 			<div className="row container-fluid d-flex justify-content-around align-items-center">
 				<div className="col-md-6 d-flex	justify-content-center align-items-center my-5">
 					<Stack spacing={2}>
-						<TextField sx={{ width: '300px' }} label="Student Name" variant="standard"/>
-						<TextField sx={{ width: '300px' }} helperText="Date of Incident" type="date" variant="standard"/>
+						<TextField sx={{ width: '300px' }} onChange={e => dispatch({ type: 'studentName', data: e.target.value })} label="Student Name" variant="standard"/>
+						<TextField sx={{ width: '300px' }} onChange={e => dispatch({ type: 'dateOfIncident', data: e.target.value })} helperText="Date of Incident" type="date" variant="standard"/>
 					</Stack>
 				</div>
 				<div className="col-md-6 d-flex	justify-content-center align-items-center my-5">
 					<Stack spacing={2}>
-						<TextField sx={{ width: '300px' }} label="Course / Yr / Section" variant="standard"/>
-						<TextField sx={{ width: '300px' }} label="Time of Incident" variant="standard"/>
+						<TextField sx={{ width: '300px' }} onChange={e => dispatch({ type: 'courseYrSection', data: e.target.value })} label="Course / Yr / Section" variant="standard"/>
+						<TextField sx={{ width: '300px' }} onChange={e => dispatch({ type: 'timeOfIncident', data: e.target.value })} label="Time of Incident" variant="standard"/>
 					</Stack>
 				</div>
 			</div>
 
 			<div className="row d-flex flex-column justify-content-center align-items-center mb-5">
 				<div className="col-md-12 d-flex justify-content-center align-items-center">
-					<TextField sx={{ width: '80vw', margin: '10px' }} label="Location" variant="standard"/>
+					<TextField sx={{ width: '80vw', margin: '10px' }} onChange={e => dispatch({ type: 'location', data: e.target.value })} label="Location" variant="standard"/>
 				</div>
 
 				<div className="col-md-12 d-flex justify-content-center align-items-center">
-					<TextField sx={{ width: '80vw', margin: '10px' }} label="Specific Area of Location" variant="standard"/>
+					<TextField sx={{ width: '80vw', margin: '10px' }} onChange={e => dispatch({ type: 'specificAreaLocation', data: e.target.value })} label="Specific Area of Location" variant="standard"/>
 				</div>
 
 				<div className="col-md-12 d-flex justify-content-center align-items-center">
-					<TextField sx={{ width: '80vw', margin: '10px' }} label="Additional Person(s) Involved" variant="standard"/>
+					<TextField sx={{ width: '80vw', margin: '10px' }} onChange={e => dispatch({ type: 'additionalPersonInvolved', data: e.target.value })} label="Additional Person(s) Involved" variant="standard"/>
 				</div>
 
 				<div className="col-md-12 d-flex justify-content-center align-items-center">
-					<TextField sx={{ width: '80vw', margin: '10px' }} label="Witnesses" variant="standard"/>
+					<TextField sx={{ width: '80vw', margin: '10px' }} onChange={e => dispatch({ type: 'witnesses', data: e.target.value })} label="Witnesses" variant="standard"/>
 				</div>
 			</div>
 
@@ -87,13 +245,25 @@ const MakeReport = props => {
 					multiline
 					rows={10}
 					maxRows={4}
-					// value={value}
-					// onChange={handleChange}
+					onChange={e => dispatch({ type: 'incidentDescription', data: e.target.value })}
 					variant="filled"
         />
 
+				<Root>
+					<Divider textAlign="left">
+						<Chip label="UPLOAD IMAGE"/>
+					</Divider>
+				</Root>
 				
+				<ImageUpload imageLimit={1} getImages={ data => {
+					dispatch({ type: 'images', data: data?.[0] });
+					setImage( data?.[0] );
+				}}/>	
+				<br/>
 
+				<Root>
+					<Divider/>
+				</Root>
 
         <TextField
 					sx={{ width: '80vw', margin: '50px' }}
@@ -102,8 +272,7 @@ const MakeReport = props => {
 					multiline
 					rows={10}
 					maxRows={4}
-					// value={value}
-					// onChange={handleChange}
+					onChange={e => dispatch({ type: 'descriptionOfUnacceptable', data: e.target.value })}
 					variant="filled"
         />
 
@@ -114,8 +283,7 @@ const MakeReport = props => {
 					multiline
 					rows={10}
 					maxRows={4}
-					// value={value}
-					// onChange={handleChange}
+					onChange={e => dispatch({ type: 'resultingActionExecuted', data: e.target.value })}
 					variant="filled"
         />
 			</div>
@@ -123,49 +291,27 @@ const MakeReport = props => {
 			<div className="row container-fluid d-flex flex-column justify-content-center align-items-center">
 				<div className="row col-12 d-flex flex-row justify-content-around align-items-center m-3">
 					<div className="col-md-4 d-flex	justify-content-center	align-items-center">
-						<TextField sx={{ width: '7cm', margin: '5px' }} label="Faculty / Employee Name" variant="standard"/>
+						<TextField sx={{ width: '7cm', margin: '5px' }} onChange={e => dispatch({ type: 'employeeName', data: e.target.value })} label="Faculty / Employee Name" variant="standard"/>
 					</div>
 
 					<div className="col-md-4 d-flex justify-content-center align-items-center">
-						<TextField sx={{ width: '7cm', margin: '5px' }} helperText="Date" type="date" variant="standard"/>
+						<TextField sx={{ width: '7cm', margin: '5px' }} onChange={e => dispatch({ type: 'date1', data: e.target.value })} helperText="Date" type="date" variant="standard"/>
 					</div>
 				</div>
 
 				<div className="row col-12 d-flex flex-row justify-content-around align-items-center m-3">
 					<div className="col-md-5 d-flex justify-content-center align-items-center">
-						<TextField sx={{ width: '7cm', margin: '5px' }} label="Head / Chairperson Name" variant="standard"/>
+						<TextField sx={{ width: '7cm', margin: '5px' }} onChange={e => dispatch({ type: 'chairpersonName', data: e.target.value })} label="Head / Chairperson Name" variant="standard"/>
 					</div>
 
 					<div className="col-md-5 d-flex justify-content-center align-items-center">
-						<TextField sx={{ width: '7cm', margin: '5px' }} helperText="Date" type="date" variant="standard"/>
+						<TextField sx={{ width: '7cm', margin: '5px' }} onChange={e => dispatch({ type: 'date2', data: e.target.value })} helperText="Date" type="date" variant="standard"/>
 					</div>
 				</div>
-{/*
-				<Root>
-					<Divider textAlign="left">
-						<Chip label="OPTIONAL"/>
-					</Divider>
-				</Root>
-				<div className="row col-12 d-flex flex-row justify-content-around align-items-center m-3">
-					<div className="col-md-4 d-flex justify-content-center align-items-center">
-						<TextField sx={{ width: '7cm', margin: '5px' }} label="Student Name" variant="standard"/>
-					</div>
-
-					<div className="col-md-4 d-flex justify-content-center align-items-center">
-						<TextField sx={{ width: '7cm', margin: '5px' }} label="Student Signature" variant="standard"/>
-					</div>
-
-					<div className="col-md-4 d-flex justify-content-center align-items-center">
-						<TextField sx={{ width: '7cm', margin: '5px' }} helperText="Date" type="date" variant="standard"/>
-					</div>
-				</div>
-				<Root>
-					<Divider/>
-				</Root>
-*/}			</div>
+			</div>
 			<div className="d-flex justify-content-around align-items-center my-5">
-				<Button variant="outlined" color="success" sx={{ width: '150px' }}>
-				  Submit
+				<Button disabled={button.isDisabled} variant="outlined" color="success" sx={{ width: '150px' }} onClick={() => handleSubmitReport()}>
+				  { button.msg }
 				</Button>
 			</div>
 		</div>

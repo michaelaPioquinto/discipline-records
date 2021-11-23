@@ -81,7 +81,7 @@ const Dashboard = props => {
       <div style={{ width: '100%', height: '100%' }} className="d-flex flex-column justify-content-center align-items-start p-1">
         <Table
           style={{ width: '100%' }}
-          maxHeight={ 580 }
+          maxHeight={ 500 }
           head={['Student ID', 'First Name', 'Last Name', 'Middle Name', 'Course', 'Year & Section']}
           content={
             row.map( item => (

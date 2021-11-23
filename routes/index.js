@@ -3,7 +3,7 @@ require('dotenv').config();
 var express = require('express');
 var router = express.Router();
 var jwt = require('jsonwebtoken');
-
+var path = require('path');
 var Student = require('../models/student');
 var User = require('../models/user');
 var Sanction = require('../models/Sanction');
@@ -338,6 +338,27 @@ router.get('/accounts/system-admin', async( req, res ) => {
 
 
 // =============== ADMINISTRATOR STAFF =================
+router.post('/save-report', async( req, res ) => {
+  Report.create({ ...req.body }, err => {
+    if( err ) return res.sendStatus( 503 );
+
+    return res.json({ message: 'Successfully saved report!'});
+  });
+});
+
+router.post('/save-report-image', async( req, res ) => {
+  if( !req.files ) return res.status( 404 );
+  
+  const image = req.files.reportImage;
+  const destination = path.join(__dirname, '../client/public/images/reports', image.name);
+
+  image.mv( destination, err => {
+    if( err ) return res.sendStatus( 503 );
+
+    return res.sendStatus( 200 );
+  });
+});
+
 router.put('/archive-student', async( req, res ) => {
   Student.findOne({ studentID: req.body.studentID }, async (err, doc) => {
     if( err ) return res.sendStatus( 503 );

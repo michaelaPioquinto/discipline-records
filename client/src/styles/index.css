@@ -32,3 +32,17 @@ code {
   opacity: 0.6;
 }
 
+.pointer:hover{
+  cursor: pointer;
+}
+
+.no-scrollbar {
+  overflow-x: auto;
+}
+
+::-webkit-scrollbar { 
+    display: none; 
+}
+
+
+
