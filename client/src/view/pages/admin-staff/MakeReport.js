@@ -11,6 +11,7 @@ import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
 
 import ImageUpload from '../../../components/ImageUpload';
+import ChipList from '../../../components/ChipList';
 
 const Root = styled('div')(({ theme }) => ({
   width: '100%',
@@ -37,8 +38,10 @@ const MakeReport = props => {
 
   const [image, setImage] = React.useState( null );
 	const initState = {
+		studentID: '',
 		reportedBy: '', 
 		role: '', 
+		duty: [],
 		dateOfReport: '', 
 		incidentNo: '', 
 		studentName: '', 
@@ -61,12 +64,20 @@ const MakeReport = props => {
 
 	const reducer = (state, action) => {
 		switch( action.type ){
+			case 'studentID':
+				state.studentID = action.data;
+				return state;
+
 			case 'reportedBy':
 				state.reportedBy = action.data;
 				return state;
 
 			case 'role':
 				state.role = action.data;		
+				return state;
+
+			case 'duty':
+				state.duty = action.data;
 				return state;
 
 			case 'dateOfReport':
@@ -147,29 +158,42 @@ const MakeReport = props => {
 	}
 
 	const handleSubmitReport = async() => {
+		let isAllowed = true;
+
 		setButton({ msg: 'Loading', isDisabled: true });
 
-		axios.post('http://localhost:3000/save-report', state)
-		.then( async res => {
-			if( image ){
-				const formData = new FormData();
-				formData.append('reportImage', image );
-
-				try{
-					await axios.post(`http://localhost:3000/save-report-image`, formData)
-				}
-				catch( err ){
-					throw err;
-				}				
+		Object.keys({ ...state}).forEach( key => {
+			if( key !== 'images' && (!state[ key ] || !state[ key ].length) ){
+				isAllowed = false;
 			}
-
-
-			setButton({ msg: 'Submit', isDisabled: false });
-			enqueueSnackbar( res.data.message, { variant: 'success' });
-		})
-		.catch( err => {
-			throw err;
 		});
+
+		if( isAllowed ){
+			axios.post('http://localhost:3000/save-report', state)
+			.then( async res => {
+				if( image ){
+					const formData = new FormData();
+					formData.append('reportImage', image );
+
+					try{
+						await axios.post(`http://localhost:3000/save-report-image`, formData)
+					}
+					catch( err ){
+						throw err;
+					}				
+				}
+
+				setButton({ msg: 'Submit', isDisabled: false });
+				enqueueSnackbar( res.data.message, { variant: 'success' });
+			})
+			.catch( err => {
+				throw err;
+			});
+		}
+		else{
+			setButton({ msg: 'Submit', isDisabled: false });
+			return enqueueSnackbar( 'All fields must have a value', { variant: 'error' });
+		}
 	}
 
 	const [state, dispatch] = React.useReducer( reducer, initState );
@@ -199,9 +223,9 @@ const MakeReport = props => {
 			</div>
 			
 			<div style={{ color: 'white' }} className="col-11 bg-dark py-1 d-flex justify-content-center align-items-center rounded">
-				<h5 className="text-uppercase p-0 m-0">
+				<h6 className="text-uppercase p-0 m-0">
 					student incident information
-				</h5>
+				</h6>
 			</div>
 
 			<div className="row container-fluid d-flex justify-content-around align-items-center">
@@ -220,6 +244,17 @@ const MakeReport = props => {
 			</div>
 
 			<div className="row d-flex flex-column justify-content-center align-items-center mb-5">
+				<div className="col-md-12 d-flex justify-content-start align-items-start">
+					<TextField sx={{ width: '300px', margin: '10px' }} onChange={e => dispatch({ type: 'studentID', data: e.target.value })} label="Student ID" variant="standard"/>
+				</div>
+
+				<div className="col-md-12">
+					<ChipList 
+						label="Add Duty"
+						getValues={ data => dispatch({ type: 'duty', data: data ? data : [] })}
+					/>
+				</div>
+
 				<div className="col-md-12 d-flex justify-content-center align-items-center">
 					<TextField sx={{ width: '80vw', margin: '10px' }} onChange={e => dispatch({ type: 'location', data: e.target.value })} label="Location" variant="standard"/>
 				</div>

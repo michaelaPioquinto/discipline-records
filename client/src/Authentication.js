@@ -387,6 +387,12 @@ function Path( pathname ){
   };
 } 
 
+String.prototype.searchContain = function( otherString ) {	
+	return this.toLowerCase()
+		.replaceAll(' ', '')
+		.search( otherString.toLowerCase().replaceAll(' ', '') ) === 0;
+}
+
 // <Route exact path="/admin">
 // 		      <Admin/>
 //     		</Route>

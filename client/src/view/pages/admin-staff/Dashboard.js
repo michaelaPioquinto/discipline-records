@@ -63,7 +63,7 @@ const Dashboard = props => {
       }
     })
     .catch( err => {
-      console.log( err );
+      throw err;
     });
   }
 
@@ -106,22 +106,34 @@ const StudentForm = props => {
 
   const [reportData, setReportData] = React.useState( null );
 
-  React.useEffect(() => {
-    const fetchStudentReport = async () => {
-      if( !props.item ) return;
+  const fetchStudentReport = async () => {
+    if( !props.item ) return;
 
-      axios.get(`http://localhost:3000/student-report/${ props.studentID }`)
-      .then( res => {
-        setReportData( res.data );
-      })
-      .catch( err => {
-        setTimeout(() => fetchStudentReport(), 5000);
-      });
-    } 
+    axios.get(`http://localhost:3000/student-report/${ props.item.studentID }`)
+    .then( res => {
+      setReportData( res.data );
+    })
+    .catch( err => {
+      if( err?.response?.status ){
+        switch( err?.response?.status ){
+          case 404:
+            props.setOpen();
+            enqueueSnackbar( 'This student does not have a report yet.', { variant: 'warning' });       
+            break;
 
-    fetchStudentReport();
-  }, [props.item]);
+          default:
+            enqueueSnackbar( 'An error occured, please try again!', { variant: 'error' });       
+            break;
+        }
+      }
+      
+      throw err;
+    });
+  } 
 
+  React.useEffect(() => fetchStudentReport(), [props.item]);
+  React.useEffect(() => console.log(reportData), [reportData]);
+  
   return(
     <div>
       <Dialog
@@ -132,11 +144,11 @@ const StudentForm = props => {
         aria-labelledby="responsive-dialog-title"
       >
         <DialogTitle id="responsive-dialog-title">
-          {"Want to edit a this student?"}
+          {"You are viewing " + (reportData?.student?.firstName ?? '') + "'s data"}
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            You can now edit these information.
+            You are not allowed to modify these data.
           </DialogContentText>
           <Box
             component="form"
@@ -152,42 +164,63 @@ const StudentForm = props => {
                   id="outlined-basic" 
                   label="Student ID" 
                   variant="outlined" 
-                  defaultValue={reportData?.studentID ?? 'Fetching...'}
+                  defaultValue={reportData?.student?.studentID}
                 />
                 <TextField
                   disabled 
                   id="outlined-basic" 
                   label="Duty" 
                   variant="outlined" 
-                  defaultValue={reportData?.duty ?? 'Fetching...'}
+                  defaultValue={reportData?.report?.duty?.join?.(' ')}
                 />
                 <TextField
                   disabled 
                   id="outlined-basic" 
                   label="Report" 
                   variant="outlined" 
-                  defaultValue={reportData?.report ?? 'Fetching...'}
+                  defaultValue={reportData?.report}
                 />
-                <TextField
-                  disabled 
-                  id="outlined-basic" 
-                  label="Evidence" 
-                  variant="outlined" 
-                  defaultValue={reportData?.evidence ?? 'Fetching...'}
-                />
+                {
+                  reportData?.report?.images
+                    ? (
+                        <div className="container-fluid">
+                          <Stack direction="column">
+                            <div className="col-12">
+                              <p><b>Evidence</b></p>
+                            </div>
+                            <div className="col-12">
+                              <img 
+                                style={{ 
+                                  imageRendering: 'pixelated', 
+                                  width: '100%', 
+                                  height: '100%' 
+                                }} 
+                                src={reportData.report.images[0]} 
+                                alt="Evidence"
+                              />
+                            </div>
+                          </Stack>
+                        </div>
+                      )
+                    : (
+                        <div className="container-fluid text-center">
+                          <p> NO EVIDENCE </p>
+                        </div>
+                      )
+                }
                 <TextField
                   disabled 
                   id="outlined-basic" 
                   label="Year" 
                   variant="outlined" 
-                  defaultValue={reportData?.year ?? 'Fetching...'}
+                  defaultValue={reportData?.student?.yearSection}
                 />
                 <TextField
                   disabled 
                   id="outlined-basic" 
                   label="Semester" 
                   variant="outlined" 
-                  defaultValue={reportData?.semester ?? 'Fetching...'}
+                  defaultValue={reportData?.semester}
                 />
               </Stack>
             </Box>

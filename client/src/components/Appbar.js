@@ -75,6 +75,7 @@ const Appbar = props => {
 	const [drawer, setDrawer] = React.useState( false );
 	const [anchorEl, setAnchorEl] = React.useState(null);
 	const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+	const [allowSearch, setSearchAllow] = React.useState( props?.openSearchOn?.includes?.( props?.listItems?.[0]?.title ) ?? false );
 
 	const toggleDrawer = open => event => {
 	    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -136,16 +137,6 @@ const Appbar = props => {
 		>
 			<MenuItem onClick={handleProfileMenuOpen}>
 				<Stack>
-					<IconButton
-						size="small"
-						aria-label="account of current user"
-						aria-controls="primary-search-account-menu"
-						aria-haspopup="true"
-						color="inherit"
-					>
-						<AccountCircle/>
-					</IconButton>
-					<p>Profile</p>
 					<Divider/>
 					<IconButton
 						size="small"
@@ -157,7 +148,6 @@ const Appbar = props => {
 					>
 						<MeetingRoomIcon/>
 					</IconButton>
-					<p>Sign-out</p>
 				</Stack>
 			</MenuItem>
 		</Menu>
@@ -181,7 +171,6 @@ const Appbar = props => {
 	      onClose={handleMenuClose}
 	    >
 	    	<Stack sx={{padding: '2px 10px 2px 10px'}}>
-		     	<MenuItem onClick={handleMenuClose}>Profile</MenuItem>
 		     	<MenuItem onClick={handleSignout}>Sign-out</MenuItem>
 	    	</Stack>
 	    </Menu>
@@ -197,7 +186,14 @@ const Appbar = props => {
 	    >
 			<List>
 				{props?.listItems?.map?.((item, index) => (
-					<ListItem key={uniqid()} button onClick={item.onClick}>
+					<ListItem 
+						key={uniqid()} 
+						button 
+						onClick={() => {
+							item.onClick();
+							setSearchAllow( props?.openSearchOn?.includes?.( item?.title ) ?? false );
+						}}
+					>
 						<ListItemIcon>
 							<ArrowForwardIosIcon fontSize="small" />
 						</ListItemIcon>
@@ -230,15 +226,22 @@ const Appbar = props => {
 					>
 						{ props.title ?? 'Menu' }
 					</Typography>
-					<Search>
-						<SearchIconWrapper>
-						  <SearchIcon />
-						</SearchIconWrapper>
-						<StyledInputBase
-							placeholder="Search…"
-							inputProps={{ 'aria-label': 'search' }}
-						/>
-					</Search>
+					{
+						allowSearch
+							? (
+									<Search>
+										<SearchIconWrapper>
+										  <SearchIcon />
+										</SearchIconWrapper>
+										<StyledInputBase
+											onChange={props.getSearchContent}
+											placeholder="Search…"
+											inputProps={{ 'aria-label': 'search' }}
+										/>
+									</Search>
+								)
+							: null
+					}
 					<Box sx={{ flexGrow: 1 }} />
 					<Box sx={{ display: { xs: 'none', md: 'flex' } }}>
 						<IconButton

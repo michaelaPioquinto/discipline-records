@@ -3,8 +3,10 @@ const { Schema } = mongoose;
 
 
 const reportsSchema = new Schema({
+	studentID: String,
 	reportedBy: String,
 	role: String,
+	duty: [ String ],
 	dateOfReport: String,
 	incidentNo: Number,
 	studentName: String,

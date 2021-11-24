@@ -61,7 +61,6 @@ const Archived = props => {
 	}
 
 	const handleYearSelection = ( e, data ) => {
-		console.log( data );
 		setYearSelected( data );
 	}
 
