@@ -7,6 +7,7 @@ const reportsSchema = new Schema({
 	reportedBy: String,
 	role: String,
 	duty: [ String ],
+	semester: String,
 	dateOfReport: String,
 	incidentNo: Number,
 	studentName: String,

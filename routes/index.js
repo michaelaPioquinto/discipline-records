@@ -258,16 +258,28 @@ router.put('/edit-violation/:id', async ( req, res ) => {
 
 
 // ================= GLOBAL ACCESS ==================
+router.get('/statistical-data', async( req, res ) => {
+  try{
+    let result = Report.find().$where( function(){
+      // Get the current year and the next 5 years
+      // Get reports from the years that has been get
+    });
+  }
+  catch( err ){
+    return res.sendStatus( 503 );
+  }
+});
+
 router.get('/student-report/:id', async( req, res ) => {
   Student.findOne({ studentID: req.params.id }, (err, student) => {
     if( err ) return res.sendStatus( 503 );
 
     if( student ){
-      Report.findOne({ studentID: req.params.id }, (err, report) => {
+      Report.find({ studentID: req.params.id }, (err, report) => {
         if( err ) return res.sendStatus( 503 );
 
         if( report ){
-          return res.json({student, report});
+          return res.json({student, report: report});
         }
         else{
           return res.sendStatus( 404 );

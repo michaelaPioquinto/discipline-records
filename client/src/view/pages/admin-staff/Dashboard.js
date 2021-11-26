@@ -28,6 +28,9 @@ import TableSkeleton from '../../../components/TableSkeleton';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 
+import ImageList from '@mui/material/ImageList';
+import ImageListItem from '@mui/material/ImageListItem';
+
 const Item = props => {
   const [bgColor, setBgColor] = React.useState('white');
 
@@ -105,6 +108,7 @@ const StudentForm = props => {
   const { enqueueSnackbar } = useSnackbar();
 
   const [reportData, setReportData] = React.useState( null );
+  const [reports, setReports] = React.useState([]);
 
   const fetchStudentReport = async () => {
     if( !props.item ) return;
@@ -131,9 +135,72 @@ const StudentForm = props => {
     });
   } 
 
+  React.useEffect(() => {
+    if( reportData ){
+      reportData.report.forEach( rep => {
+        setReports( reports => [ ...reports, (
+            <div key={uniqid()}>
+                <Stack direction="column" spacing={2}>
+                  <TextField
+                      disabled 
+                      id="outlined-basic" 
+                      label={`Duty - ${ rep.semester }`} 
+                      variant="outlined" 
+                      defaultValue={rep?.duty?.join?.(', ')}
+                  />
+                  <TextField
+                      disabled 
+                      id="outlined-basic" 
+                      label="Report" 
+                      variant="outlined" 
+                      defaultValue={rep?.incidentDescription}
+                  />
+                  {
+                    rep?.images
+                      ? (
+                          <div className="container-fluid">
+                            <Stack direction="column">
+                              <div className="col-12">
+                                <p><b>Evidence</b></p>
+                              </div>
+                              <div className="col-12">
+                                <img 
+                                  style={{ 
+                                    imageRendering: 'pixelated', 
+                                    width: '100%', 
+                                    height: '100%' 
+                                  }} 
+                                  src={rep.images[0]} 
+                                  alt="Evidence"
+                                />
+                              </div>
+                            </Stack>
+                          </div>
+                        )
+                      : (
+                          <div className="container-fluid text-center">
+                            <p> NO EVIDENCE </p>
+                          </div>
+                        )
+                  }
+                  <TextField
+                    disabled 
+                    id="outlined-basic" 
+                    label="Semester" 
+                    variant="outlined" 
+                    defaultValue={rep?.semester}
+                  />
+                  <Divider/>
+              </Stack>
+            </div>
+          )]);
+      });
+    }
+  }, [reportData]);
+
   React.useEffect(() => fetchStudentReport(), [props.item]);
   React.useEffect(() => console.log(reportData), [reportData]);
-  
+
   return(
     <div>
       <Dialog
@@ -159,69 +226,30 @@ const StudentForm = props => {
             autoComplete="off"
             > 
               <Stack spacing={3}>
-                <TextField
-                  disabled 
-                  id="outlined-basic" 
-                  label="Student ID" 
-                  variant="outlined" 
-                  defaultValue={reportData?.student?.studentID}
-                />
-                <TextField
-                  disabled 
-                  id="outlined-basic" 
-                  label="Duty" 
-                  variant="outlined" 
-                  defaultValue={reportData?.report?.duty?.join?.(' ')}
-                />
-                <TextField
-                  disabled 
-                  id="outlined-basic" 
-                  label="Report" 
-                  variant="outlined" 
-                  defaultValue={reportData?.report}
-                />
                 {
-                  reportData?.report?.images
+                  reportData
                     ? (
-                        <div className="container-fluid">
-                          <Stack direction="column">
-                            <div className="col-12">
-                              <p><b>Evidence</b></p>
-                            </div>
-                            <div className="col-12">
-                              <img 
-                                style={{ 
-                                  imageRendering: 'pixelated', 
-                                  width: '100%', 
-                                  height: '100%' 
-                                }} 
-                                src={reportData.report.images[0]} 
-                                alt="Evidence"
-                              />
-                            </div>
-                          </Stack>
-                        </div>
-                      )
-                    : (
-                        <div className="container-fluid text-center">
-                          <p> NO EVIDENCE </p>
-                        </div>
-                      )
+                      <>
+                        <TextField
+                          disabled 
+                          id="outlined-basic" 
+                          label="Student ID" 
+                          variant="outlined" 
+                          defaultValue={reportData?.student?.studentID}
+                        />
+                        <TextField
+                          disabled 
+                          id="outlined-basic" 
+                          label="Year" 
+                          variant="outlined" 
+                          defaultValue={reportData?.student?.yearSection}
+                        />
+                      </>
+                    )
+                    : null
+
                 }
-                <TextField
-                  disabled 
-                  id="outlined-basic" 
-                  label="Year" 
-                  variant="outlined" 
-                  defaultValue={reportData?.student?.yearSection}
-                />
-                <TextField
-                  disabled 
-                  id="outlined-basic" 
-                  label="Semester" 
-                  variant="outlined" 
-                  defaultValue={reportData?.semester}
-                />
+                { reports }
               </Stack>
             </Box>
         </DialogContent>

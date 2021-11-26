@@ -4,6 +4,7 @@ import uniqid from 'uniqid';
 
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
 import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
 import Chip from '@mui/material/Chip';
@@ -39,6 +40,7 @@ const MakeReport = props => {
   const [image, setImage] = React.useState( null );
 	const initState = {
 		studentID: '',
+		semester: '1st semester',
 		reportedBy: '', 
 		role: '', 
 		duty: [],
@@ -66,6 +68,10 @@ const MakeReport = props => {
 		switch( action.type ){
 			case 'studentID':
 				state.studentID = action.data;
+				return state;
+
+			case 'semester':
+				state.semester = action.data;
 				return state;
 
 			case 'reportedBy':
@@ -248,6 +254,17 @@ const MakeReport = props => {
 					<TextField sx={{ width: '300px', margin: '10px' }} onChange={e => dispatch({ type: 'studentID', data: e.target.value })} label="Student ID" variant="standard"/>
 				</div>
 
+				<div className="col-md-12 d-flex justify-content-start align-items-start">
+					<Autocomplete
+							defaultValue={state.semester}
+							sx={{ width: '300px', margin: '10px' }}
+							options={['1st semester', '2nd semester']}
+							onChange={(e, data) => dispatch({ type: 'semester', data })}
+							onInputChange={(e, data) => dispatch({ type: 'semester', data })}
+							renderInput={ params => <TextField { ...params} label="Semester" variant="standard"/> }
+						/>
+				</div>
+
 				<div className="col-md-12">
 					<ChipList 
 						label="Add Duty"
@@ -352,5 +369,6 @@ const MakeReport = props => {
 		</div>
 	);
 }
+
 
 export default MakeReport;
