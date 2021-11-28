@@ -4,6 +4,8 @@ var express = require('express');
 var router = express.Router();
 var jwt = require('jsonwebtoken');
 var path = require('path');
+var fs = require('fs');
+
 var Student = require('../models/student');
 var User = require('../models/user');
 var Sanction = require('../models/Sanction');
@@ -12,6 +14,7 @@ var Report = require('../models/report');
 var Archived = require('../models/archived');
 var Token = require('../models/token');
 
+var yearTrackerPath = path.join( __dirname, '../data/year-tracker.json');
 
 const requestAccessToken = ( user ) => {
   return jwt.sign( user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '24h' } );
@@ -45,55 +48,83 @@ router.get('/verify-me', authentication, async (req, res, next) => {
 router.post('/sign-in', async (req, res, next) => {
   const { username, password } = req.body;
 
-  User.findOne({ username: username, password: password }, (err, doc) => {
+  Student.findOne({ studentID: username }, (err, doc) => {
     if( err ) return res.sendStatus( 500 );
 
     if( doc ){
-  		if( doc.status === 'activated' ){
+      if( doc.archived.isArchived ){
+        return res.status( 403 ).json({ message: 'This account is deactivated.' });
+      }
+      else{
+        const user = { name: username, role: 'student' };
+        const accessToken = requestAccessToken( user );
+        const refreshToken = jwt.sign( user, process.env.REFRESH_TOKEN_SECRET );
 
-	      const user = { name: username, role: doc.role };
-	      const accessToken = requestAccessToken( user );
-	      const refreshToken = jwt.sign( user, process.env.REFRESH_TOKEN_SECRET );
+        Token.create({ code: refreshToken }, err => {
+          if( err ) return res.sendStatus( 500 );
 
-	      Token.create({ code: refreshToken }, err => {
-	        if( err ) return res.sendStatus( 500 );
-
-	        let path = '';
-
-	        switch( doc.role ){
-	        	case 'admin':
-	        		path = '/admin';
-	        		break;
-
-	        	case 'sysadmin':
-	        		path = '/system-admin';
-	        		break;
-
-	        	case 'adminstaff':
-	        		path = '/administrative-staff';
-	        		break;
-
-	        	default:
-							path = '/student';	        		
-	        		break;
-	        }
-
-	        return res.json({
-	          message: `Welcome ${ username }!`,
-	          accessToken,
-	          refreshToken,
-	          role: doc.role,
-	          path 
-	        });
-	      });
-  		}
-  		else{
-  			return res.status( 403 ).json({ message: 'This account is deactivated.'});
-  		}
+          return res.json({
+            message: `Welcome ${ username }!`,
+            accessToken,
+            refreshToken,
+            role: doc.role,
+            path: '/student' 
+          });
+        });
+      }
     }
     else{
-      return res.status( 403 ).json({
-        message: 'Incorrect password or username'
+      User.findOne({ username: username, password: password }, (err, doc) => {
+        if( err ) return res.sendStatus( 500 );
+
+        if( doc ){
+          if( doc.status === 'activated' ){
+
+            const user = { name: username, role: doc.role };
+            const accessToken = requestAccessToken( user );
+            const refreshToken = jwt.sign( user, process.env.REFRESH_TOKEN_SECRET );
+
+            Token.create({ code: refreshToken }, err => {
+              if( err ) return res.sendStatus( 500 );
+
+              let path = '';
+
+              switch( doc.role ){
+                case 'admin':
+                  path = '/admin';
+                  break;
+
+                case 'sysadmin':
+                  path = '/system-admin';
+                  break;
+
+                case 'adminstaff':
+                  path = '/administrative-staff';
+                  break;
+
+                default:
+                  path = '/student';              
+                  break;
+              }
+
+              return res.json({
+                message: `Welcome ${ username }!`,
+                accessToken,
+                refreshToken,
+                role: doc.role,
+                path 
+              });
+            });
+          }
+          else{
+            return res.status( 403 ).json({ message: 'This account is deactivated.'});
+          }
+        }
+        else{
+          return res.status( 403 ).json({
+            message: 'Incorrect password or username'
+          });
+        }
       });
     }
   });
@@ -259,15 +290,56 @@ router.put('/edit-violation/:id', async ( req, res ) => {
 
 // ================= GLOBAL ACCESS ==================
 router.get('/statistical-data', async( req, res ) => {
-  try{
-    let result = Report.find().$where( function(){
-      // Get the current year and the next 5 years
-      // Get reports from the years that has been get
-    });
-  }
-  catch( err ){
-    return res.sendStatus( 503 );
-  }
+  fs.readFile( yearTrackerPath, async (err, data) => {
+    try{
+        years = JSON.parse( data );
+
+        let violatorsNumPerYear = {
+          firstSemester : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+          secondSemester : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+        };
+
+
+        let firstSem = await Report.find()
+          .$where(`[${years.yearTracker}].includes(Number( this.dateOfReport.split('-')[0] ))`)
+          .and([{ semester: '1st semester' }]);
+
+        let secondSem = await Report.find()
+          .$where(`[${years.yearTracker}].includes(Number( this.dateOfReport.split('-')[0] ))`)
+          .and([{ semester: '2nd semester' }]);
+
+        let memoizedID = [];
+
+        firstSem.forEach( item => {
+          if( memoizedID.includes( item.studentID ) ) return;
+          memoizedID.push( item.studentID );
+
+          let index = years.yearTracker.indexOf(Number( item.dateOfReport.split('-')[0] ));
+
+          if( index >= 0 ) violatorsNumPerYear.firstSemester[ index ] += 1; 
+        });
+
+        memoizedID = [];
+
+        secondSem.forEach( item => {
+          if( memoizedID.includes( item.studentID ) ) return;
+          memoizedID.push( item.studentID );
+
+          let index = years.yearTracker.indexOf(Number( item.dateOfReport.split('-')[0] ));
+
+          if( index >= 0 ) violatorsNumPerYear.secondSemester[ index ] += 1; 
+        });
+
+        return res.json({
+          years: years.yearTracker,
+          firstSem: violatorsNumPerYear.firstSemester,
+          secondSem: violatorsNumPerYear.secondSemester
+        });
+    }
+    catch( err ){
+      return res.sendStatus( 503 );
+    }
+  });
 });
 
 router.get('/student-report/:id', async( req, res ) => {
@@ -341,22 +413,38 @@ router.get('/accounts/admin', async( req, res ) => {
 });
 
 router.post('/create-user/admin', async( req, res ) => {
-  User.create({ ...req.body }, err => {
+  Student.findOne({ studentID: req.body.username }, (err, doc) => {
     if( err ) return res.sendStatus( 503 );
 
-    return res.sendStatus( 200 );
+    if( doc ){
+      return res.json({ message: 'You must not try to use student ID as your username' });
+    }
+    else{
+      User.create({ ...req.body }, err => {
+        if( err ) return res.sendStatus( 503 );
+
+        return res.sendStatus( 200 );
+      });
+    }
   });
 });
 
 router.post('/edit-user/admin', async( req, res ) => {
-  User.findOneAndUpdate({ _id: req.body.id }, { ...req.body }, err => {
+  Student.findOne({ studentID: req.body.username }, (err, doc) => {
     if( err ) return res.sendStatus( 503 );
 
-    return res.sendStatus( 200 );
+    if( doc ){
+      return res.json({ message: 'You must not try to use student ID as your username' });
+    }
+    else{
+      User.findOneAndUpdate({ _id: req.body.id }, { ...req.body }, err => {
+        if( err ) return res.sendStatus( 503 );
+
+        return res.sendStatus( 200 );
+      });
+    }
   });
 });
-
-
 
 
 // ============== SYSTEM ADMINISTRATOR ================
@@ -487,5 +575,10 @@ router.delete('/delete-student/:id', async( req, res ) => {
     return res.sendStatus( 200 );
   });
 });
+
+
+const incrementYearTracker = tracker => {
+  return tracker.map( year => year += 1 );
+}
 
 module.exports = router;

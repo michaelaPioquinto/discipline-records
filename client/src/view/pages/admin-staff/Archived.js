@@ -14,6 +14,9 @@ import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
 import UnarchiveIcon from '@mui/icons-material/Unarchive';
 
+import SearchContext from '../../../context/SearchContext';
+
+
 const Student = props => {
 	const { handleUnarchive } = props;
 
@@ -37,9 +40,12 @@ const Student = props => {
 const Archived = props => {
 	const [archivedStudents, setArchivedStudents] = React.useState([]);
 	const [renderedStudents, setRenderedStudents] = React.useState([]);
+	const [accounts, setAccounts] = React.useState([]);
 	const [yearOptions, setYearOptions] = React.useState([]);
 	const [yearSelected, setYearSelected] = React.useState( '' );
 	
+	const search = React.useContext( SearchContext );
+
 	const getArchived = async() => {
 		axios.get('http://localhost:3000/archived-students')
 		.then( res => {
@@ -71,7 +77,6 @@ const Archived = props => {
 
 			const getYear = student => {
 				if( !years.includes(student.archived.year) ){ 
-					console.log( student.archived.year );
 					years.push( student.archived.year ); 
 				}
 			};
@@ -79,13 +84,14 @@ const Archived = props => {
 
 			archivedStudents.forEach( getYear );
 			archivedStudents.forEach( student => {
-				students.push(<Student key={uniqid()} {...student} handleUnarchive={handleUnarchive}/>);
+				students.push( student );
 			});
 
-			setRenderedStudents([ ...students ]);
+			setAccounts([ ...students ]);
 			setYearOptions([ ...years ]);
 		}
 	}, [archivedStudents]);
+
 
 	React.useEffect(() => {
 		const students = []
@@ -93,18 +99,31 @@ const Archived = props => {
 		if( yearSelected && yearSelected?.length ){
 			archivedStudents?.forEach?.( student => {
 				if( student.archived.year.includes( yearSelected ) )
-					students.push(<Student key={uniqid()} {...student} handleUnarchive={handleUnarchive}/>);
+					students.push( student );
 			});
 		}
 		else{
 			archivedStudents?.forEach?.( student => {
-				students.push(<Student key={uniqid()} {...student} handleUnarchive={handleUnarchive}/>);
+				students.push( student );
 			});
 
 		}
 
-		setRenderedStudents([ ...students ]);
+		setAccounts([ ...students ]);
 	}, [yearSelected]);
+
+
+	React.useEffect(() => {
+		let renderedItem = [];
+
+		accounts.forEach( student => {
+			if( student.firstName.searchContain( search ) ){
+				renderedItem.push( <Student key={uniqid()} {...student} handleUnarchive={handleUnarchive}/> );
+			}
+		});
+
+		setRenderedStudents([ ...renderedItem ]);
+	}, [accounts, search]);
 
 	React.useEffect(() => getArchived(), []);
 

@@ -31,6 +31,8 @@ import TableCell from '@mui/material/TableCell';
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 
+import SearchContext from '../../../context/SearchContext';
+
 const Item = props => {
   const [bgColor, setBgColor] = React.useState('white');
 
@@ -54,15 +56,35 @@ const Item = props => {
 
 const Dashboard = props => {
 	// Fetch user data
-	const [row, setRow] = React.useState([]);
+	const [accounts, setAccounts] = React.useState( [] );
+  const [items, setItems] = React.useState( [] );
   const [editForm, setEditForm] = React.useState({ isOpen: false, item: null }); 
+  const search = React.useContext( SearchContext );
+  
+  React.useEffect(() => {
+    let renderedItem = [];
+
+    accounts.forEach( acc => {
+      if( acc.firstName.searchContain( search ) ){
+        renderedItem.push( 
+          <Item
+            key={uniqid()}
+            onClick={setEditForm}
+            {...acc}
+          />
+        );
+      }
+    });
+
+    setItems([...renderedItem]);
+  }, [accounts, search]);
 
 	const fetchStudentData = async() => {
     axios.get('http://localhost:3000/student-data')
     .then( res => {
       if( res.data ){
         const modifiedData = res.data.map( datum => ({ id: datum._id, ...datum}));
-        setRow( modifiedData );
+        setAccounts( modifiedData );
       }
     })
     .catch( err => {
@@ -86,15 +108,7 @@ const Dashboard = props => {
           style={{ width: '100%' }}
           maxHeight={ 500 }
           head={['Student ID', 'First Name', 'Last Name', 'Middle Name', 'Course', 'Year & Section']}
-          content={
-            row.map( item => (
-              <Item
-                key={uniqid()}
-                onClick={setEditForm}
-                {...item}
-              />
-            ))
-          }
+          content={ items }
         />
         <StudentForm setOpen={setOpen} item={editForm.item} isOpen={editForm.isOpen} />
       </div>
@@ -199,14 +213,16 @@ const StudentForm = props => {
   }, [reportData]);
 
   React.useEffect(() => fetchStudentReport(), [props.item]);
-  React.useEffect(() => console.log(reportData), [reportData]);
 
   return(
     <div>
       <Dialog
         fullScreen={fullScreen}
         open={ props.isOpen }
-        onClose={ props.setOpen }
+        onClose={ () => {
+          setReportData( null );
+          props.setOpen();
+        }}
         maxWidth="md"
         aria-labelledby="responsive-dialog-title"
       >

@@ -26,6 +26,8 @@ import Table from '../../../components/Table';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 
+import SearchContext from '../../../context/SearchContext';
+
 const Item = props => (
   <TableRow>
       <TableCell> { props.violationName } </TableCell>
@@ -36,11 +38,14 @@ const Item = props => (
 );
 
 const Violation = props => {
-	const [violationList, setViolationList] = React.useState([]);
+	const [violationList, setViolationList] = React.useState( [] );
+	const [list, setList] = React.useState( [] );
 	const [openForm, setOpenForm] = React.useState( false );
 	const [editForm, setEditForm] = React.useState({ isOpen: false, item: null });
 	const [violation, setViolation] = React.useState( null );
 	const [deleteViol, setDeleteViol] = React.useState( null );
+
+	const search = React.useContext( SearchContext );
 
 	const { enqueueSnackbar } = useSnackbar();
 	
@@ -59,6 +64,18 @@ const Violation = props => {
 	// const handleEditButton = () => { 
 	// 	setEditForm({ isOpen: false, item: null });
 	// }
+
+	React.useEffect(() => {
+		let renderedItem = [];
+
+		violationList.forEach( viol => {
+			if( viol.violationName.searchContain( search ) ){
+				renderedItem.push( viol );
+			}
+		});
+
+		setList([...renderedItem]);
+	}, [violationList, search]);
 
 	const fetchViolationList = async() => {
 		axios.get('http://localhost:3000/violation-list')
@@ -102,7 +119,7 @@ const Violation = props => {
         maxWidth={580}
         head={['Violation Name', 'First Offense', 'Second Offense', 'Third Offense']}
         content={
-          violationList.map( item => (
+          list.map( item => (
             <Item
               key={uniqid()}
               onClick={setEditForm}

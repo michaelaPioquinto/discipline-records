@@ -6,8 +6,10 @@ import TableSkeleton from '../components/TableSkeleton';
 
 import LinearProgress from '@mui/material/LinearProgress';
 
+const Statistical = React.lazy(() => import('./pages/admin/Statistical'));
 const Dashboard = React.lazy(() => import('./pages/admin/Dashboard'));
 const Violation = React.lazy(() => import('./pages/admin/Violation'));
+const Handbook = React.lazy(() => import('./pages/admin/Handbook'));
 const Accounts = React.lazy(() => import('./pages/admin/Accounts'));
 
 const Admin = props => {
@@ -21,8 +23,8 @@ const Admin = props => {
 				listItems={[
 					{ title: 'Dashboard', onClick: () => content.name === 'Dashboard' ? null : setContent({ name: 'Dashboard', cont: <Dashboard/> }) },
 					{ title: 'Violation', onClick: () =>  content.name === 'Validation' ? null : setContent({ name: 'Violation', cont: <Violation/> })},
-					{ title: 'Statistical', onClick: () => content.name === 'Statistical' ? null : setContent({ name: 'Statistical', cont: <Statistical/> }) },
 					{ title: 'Account', onClick: () => content.name === 'Account' ? null : setContent({ name: 'Account', cont: <Accounts/> }) },
+					{ title: 'Statistical', onClick: () => content.name === 'Statistical' ? null : setContent({ name: 'Statistical', cont: <Statistical/> }) },
 					{ title: 'Handbook', onClick: () => content.name === 'Handbook' ? null : setContent({ name: 'Handbook', cont: <Handbook/> }) },
 				]}
 			/>
@@ -35,24 +37,5 @@ const Admin = props => {
 	)
 }
 
-
-
-
-
-const Statistical = props => {
-	return(
-		<h1>
-			Statistical
-		</h1>	
-	)
-}
-
-const Handbook = props => {
-	return(
-		<h1>
-			Statistical
-		</h1>	
-	)
-}
 
 export default Admin;

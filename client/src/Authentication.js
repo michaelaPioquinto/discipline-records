@@ -53,7 +53,9 @@ const Authentication = props => {
 	const tools = {
 		setView: setToThisView,
 		setAllow,
-		setRole
+		setRole,
+		role,
+		name,
 	}
 
 

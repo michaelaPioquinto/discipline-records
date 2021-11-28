@@ -4,7 +4,6 @@ import uniqid from 'uniqid';
 
 import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
-// import { DataGrid } from '@mui/x-data-grid';
 
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
@@ -23,48 +22,39 @@ import { useTheme } from '@mui/material/styles';
 
 import { useSnackbar } from 'notistack';
 
+import Table from '../../../components/Table';
+import TableRow from '@mui/material/TableRow';
+import TableCell from '@mui/material/TableCell';
+
+import SearchContext from '../../../context/SearchContext';
+
 const Item = props => {
-  return(
-    <>
-      <div style={{ width: '100%' }} className="item rounded" onDoubleClick={() => props.onClick({ isOpen: true, item: {...props} })}>
-        <Paper elevation={2} sx={{ backgroundColor: 'rgba(0, 0, 0, 0.1)' }}>
-          <Stack 
-            direction="row" 
-            alignItems="center" 
-          >
-            <div style={{ height: '40px' }} className="col-2 text-center d-flex justify-content-center align-items-center">
-              <p className="p-0 m-0"> { props.id } </p>
-            </div>
-
-            <div style={{ height: '40px' }} className="col-4 text-center d-flex justify-content-center align-items-center">
-              <p className="p-0 m-0"> { props.violationName } </p>
-            </div>
-
-            <div style={{ height: '40px' }} className="col-2 text-center d-flex justify-content-center align-items-center">
-              <p className="p-0 m-0"> { props.firstOffense } </p>
-            </div>
-
-            <div style={{ height: '40px' }} className="col-2 text-center d-flex justify-content-center align-items-center">
-              <p className="p-0 m-0"> { props.secondOffense } </p>
-            </div>
-
-            <div style={{ height: '40px' }} className="col-2 text-center d-flex justify-content-center align-items-center">
-              <p className="p-0 m-0"> { props.thirdOffense } </p>
-            </div>
-          </Stack>
-        </Paper>
-      </div>
-    </>
-  );
+	const [bgColor, setBgColor] = React.useState('white');
+	
+	return(
+	  <TableRow 
+			sx={{ backgroundColor: bgColor, transition: '.1s ease-in-out' }} 
+			onPointerEnter={() => setBgColor('rgba(0, 0, 0, 0.2)')}
+			onPointerLeave={() => setBgColor('white')}	  
+	  	onDoubleClick={() => props.onClick({ isOpen: true, item: {...props} })}
+	  >
+	      <TableCell> { props.violationName } </TableCell>
+	      <TableCell> { props.firstOffense } </TableCell>
+	      <TableCell> { props.secondOffense } </TableCell>
+	      <TableCell> { props.thirdOffense } </TableCell>
+	  </TableRow>
+	);
 }
 
 const Violation = props => {
-	const [violationList, setViolationList] = React.useState([]);
-	const [content, setContent] = React.useState([]);
+	const [violationList, setViolationList] = React.useState( [] );
+	const [list, setList] = React.useState( [] );
 	const [openForm, setOpenForm] = React.useState( false );
 	const [editForm, setEditForm] = React.useState({ isOpen: false, item: null });
 	const [violation, setViolation] = React.useState( null );
 	const [deleteViol, setDeleteViol] = React.useState( null );
+
+	const search = React.useContext( SearchContext );
 
 	const { enqueueSnackbar } = useSnackbar();
 	
@@ -76,14 +66,6 @@ const Violation = props => {
 		thirdOffense: ''
 	});
 
-	const setContentToNone = () => {
-		setContent(
-			<div className="d-flex justify-content-center align-items-center">
-				<h3 style={{ color: 'rgba(0, 0, 0, 0.3)'}}>NO ITEMS YET</h3>
-			</div>
-		);
-	}
-
 	const handleAddButton = () => { 
 		setOpenForm( openForm => !openForm );
 	}	
@@ -91,6 +73,18 @@ const Violation = props => {
 	const handleEditButton = () => { 
 		setEditForm({ isOpen: false, item: null });
 	}
+
+	React.useEffect(() => {
+		let renderedItem = [];
+
+		violationList.forEach( viol => {
+			if( viol.violationName.searchContain( search ) ){
+				renderedItem.push( viol );
+			}
+		});
+
+		setList([...renderedItem]);
+	}, [violationList, search]);
 
 	const fetchViolationList = async() => {
 		axios.get('http://localhost:3000/violation-list')
@@ -100,9 +94,6 @@ const Violation = props => {
 					id: index,
 					...viol
 				})));
-			}
-			else{
-				// setContentToNone();
 			}
 		})
 		.catch( err => {
@@ -115,42 +106,8 @@ const Violation = props => {
 	}, []);
 
 	React.useEffect(() => {
-		if( violationList.length ){
-			setContent( null );
-		}
-
 		setViolation( initViolation( violationList.length ) );
 	}, [violationList]);
-
-
-	React.useEffect(() => {
-		const saveViolation = async viol => {
-			axios.post('http://localhost:3000/save-violation', viol )
-			.then(() => {
-				enqueueSnackbar('Successfully added violation', { variant: 'success' });
-			})
-			.catch(() => {
-				setTimeout(() => saveViolation( viol ), 5000);
-			});
-		}
-
-		if( violation && violation?.violationName?.length ){
-			let isViolationExists = false;
-
-			violationList.forEach( viol => {
-				if( viol.violationName.toLowerCase() === violation.violationName.toLowerCase() ){
-					isViolationExists = true;
-					return enqueueSnackbar('Violation already exists', { variant: 'error' });
-				}
-			});
-
-			if( !isViolationExists ){
-				setViolationList( violationList => [...violationList, { ...violation } ]);
-				saveViolation( violation );
-				setViolation( initViolation( violationList.length ) );
-			}
-		}
-	}, [violation]);
 
 
 	React.useEffect(() => {
@@ -158,10 +115,6 @@ const Violation = props => {
 			let modifiedViolations = violationList.filter( viol => viol.id !== deleteViol.id );
 
 			if( modifiedViolations.length ){
-				setViolationList([ ...modifiedViolations ]);
-			}
-			else{
-				// setContentToNone();
 			}
 
 			setDeleteViol( null );
@@ -170,106 +123,46 @@ const Violation = props => {
 
 	return(
 		<div style={{ width: '100%', height: '80vh' }} className="p-3 d-flex flex-column">
-			{ content }			
-			<div style={{ position: 'absolute', bottom: '15px', right: '15px' }}>
-				<IconButton style={{ backgroundColor: 'rgba(25, 25, 21, 0.9)' }} onClick={handleAddButton}>
-					<AddIcon style={{ color: 'white' }}/>
-				</IconButton>
-			</div>
-			<ValidationEditForm 
+      <Table
+        style={{ width: '100%' }}
+        maxWidth={580}
+        head={['Violation Name', 'First Offense', 'Second Offense', 'Third Offense']}
+        content={
+          list.map( item => (
+            <Item
+              key={uniqid()}
+              onClick={setEditForm}
+              {...item}
+            />
+          ))
+        }
+      />
+      <ValidationEditForm 
 				setDelete={setDeleteViol} 
 				editForm={editForm} 
 				setViolationList={setViolationList} 
 				setOpen={handleEditButton}
 				fetchViolationList={fetchViolationList}
 			/>
-			<Paper 
-        elevation={3} 
-        sx={{ 
-          backgroundColor: 'rgba(0, 0, 0, 0.8)', 
-          color: 'white',
-          width: '100%', 
-          height: '50px', 
-          padding: '10px',
-          marginBottom: '10px',
-        }}
-      >
-        <Stack
-          direction="row" 
-          divider={
-            <Divider 
-              sx={{ width: 2, alignSelf: 'stretch', height: '30px !important' }} 
-              orientation="vertical" 
-              flexItem 
-            />
-          } 
-          spacing={0}
-          alignItems="center"
-        > 
-          <div className="col-2 text-center">
-            <p className="db-table-header-label m-0 p-0">
-              ID
-            </p>
-          </div>
-          
-          <div className="col-4 text-center">
-            <p className="db-table-header-label m-0 p-0">
-              Violation Name
-            </p>
-          </div>
-
-          <div className="col-2 text-center">
-            <p className="db-table-header-label m-0 p-0">
-              First Offense
-            </p>
-          </div>
-
-          <div className="col-2 text-center">
-            <p className="db-table-header-label m-0 p-0">
-              Second Offense
-            </p>
-          </div>
-
-          <div className="col-2 text-center">
-            <p className="db-table-header-label m-0 p-0">
-              third Offense
-            </p>
-          </div>
-        </Stack>
-      </Paper>
-      <div style={{ width: '100%', height: '90%' }}>
-          <Stack spacing={1}>
-            {
-              violationList.map( item => (
-                <Item
-                	key={uniqid()}
-                  onClick={setEditForm}
-                  {...item}
-                />
-              ))
-            }
-          </Stack>
-      </div>
-			{/*<DataGrid
-				sx={{ height: '100%' }}
-				columns={columns}
-				rows={[...violationList]}
-				pageSize={10}
-				rowsPerPageOptions={[5]}
-				onRowClick={e => setEditForm({ isOpen: true, item: e.row })}
-			/>*/}
-			{ 
+      { 
 				violation && 
 				<ValidationForm 
 					setOpen={handleAddButton} 
 					open={openForm} 
 					setViolation={setViolation} 
 					length={violationList.length}
+					fetchViolationList={fetchViolationList}
 				/> 
 			}
+			<div style={{ position: 'absolute', bottom: '15px', right: '15px' }}>
+				<IconButton style={{ backgroundColor: 'rgba(25, 25, 21, 0.9)' }} onClick={handleAddButton}>
+					<AddIcon style={{ color: 'white' }}/>
+				</IconButton>
+			</div>
 		</div>
 	)
 }
+
 
 
 const ValidationForm = props => {
@@ -355,8 +248,16 @@ const ValidationForm = props => {
 						Discard
 					</Button>
 					<Button 
-						onClick={() => {
+						onClick={async () => {
 							if( violationName.length && firstOffense.length && secondOffense.length && thirdOffense.length ){
+								await axios.post('http://localhost:3000/save-violation', { violationName, firstOffense, secondOffense, thirdOffense })
+								.then(() => {
+									enqueueSnackbar('Successfully added a violation', { variant: 'success' });
+								})
+								.catch( err => {
+									enqueueSnackbar('Please try again!', { variant: 'error' });
+								});
+
 								props.setViolation( violation => ({ id: violation.id, violationName, firstOffense, secondOffense, thirdOffense }));
 								props.fetchViolationList();
 								return props.setOpen();

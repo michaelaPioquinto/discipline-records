@@ -22,7 +22,8 @@ import DialogTitle from '@mui/material/DialogTitle';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
-
+import TableRow from '@mui/material/TableRow';
+import TableCell from '@mui/material/TableCell';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -30,8 +31,11 @@ import FormControl from '@mui/material/FormControl';
 import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
 
+import Table from '../../../components/Table';
+
 const Item = props => {
 	const [status, setStatus] = React.useState( props.status === 'activated' ? true : false );
+	const [bgColor, setBgColor] = React.useState('white');
 
 	const handleStatus = e => {
 		setStatus( e.target.checked );
@@ -53,34 +57,21 @@ const Item = props => {
 	const displayRole = userRole => userRole === 'sysadmin' ? 'SYSTEM ADMINISTRATOR' : 'ADMINISTRATOR STAFF';
 
 	return(
-		<>
-			<div id="account-item" style={{ width: '100%' }} className="rounded item" onDoubleClick ={() => props.onDoubleClick ({ editingMode: true, ...props })}>
-				<Paper elevation={2} sx={{ backgroundColor: 'rgba(0, 0, 0, 0.1)' }}>
-					<Stack 
-						direction="row" 
-						justifyContent="space-around" 
-						alignItems="center" 
-						spacing={4}
-						sx={{ display: 'flex' }}
-					>
-						<div className="col-3">
-							<p className="p-0 m-0"> { props.username } </p>
-						</div>
-
-						<div className="col-4">
-							<p className="p-0 m-0"> { displayRole(props.role) } </p>
-						</div>
-
-						<div className="col-3">
-							<FormControlLabel 
-								control={<Switch checked={status} onChange={handleStatus}/>} 
-								label={ status ? 'Activated' : 'Deactivated' }
-							/>
-						</div>
-					</Stack>
-				</Paper>
-			</div>
-		</>
+		<TableRow 
+			sx={{ backgroundColor: bgColor, transition: '.1s ease-in-out' }} 
+			onPointerEnter={() => setBgColor('rgba(0, 0, 0, 0.2)')}
+			onPointerLeave={() => setBgColor('white')}
+			onDoubleClick ={() => props.onDoubleClick ({ editingMode: true, ...props })}
+		>
+			<TableCell> { props.username } </TableCell>
+			<TableCell> { displayRole( props.role ) } </TableCell>
+			<TableCell> 
+				<FormControlLabel 
+					control={<Switch checked={status} onChange={handleStatus}/>} 
+					label={ status ? 'Activated' : 'Deactivated' }
+				/>
+			</TableCell>
+		</TableRow>
 	);
 }
 
@@ -135,52 +126,12 @@ const Accounts = props => {
 
 	return(
 		<div style={{ width: '100%', height: '80vh' }} className="p-3 text-center">
-			<Paper 
-				elevation={3} 
-				sx={{ 
-					backgroundColor: 'rgba(0, 0, 0, 0.8)', 
-					color: 'white',
-					width: '100%', 
-					height: '50px', 
-					padding: '10px',
-					marginBottom: '10px',
-				}}
-			>
-				<Stack
-					direction="row" 
-					divider={
-						<Divider 
-							sx={{ width: 2, alignSelf: 'stretch', height: '30px !important' }} 
-							orientation="vertical" 
-							flexItem 
-						/>
-					} 
-					spacing={3}
-					justifyContent="space-around"
-					alignItems="center"
-				>	
-					<div className="col-3">
-						<Typography variant="h6">
-							Name
-						</Typography>
-					</div>
-					<div className="col-4">
-						<Typography variant="h6">
-							Role
-						</Typography>
-					</div>
-					<div className="col-3">
-						<Typography variant="h6">
-							Status
-						</Typography>
-					</div>
-				</Stack>
-			</Paper>
-			<div style={{ width: '100%', height: '90%', overflowY: 'auto' }}>
-				<Stack spacing={1}>
-					{ items }
-				</Stack>
-			</div>
+			<Table
+				maxHeight={ 500 }
+				style={{ width: '100%' }}
+				head={['Username', 'Role', 'Status']}
+				content={ items }
+			/>
 			<AddUser 
 				open={addForm} 
 				setOpen={handleAddForm}
@@ -297,15 +248,20 @@ const AddUser = props => {
 									<Button 
 										autoFocus
 										onClick={() => {
-											axios.post('http://localhost:3000/create-user/admin', { username, password, status, email, role })
-											.then(() => {
-												props.fetchAccounts();
-												props.setOpen();
-												enqueueSnackbar('Successfully added a user', { variant: 'success' });
-											})
-											.catch(() => {
-												enqueueSnackbar('Please try again', { variant: 'error' });
-											});
+											if( id && username && password && status && email && role ){
+												axios.post('http://localhost:3000/create-user/admin', { username, password, status, email, role })
+												.then(() => {
+													props.fetchAccounts();
+													props.setOpen();
+													enqueueSnackbar('Successfully edited a user', { variant: 'success' });
+												})
+												.catch(() => {
+													enqueueSnackbar('Please try again', { variant: 'error' });
+												});
+											}
+											else{
+												enqueueSnackbar('All fields must be filled up', { variant: 'error' });
+											}
 										}}
 									>
 										Add
@@ -332,15 +288,20 @@ const AddUser = props => {
 									<Button 
 										autoFocus
 										onClick={() => {
-											axios.post('http://localhost:3000/edit-user/admin', { id, username, password, status, email, role })
-											.then(() => {
-												props.fetchAccounts();
-												props.setOpen();
-												enqueueSnackbar('Successfully edited a user', { variant: 'success' });
-											})
-											.catch(() => {
-												enqueueSnackbar('Please try again', { variant: 'error' });
-											});
+											if( id && username && password && status && email && role ){
+												axios.post('http://localhost:3000/edit-user/admin', { id, username, password, status, email, role })
+												.then(() => {
+													props.fetchAccounts();
+													props.setOpen();
+													enqueueSnackbar('Successfully edited a user', { variant: 'success' });
+												})
+												.catch(() => {
+													enqueueSnackbar('Please try again', { variant: 'error' });
+												});
+											}
+											else{
+												enqueueSnackbar('All fields must be filled up', { variant: 'error' });
+											}
 										}}
 									>
 										Save

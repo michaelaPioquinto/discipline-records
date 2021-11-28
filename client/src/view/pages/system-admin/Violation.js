@@ -4,7 +4,6 @@ import uniqid from 'uniqid';
 
 import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
-// import { DataGrid } from '@mui/x-data-grid';
 
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
@@ -23,173 +22,114 @@ import { useTheme } from '@mui/material/styles';
 
 import { useSnackbar } from 'notistack';
 
-const Item = props => {
-  return(
-    <>
-      <div style={{ width: '100%' }} className="rounded">
-        <Paper elevation={2} sx={{ backgroundColor: 'rgba(0, 0, 0, 0.1)' }}>
-          <Stack 
-            direction="row" 
-            alignItems="center" 
-          >
-            <div style={{ height: '40px' }} className="col-2 text-center d-flex justify-content-center align-items-center">
-              <p className="p-0 m-0"> { props.id } </p>
-            </div>
+import Table from '../../../components/Table';
+import TableRow from '@mui/material/TableRow';
+import TableCell from '@mui/material/TableCell';
 
-            <div style={{ height: '40px' }} className="col-4 text-center d-flex justify-content-center align-items-center">
-              <p className="p-0 m-0"> { props.violationName } </p>
-            </div>
+import SearchContext from '../../../context/SearchContext';
 
-            <div style={{ height: '40px' }} className="col-2 text-center d-flex justify-content-center align-items-center">
-              <p className="p-0 m-0"> { props.firstOffense } </p>
-            </div>
-
-            <div style={{ height: '40px' }} className="col-2 text-center d-flex justify-content-center align-items-center">
-              <p className="p-0 m-0"> { props.secondOffense } </p>
-            </div>
-
-            <div style={{ height: '40px' }} className="col-2 text-center d-flex justify-content-center align-items-center">
-              <p className="p-0 m-0"> { props.thirdOffense } </p>
-            </div>
-          </Stack>
-        </Paper>
-      </div>
-    </>
-  );
-}
+const Item = props => (
+  <TableRow>
+      <TableCell> { props.violationName } </TableCell>
+      <TableCell> { props.firstOffense } </TableCell>
+      <TableCell> { props.secondOffense } </TableCell>
+      <TableCell> { props.thirdOffense } </TableCell>
+  </TableRow>
+);
 
 const Violation = props => {
-	const [violationList, setViolationList] = React.useState([]);
-	const [openForm, setOpenForm] = React.useState( false );
-	const [editForm, setEditForm] = React.useState({ isOpen: false, item: null });
-	const [violation, setViolation] = React.useState( null );
-	const [deleteViol, setDeleteViol] = React.useState( null );
+  const [violationList, setViolationList] = React.useState( [] );
+  const [list, setList] = React.useState( [] );
+  const [openForm, setOpenForm] = React.useState( false );
+  const [editForm, setEditForm] = React.useState({ isOpen: false, item: null });
+  const [violation, setViolation] = React.useState( null );
+  const [deleteViol, setDeleteViol] = React.useState( null );
 
-	const { enqueueSnackbar } = useSnackbar();
-	
-	const initViolation = id => ({
-		id,
-		violationName: '',
-		firstOffense: '',
-		secondOffense: '',
-		thirdOffense: ''
-	});
+  const search = React.useContext( SearchContext );
 
-	const handleAddButton = () => { 
-		setOpenForm( openForm => !openForm );
-	}	
+  const { enqueueSnackbar } = useSnackbar();
+  
+  const initViolation = id => ({
+    id,
+    violationName: '',
+    firstOffense: '',
+    secondOffense: '',
+    thirdOffense: ''
+  });
 
-	const handleEditButton = () => { 
-		setEditForm({ isOpen: false, item: null });
-	}
+  // const handleAddButton = () => { 
+  //  setOpenForm( openForm => !openForm );
+  // }  
 
-	const fetchViolationList = async() => {
-		axios.get('http://localhost:3000/violation-list')
-		.then( res => {
-			if( res.data?.length ){
-				setViolationList( res.data.map( (viol, index) => ({ 
-					id: index,
-					...viol
-				})));
-			}
-		})
-		.catch( err => {
-			setTimeout(() => fetchViolationList(), 5000);
-		});
-	}
-	
-	React.useEffect(() => {
-		fetchViolationList();
-	}, []);
+  // const handleEditButton = () => { 
+  //  setEditForm({ isOpen: false, item: null });
+  // }
 
-	React.useEffect(() => {
-		setViolation( initViolation( violationList.length ) );
-	}, [violationList]);
+  React.useEffect(() => {
+    let renderedItem = [];
+
+    violationList.forEach( viol => {
+      if( viol.violationName.searchContain( search ) ){
+        renderedItem.push( viol );
+      }
+    });
+
+    setList([...renderedItem]);
+  }, [violationList, search]);
+
+  const fetchViolationList = async() => {
+    axios.get('http://localhost:3000/violation-list')
+    .then( res => {
+      if( res.data?.length ){
+        setViolationList( res.data.map( (viol, index) => ({ 
+          id: index,
+          ...viol
+        })));
+      }
+    })
+    .catch( err => {
+      setTimeout(() => fetchViolationList(), 5000);
+    });
+  }
+  
+  React.useEffect(() => {
+    fetchViolationList();
+  }, []);
+
+  React.useEffect(() => {
+    setViolation( initViolation( violationList.length ) );
+  }, [violationList]);
 
 
-	React.useEffect(() => {
-		if( deleteViol ){
-			let modifiedViolations = violationList.filter( viol => viol.id !== deleteViol.id );
+  // React.useEffect(() => {
+  //  if( deleteViol ){
+  //    let modifiedViolations = violationList.filter( viol => viol.id !== deleteViol.id );
 
-			if( modifiedViolations.length ){
-				setViolationList([ ...modifiedViolations ]);
-			}
+  //    if( modifiedViolations.length ){
+  //    }
 
-			setDeleteViol( null );
-		}
-	}, [deleteViol]);
+  //    setDeleteViol( null );
+  //  }
+  // }, [deleteViol]);
 
-	return(
-		<div style={{ width: '100%', height: '80vh' }} className="p-3 d-flex flex-column">
-			<Paper 
-        elevation={3} 
-        sx={{ 
-          backgroundColor: 'rgba(0, 0, 0, 0.8)', 
-          color: 'white',
-          width: '100%', 
-          height: '50px', 
-          padding: '10px',
-          marginBottom: '10px',
-        }}
-      >
-        <Stack
-          direction="row" 
-          divider={
-            <Divider 
-              sx={{ width: 2, alignSelf: 'stretch', height: '30px !important' }} 
-              orientation="vertical" 
-              flexItem 
+  return(
+    <div style={{ width: '100%', height: '80vh' }} className="p-3 d-flex flex-column">
+      <Table
+        style={{ width: '100%' }}
+        maxWidth={580}
+        head={['Violation Name', 'First Offense', 'Second Offense', 'Third Offense']}
+        content={
+          list.map( item => (
+            <Item
+              key={uniqid()}
+              onClick={setEditForm}
+              {...item}
             />
-          } 
-          spacing={0}
-          alignItems="center"
-        > 
-          <div className="col-2 text-center">
-            <p className="db-table-header-label m-0 p-0">
-              ID
-            </p>
-          </div>
-          
-          <div className="col-4 text-center">
-            <p className="db-table-header-label m-0 p-0">
-              Violation Name
-            </p>
-          </div>
-
-          <div className="col-2 text-center">
-            <p className="db-table-header-label m-0 p-0">
-              First Offense
-            </p>
-          </div>
-
-          <div className="col-2 text-center">
-            <p className="db-table-header-label m-0 p-0">
-              Second Offense
-            </p>
-          </div>
-
-          <div className="col-2 text-center">
-            <p className="db-table-header-label m-0 p-0">
-              third Offense
-            </p>
-          </div>
-        </Stack>
-      </Paper>
-      <div style={{ width: '100%', height: '90%' }}>
-          <Stack spacing={1}>
-            {
-              violationList.map( item => (
-                <Item
-                	key={uniqid()}
-                  onClick={setEditForm}
-                  {...item}
-                />
-              ))
-            }
-          </Stack>
-      </div>
-		</div>
-	)
+          ))
+        }
+      />
+    </div>
+  )
 }
 
 
