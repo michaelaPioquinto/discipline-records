@@ -9,8 +9,12 @@ import LinearProgress from '@mui/material/LinearProgress';
 const Dashboard = React.lazy(() => import('./pages/student/Dashboard'));
 const Handbook = React.lazy(() => import('./pages/student/Handbook'));
 
-const Admin = props => {
-	const [content, setContent] = React.useState({ name: 'Dashboard', cont: <Dashboard/> });
+const Student = props => {
+	const [content, setContent] = React.useState({ name: 'Dashboard', cont: <Dashboard name={ props.tools.name }/> });
+
+	React.useEffect(() => {
+		console.log( props.tools.name );
+	}, []);
 
 	return(
 		<div style={{ width: '100%', height: '100%'}}>
@@ -18,7 +22,7 @@ const Admin = props => {
 				tools={props.tools}
 				title="Student" 
 				listItems={[
-					{ title: 'Dashboard', onClick: () => content.name === 'Dashboard' ? null : setContent({ name: 'Dashboard', cont: <Dashboard id={ props.tools.name }/> }) },
+					{ title: 'Dashboard', onClick: () => content.name === 'Dashboard' ? null : setContent({ name: 'Dashboard', cont: <Dashboard name={ props.tools.name }/> }) },
 					{ title: 'Handbook', onClick: () => content.name === 'Handbook' ? null : setContent({ name: 'Handbook', cont: <Handbook/> }) },
 				]}
 			/>
@@ -32,4 +36,4 @@ const Admin = props => {
 }
 
 
-export default Admin;
+export default Student;

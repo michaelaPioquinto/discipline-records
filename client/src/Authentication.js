@@ -24,8 +24,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Admin = React.lazy(() => import('./view/Admin'));
 const Student = React.lazy(() => import('./view/Student'));
-const AdministrativeStaff = React.lazy(() => import('./view/Administrative-Staff'));
 const SystemAdmin = React.lazy(() => import('./view/System-Admin'));
+const AdministrativeStaff = React.lazy(() => import('./view/Administrative-Staff'));
 
 const ROOT = '/';
 const VIEWS = [
@@ -69,6 +69,7 @@ const Authentication = props => {
 	      }
 	    })
 	    .then( res => {
+	    	console.log( res.data.username );
 	      setName( res.data.username );
 	      setRole( res.data.role );
 	      setAllow(() => true);

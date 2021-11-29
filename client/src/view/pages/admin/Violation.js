@@ -252,6 +252,7 @@ const ValidationForm = props => {
 							if( violationName.length && firstOffense.length && secondOffense.length && thirdOffense.length ){
 								await axios.post('http://localhost:3000/save-violation', { violationName, firstOffense, secondOffense, thirdOffense })
 								.then(() => {
+									props.fetchViolationList();
 									enqueueSnackbar('Successfully added a violation', { variant: 'success' });
 								})
 								.catch( err => {
@@ -377,6 +378,7 @@ const ValidationEditForm = props => {
 							const handleDelete = async () => {
 								axios.delete(`http://localhost:3000/delete-violation/${props.editForm.item._id}`)
 								.then( res => {
+									props.fetchViolationList();
 									enqueueSnackbar('Successfully deleted violation', { variant: 'success' });
 								})
 								.catch(() => {
