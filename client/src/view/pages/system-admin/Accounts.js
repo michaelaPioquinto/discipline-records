@@ -170,6 +170,7 @@ const AddUser = props => {
 	const handlePassword = async e => {
 		setPassword( e.target.value );
 	}
+
 	React.useEffect(() => {
 		if( props.editingMode ){
 			setID( props._id );
@@ -237,7 +238,7 @@ const AddUser = props => {
 									<Button 
 										autoFocus
 										onClick={() => {
-											if( id && username && password && status && email ){
+											if( username && password && status && email ){
 												axios.post('http://localhost:3000/create-user/admin', { username, password, status, email, role: 'admin' })
 												.then(() => {
 													props.fetchAccounts();

@@ -25,7 +25,11 @@ const reportsSchema = new Schema({
 	employeeName: String,
 	employeeDate: String,
 	headName: String,
-	headDate: String
+	headDate: String,
+	majorProblemBehavior: [ String ],
+	initialActionGiven: String,
+	administrativeDecision: [ String ],
+	administrativeComment: String
 });
 
 

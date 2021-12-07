@@ -1,12 +1,15 @@
 import React from 'react';
 import axios from 'axios';
 import uniqid from 'uniqid';
+import debounce from 'lodash.debounce';
 
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import Chip from '@mui/material/Chip';
 import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
@@ -22,6 +25,8 @@ const Root = styled('div')(({ theme }) => ({
   },
 }));
 
+const label = { inputProps: { 'aria-label': 'Checkbox violation' } };
+
 const renderDate = date => {
 	if( !date ) return '';
 
@@ -36,6 +41,10 @@ const renderDate = date => {
 const MakeReport = props => {
   const { enqueueSnackbar } = useSnackbar();
   const [button, setButton] = React.useState({ msg: 'Submit', isDisabled: false });
+	
+	const [otherMinor, setOtherMinor] = React.useState( '' );
+  const [otherMajor, setOtherMajor] = React.useState( '' );
+  const [otherDecision, setOtherDecision] = React.useState( '' );
 
   const [image, setImage] = React.useState( null );
 	const initState = {
@@ -61,7 +70,12 @@ const MakeReport = props => {
 		employeeName: '',
 		date1: '',
 		chairpersonName: '',
-		date2: ''
+		date2: '',
+		majorProblemBehavior: [],
+		minorProblemBehavior: [],
+		initialActionGiven: '',
+		administrativeDecision: [],
+		administrativeComment: '',
 	}
 
 	const reducer = (state, action) => {
@@ -158,6 +172,26 @@ const MakeReport = props => {
 				state.date2 = renderDate( action.data );
 				return state;
 
+			case 'majorProblemBehavior':
+				state.majorProblemBehavior = action.data;
+				return state;
+
+			case 'minorProblemBehavior':
+				state.minorProblemBehavior = action.data;
+				return state;
+
+			case 'initialActionGiven':			
+				state.initialActionGiven = action.data;
+				return state;
+
+			case 'administrativeDecision':
+				state.administrativeDecision = action.data;
+				return state;
+
+			case 'administrativeComment':
+				state.administrativeComment = action.data;
+				return state;
+
 			default:
 				return state;
 		}
@@ -168,37 +202,94 @@ const MakeReport = props => {
 
 		setButton({ msg: 'Loading', isDisabled: true });
 
-		Object.keys({ ...state}).forEach( key => {
-			if( key !== 'images' && (!state[ key ] || !state[ key ].length) ){
-				isAllowed = false;
-			}
-		});
+		dispatch({ type: 'majorProblemBehavior', data: [...state.majorProblemBehavior, otherMajor] });
+		dispatch({ type: 'minorProblemBehavior', data: [...state.minorProblemBehavior, otherMinor] });
+		dispatch({ type: 'administrativeDecision', data: [...state.administrativeDecision, otherDecision] });
 
-		if( isAllowed ){
-			axios.post('http://localhost:3000/save-report', state)
-			.then( async res => {
-				if( image ){
-					const formData = new FormData();
-					formData.append('reportImage', image );
+		setTimeout(() => {
+			Object.keys({ ...state}).forEach( key => {
+				if(( key !== 'majorProblemBehavior' && key !== 'minorProblemBehavior' && key !== 'administrativeDecision') 
+					&& key !== 'images' && (!state[ key ] || !state[ key ].length) ){
 
-					try{
-						await axios.post(`http://localhost:3000/save-report-image`, formData)
-					}
-					catch( err ){
-						throw err;
-					}				
+					console.log( key );
+					isAllowed = false;
 				}
-
-				setButton({ msg: 'Submit', isDisabled: false });
-				enqueueSnackbar( res.data.message, { variant: 'success' });
-			})
-			.catch( err => {
-				throw err;
 			});
+
+			if( isAllowed ){
+				axios.post('http://localhost:3000/save-report', state)
+				.then( async res => {
+					if( image ){
+						const formData = new FormData();
+						formData.append('reportImage', image );
+
+						try{
+							await axios.post(`http://localhost:3000/save-report-image`, formData)
+						}
+						catch( err ){
+							throw err;
+						}				
+					}
+
+					setButton({ msg: 'Submit', isDisabled: false });
+					enqueueSnackbar( res.data.message, { variant: 'success' });
+				})
+				.catch( err => {
+					throw err;
+				});
+			}
+			else{
+				setButton({ msg: 'Submit', isDisabled: false });
+				return enqueueSnackbar( 'All fields must have a value', { variant: 'error' });
+			}
+		}, 1000);
+	}
+
+	const handleMajorProblemBehavior = (e, value) => {
+		const label = e.target.labels[0].innerText;
+		const labelExists = state.majorProblemBehavior.includes( label );
+
+		if( labelExists && !value ){
+			const newList = state.majorProblemBehavior.filter( val => val !== label );
+			dispatch({ type: 'majorProblemBehavior', data: newList });
 		}
-		else{
-			setButton({ msg: 'Submit', isDisabled: false });
-			return enqueueSnackbar( 'All fields must have a value', { variant: 'error' });
+		else if( !labelExists && value ){
+			const newList = state.majorProblemBehavior;
+			newList.push( label );
+
+			dispatch({ type: 'majorProblemBehavior', data: newList });
+		}
+	}
+
+	const handleMinorProblemBehavior = (e, value) => {
+		const label = e.target.labels[0].innerText;
+		const labelExists = state.minorProblemBehavior.includes( label );
+
+		if( labelExists && !value ){
+			const newList = state.minorProblemBehavior.filter( val => val !== label );
+			dispatch({ type: 'minorProblemBehavior', data: newList });
+		}
+		else if( !labelExists && value ){
+			const newList = state.minorProblemBehavior;
+			newList.push( label );
+
+			dispatch({ type: 'minorProblemBehavior', data: newList });
+		}
+	}
+
+	const handleAdministrativeDecision = (e, value) => {
+		const label = e.target.labels[0].innerText;
+		const labelExists = state.minorProblemBehavior.includes( label );
+
+		if( labelExists && !value ){
+			const newList = state.administrativeDecision.filter( val => val !== label );
+			dispatch({ type: 'administrativeDecision', data: newList });
+		}
+		else if( !labelExists && value ){
+			const newList = state.administrativeDecision;
+			newList.push( label );
+
+			dispatch({ type: 'administrativeDecision', data: newList });
 		}
 	}
 
@@ -361,12 +452,285 @@ const MakeReport = props => {
 					</div>
 				</div>
 			</div>
+
+			<div className="col-12">
+				<Root>
+						<Divider textAlign="left">
+							<Chip label="GRIEVANCE"/>
+						</Divider>
+				</Root>
+			</div>
+
+			<div className="mt-5 row d-flex flex-row justify-content-center align-items-center mb-5">
+				<div className="col-md-12 px-5 d-flex justify-content-start align-items-start">
+					<h5 className="text-uppercase"><b>problem behavior:</b></h5>
+				</div>
+
+				<div className="px-5 col-md-5 my-3 d-flex flex-column justify-content-between align-items-start">
+					<div className="col-12">
+						<p className="text-uppercase">minors:</p>
+					</div>
+
+					<FormControlLabel
+						label="Not wearing prescribed school uniform"
+						control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
+					/>
+					
+					<FormControlLabel
+						label="Not wearing I.D"
+						control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
+					/>
+
+					<FormControlLabel
+						label="Dress Code"
+						control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
+					/>
+
+					<FormControlLabel
+						label="Using vulgar words and rough behavior"
+						control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
+					/>
+
+					<FormControlLabel
+						label="Loitering"
+						control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
+					/>
+
+					<FormControlLabel
+						label="Littering"
+						control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
+					/>
+
+					<FormControlLabel
+						label="Careless / unauthorized use of school property "
+						control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
+					/>
+
+					<FormControlLabel
+						label="Unauthorized posting of announcements, posters and notices."
+						control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
+					/>
+
+					<OtherCheckBox onChange={value => setOtherMinor( value )}/>
+				</div>
+
+				{/*================================================================================*/}
+
+				<div className="px-5 col-md-5 my-3 d-flex flex-column justify-content-center align-items-start">
+					<div className="col-12">
+						<p className="text-uppercase">majors: (Automatic Office Referral)</p>
+					</div>
+
+					<FormControlLabel
+						label="Using another persons, ID/COR, lending of ID/COR"
+						control={<Checkbox onChange={handleMajorProblemBehavior}{...label}/>}
+					/>
+					
+					<FormControlLabel
+						label="Forging, Falsifying or Tampering of any Academic, Official Records of Documents"
+						control={<Checkbox onChange={handleMajorProblemBehavior}{...label}/>}
+					/>
+
+					<FormControlLabel
+						label="Unauthorized possession of examination materials, and other documents"
+						control={<Checkbox onChange={handleMajorProblemBehavior}{...label}/>}
+					/>
+
+					<FormControlLabel
+						label="Having somebody else take an examination for another"
+						control={<Checkbox onChange={handleMajorProblemBehavior}{...label}/>}
+					/>
+
+					<FormControlLabel
+						label="Cheating during examination"
+						control={<Checkbox onChange={handleMajorProblemBehavior}{...label}/>}
+					/>
+
+					<FormControlLabel
+						label="Plagiarism"
+						control={<Checkbox onChange={handleMajorProblemBehavior}{...label}/>}
+					/>
+
+					<FormControlLabel
+						label="Grave act of disrespect"
+						control={<Checkbox onChange={handleMajorProblemBehavior}{...label}/>}
+					/>
+
+					<FormControlLabel
+						label="Involvement in any form of attack to other person"
+						control={<Checkbox onChange={handleMajorProblemBehavior}{...label}/>}
+					/>
+
+					<FormControlLabel
+						label="Bullying in any form"
+						control={<Checkbox onChange={handleMajorProblemBehavior}{...label}/>}
+					/>
+
+					<OtherCheckBox onChange={value => setOtherMajor( value )}/>
+				</div>
+			</div>			
+
+			<div className="row container-fluid d-flex flex-column justify-content-center align-items-center">
+				<div className="col-md-12 px-5 d-flex justify-content-start align-items-start">
+					<h5 className="text-uppercase"><b>administrative decision:</b></h5>
+				</div>
+				<div className="row col-md-12">
+					<div className="col-md-4">
+						<FormControlLabel
+							label="Conference w/ student "
+							control={<Checkbox onChange={handleAdministrativeDecision} {...label}/>}
+						/>
+					</div>
+
+					<div className="col-md-4">
+						<FormControlLabel
+							label="Parent contact"
+							control={<Checkbox onChange={handleAdministrativeDecision} {...label}/>}
+						/>
+					</div>
+
+					<div className="col-md-4">
+						<FormControlLabel
+							label="Detention"
+							control={<Checkbox onChange={handleAdministrativeDecision} {...label}/>}
+						/>
+					</div>
+
+					<div className="col-md-4">
+						<FormControlLabel
+							label="Community Service"
+							control={<Checkbox onChange={handleAdministrativeDecision} {...label}/>}
+						/>
+					</div>
+
+					<div className="col-md-4">
+						<FormControlLabel
+							label="Oral Reprimand / Written Apology from the Students"
+							control={<Checkbox onChange={handleAdministrativeDecision} {...label}/>}
+						/>
+					</div>
+
+					<div className="col-md-4">
+						<FormControlLabel
+							label="Oral and Written Reprimand / Written Apology from the Students and Counselling"
+							control={<Checkbox onChange={handleAdministrativeDecision} {...label}/>}
+						/>
+					</div>
+
+					<div className="col-md-4">
+						<FormControlLabel
+							label="Suspension"
+							control={<Checkbox onChange={handleAdministrativeDecision} {...label}/>}
+						/>
+					</div>
+
+					<div className="col-md-4">
+						<FormControlLabel
+							label="Dismissal"
+							control={<Checkbox onChange={handleAdministrativeDecision} {...label}/>}
+						/>
+					</div>
+
+					<div className="col-md-4">
+						<FormControlLabel
+							label="Exclusion"
+							control={<Checkbox onChange={handleAdministrativeDecision} {...label}/>}
+						/>
+					</div>
+
+					<div className="col-md-4">
+						<FormControlLabel
+							label="Expulsion"
+							control={<Checkbox onChange={handleAdministrativeDecision} {...label}/>}
+						/>
+					</div>
+
+					<div className="col-5">
+						<OtherCheckBox onChange={value => setOtherDecision( value )}/>
+					</div>
+				</div>
+			</div>
+			
+			<div className="col-12 d-flex justify-content-center align-items-center">
+				<TextField
+					sx={{ width: '80vw', margin: '50px' }}
+					id="standard-multiline-flexible"
+					label="Initial Action Given"
+					multiline
+					rows={10}
+					// maxRows={4}
+					onChange={e => dispatch({ type: 'initialActionGiven', data: e.target.value })}
+					variant="filled"
+        />
+			</div>
+
+			<div className="col-12 d-flex justify-content-center align-items-center">
+				<TextField
+					sx={{ width: '80vw', margin: '50px' }}
+					id="standard-multiline-flexible"
+					label="Administrative Comments and/or Follow Up:"
+					multiline
+					rows={10}
+					// maxRows={4}
+					onChange={e => dispatch({ type: 'administrativeComment', data: e.target.value })}
+					variant="filled"
+        />
+			</div>
+
 			<div className="d-flex justify-content-around align-items-center my-5">
 				<Button disabled={button.isDisabled} variant="outlined" color="success" sx={{ width: '150px' }} onClick={() => handleSubmitReport()}>
 				  { button.msg }
 				</Button>
 			</div>
 		</div>
+	);
+}
+
+const OtherCheckBox = props => {
+	const [isChecked, setIsChecked] = React.useState( false );
+	const [value, setValue] = React.useState('');
+	const [key, setKey] = React.useState( props?.key );
+
+	const handleChecked = e => {
+		setIsChecked( e.target.checked );
+	}
+
+	const handleOnChange = e => {
+		setValue( e.target.value );
+	}
+
+	const debouncedValuePassing = debounce(props?.onChange, 1000);
+
+	React.useEffect(() => {
+		if( !isChecked ){
+			setValue( '' );
+		}
+
+		if( isChecked && !value.length ){
+			props?.isEmpty?.( true );
+		}
+		else if( isChecked && value.length ){
+			props?.isEmpty?.( false );
+		}
+
+		debouncedValuePassing?.( value, key );
+
+	}, [isChecked, value]);
+
+	return(
+		<FormControlLabel
+			label={
+				<TextField 
+					disabled={!isChecked} 
+					value={value} 
+					onChange={handleOnChange} 
+					label="Other" 
+					variant="standard"
+					helperText={ isChecked ? 'Enter text here' : '' }
+				/>
+			}
+			control={<Checkbox checked={isChecked} onChange={handleChecked} {...label}/>}
+		/>
 	);
 }
 

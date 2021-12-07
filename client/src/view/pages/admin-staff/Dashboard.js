@@ -33,6 +33,19 @@ import ImageListItem from '@mui/material/ImageListItem';
 
 import SearchContext from '../../../context/SearchContext';
 
+import Chip from '@mui/material/Chip';
+import { styled } from '@mui/material/styles';
+
+
+const Root = styled('div')(({ theme }) => ({
+  width: '100%',
+  ...theme.typography.body2,
+  '& > :not(style) + :not(style)': {
+    marginTop: theme.spacing(2),
+  },
+}));
+
+
 const Item = props => {
   const [bgColor, setBgColor] = React.useState('white');
 
@@ -155,20 +168,30 @@ const StudentForm = props => {
         setReports( reports => [ ...reports, (
             <div key={uniqid()}>
                 <Stack direction="column" spacing={2}>
-                  <TextField
-                      disabled 
-                      id="outlined-basic" 
-                      label={`Duty - ${ rep.semester }`} 
-                      variant="outlined" 
-                      defaultValue={rep?.duty?.join?.(', ')}
-                  />
-                  <TextField
-                      disabled 
-                      id="outlined-basic" 
-                      label="Report" 
-                      variant="outlined" 
-                      defaultValue={rep?.incidentDescription}
-                  />
+                  {
+                    rep?.semester 
+                      ? <TextField
+                            disabled 
+                            id="outlined-basic" 
+                            label={`Duty - ${ rep.semester }`} 
+                            variant="outlined" 
+                            defaultValue={rep?.duty?.join?.(', ')}
+                        />
+                      : null
+                  }
+
+                  {
+                    rep?.semester 
+                      ? <TextField
+                          disabled 
+                          id="outlined-basic" 
+                          label="Report" 
+                          variant="outlined" 
+                          defaultValue={rep?.incidentDescription}
+                        />
+                      : null
+                  }
+
                   {
                     rep?.images
                       ? (
@@ -197,13 +220,76 @@ const StudentForm = props => {
                           </div>
                         )
                   }
-                  <TextField
-                    disabled 
-                    id="outlined-basic" 
-                    label="Semester" 
-                    variant="outlined" 
-                    defaultValue={rep?.semester}
-                  />
+
+                  {
+                    rep?.semester 
+                      ? <TextField
+                          disabled 
+                          id="outlined-basic" 
+                          label="Semester" 
+                          variant="outlined" 
+                          defaultValue={rep?.semester}
+                        />
+                      : null
+                  }
+
+                  {
+                    rep?.majorProblemBehavior?.length && rep?.semester
+                      ? <Root>
+                          <Divider textAlign="left">
+                            <Chip label={`GRIEVANCE - ${ rep.semester }`}/>
+                          </Divider>
+                        </Root>
+                      : null
+                  }
+                  
+                  {
+                    rep?.majorProblemBehavior?.length
+                      ? <TextField
+                          disabled 
+                          id="outlined-basic" 
+                          label={`Major Problem Behavior`} 
+                          variant="outlined" 
+                          defaultValue={rep?.majorProblemBehavior?.join?.(', ')}
+                        />
+                      : null
+                  }
+
+                  {
+                    rep?.initialActionGiven
+                      ? <TextField
+                          disabled 
+                          id="outlined-basic" 
+                          label={`Initial Action Given`} 
+                          variant="outlined" 
+                          defaultValue={rep?.initialActionGiven}
+                        />
+                      : null
+                  }
+
+                  {
+                    rep?.administrativeDecision
+                      ? <TextField
+                          disabled 
+                          id="outlined-basic" 
+                          label={`Administrative Decision`} 
+                          variant="outlined" 
+                          defaultValue={rep?.administrativeDecision}
+                        />
+                      : null
+                  }
+
+                  {
+                    rep?.administrativeComment
+                      ? <TextField
+                          disabled 
+                          id="outlined-basic" 
+                          label={`Administrative Comment`} 
+                          variant="outlined" 
+                          defaultValue={rep?.administrativeComment}
+                        />
+                      : null
+                  }
                   <Divider/>
               </Stack>
             </div>

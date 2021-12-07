@@ -71,25 +71,32 @@ const Archived = props => {
 	}
 
 	React.useEffect(() => {
-		if( archivedStudents.length ){
-			const students = [];
-			const years = []
+		let renderedItem = [];
 
-			const getYear = student => {
-				if( !years.includes(student.archived.year) ){ 
-					years.push( student.archived.year ); 
-				}
-			};
+		accounts.forEach( student => {
+			if( student.firstName.searchContain( search ) ){
+				renderedItem.push( <Student key={uniqid()} {...student} handleUnarchive={handleUnarchive}/> );
+			}
+		});
+
+		setRenderedStudents([ ...renderedItem ]);
+	}, [accounts, search]);
+	
+	React.useEffect(() => {
+		const students = [];
+		const years = []
+
+		const getYear = student => {
+			if( !years.includes(student.archived.year) ){ 
+				years.push( student.archived.year ); 
+			}
+		};
 
 
-			archivedStudents.forEach( getYear );
-			archivedStudents.forEach( student => {
-				students.push( student );
-			});
+		archivedStudents.forEach( getYear );
 
-			setAccounts([ ...students ]);
-			setYearOptions([ ...years ]);
-		}
+		setAccounts([ ...archivedStudents ]);
+		setYearOptions([ ...years ]);
 	}, [archivedStudents]);
 
 
@@ -106,24 +113,12 @@ const Archived = props => {
 			archivedStudents?.forEach?.( student => {
 				students.push( student );
 			});
-
 		}
 
 		setAccounts([ ...students ]);
 	}, [yearSelected]);
 
-
-	React.useEffect(() => {
-		let renderedItem = [];
-
-		accounts.forEach( student => {
-			if( student.firstName.searchContain( search ) ){
-				renderedItem.push( <Student key={uniqid()} {...student} handleUnarchive={handleUnarchive}/> );
-			}
-		});
-
-		setRenderedStudents([ ...renderedItem ]);
-	}, [accounts, search]);
+	React.useEffect(() => console.log(renderedStudents), [renderedStudents]);
 
 	React.useEffect(() => getArchived(), []);
 
@@ -144,7 +139,7 @@ const Archived = props => {
 							maxHeight={330}
 							style={{ width: '100%' }}
 							head={['Student ID', 'First Name', 'Last Name', 'Middle Name', 'Course', 'Unarchive']}
-							content={renderedStudents}
+							content={[...renderedStudents]}
 						/>
 					</div>
 				</Stack>

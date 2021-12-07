@@ -343,10 +343,18 @@ router.get('/statistical-data', async( req, res ) => {
 });
 
 router.get('/student-report/:id', async( req, res ) => {
-  Student.findOne({ studentID: req.params.id }, (err, student) => {
+  Student.findOne({ studentID: req.params.id }, async (err, student) => {
     if( err ) return res.sendStatus( 503 );
 
     if( student ){
+      try{
+        const report = await Report.find({ studentID: req.params.id });
+
+        return res.json({ student, report }); 
+      }
+      catch( err ){
+        return res.sendStatus( 503 );
+      }
       Report.find({ studentID: req.params.id }, (err, report) => {
         if( err ) return res.sendStatus( 503 );
 
@@ -459,6 +467,7 @@ router.get('/accounts/system-admin', async( req, res ) => {
 
 
 // =============== ADMINISTRATOR STAFF =================
+
 router.post('/save-report', async( req, res ) => {
   Report.create({ ...req.body }, err => {
     if( err ) return res.sendStatus( 503 );
