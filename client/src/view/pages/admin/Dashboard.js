@@ -1,3 +1,25 @@
+// Admin
+// dashboard Nakokopya ung report nang iba [/]
+// Violation pag iisa nalang violation hindi na rerefresh pag dinelete [/]
+// Duplicate violation [/]
+// Trash [] - 
+// Account need all field [/]
+
+// Adstaff
+// Search student id [/]
+// Student duplicate [/]
+// Make report time incedent [/]
+// Send report redirect [] 
+// Picture must be jpg [] - bawal png?
+
+// Student
+// Pag sinasave picture black lang [/]  
+
+// Kapag mag ccreate ng account for admin, sysadmin and staff kailangan may basic info sa tao (name, email, etc) []
+// Yung design wag masyadong plain (sabi ni caraan) []
+
+// ======================================================================================
+
 import React from 'react';
 import { Redirect } from 'react-router-dom';
 import axios from 'axios';
@@ -65,7 +87,7 @@ const Dashboard = props => {
     let renderedItem = [];
 
     accounts.forEach( acc => {
-      if( acc.firstName.searchContain( search ) ){
+      if( acc.studentID.searchContain( search ) ){
         renderedItem.push( 
           <Item
             key={uniqid()}
@@ -122,7 +144,7 @@ const StudentForm = props => {
   const { enqueueSnackbar } = useSnackbar();
 
   const [reportData, setReportData] = React.useState( null );
-  const [reports, setReports] = React.useState([]);
+  const [reports, setReports] = React.useState( [] );
 
   const fetchStudentReport = async () => {
     if( !props.item ) return;
@@ -151,7 +173,7 @@ const StudentForm = props => {
 
   React.useEffect(() => {
     if( reportData ){
-      reportData.report.forEach( rep => {
+      reportData?.report?.forEach?.( rep => {
         setReports( reports => [ ...reports, (
             <div key={uniqid()}>
                 <Stack direction="column" spacing={2}>
@@ -210,6 +232,9 @@ const StudentForm = props => {
           )]);
       });
     }
+    else{
+      setReports( [] );
+    }
   }, [reportData]);
 
   React.useEffect(() => fetchStudentReport(), [props.item]);
@@ -221,6 +246,7 @@ const StudentForm = props => {
         open={ props.isOpen }
         onClose={ () => {
           setReportData( null );
+          setReports( [] );
           props.setOpen();
         }}
         maxWidth="md"

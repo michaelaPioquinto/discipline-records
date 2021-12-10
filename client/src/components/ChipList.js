@@ -33,6 +33,12 @@ const ChipList = props => {
 		props?.getValues?.( wordList.length ? wordList : null );
 	}, [wordList]);
 
+	React.useEffect(() => {
+		if( props.value ){
+			setWordList([ ...props.value ]);
+		}
+	}, [props]);
+
 	return(
 		<div
 			style={{

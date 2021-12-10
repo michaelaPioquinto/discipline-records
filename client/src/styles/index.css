@@ -19,6 +19,20 @@ code {
   overflow: hidden;
 }
 
+#discipline-logo, #cct-logo{
+  image-rendering: optimizeSpeed;
+}
+
+#cct-logo{
+  width: 130px;
+  height: 130px;
+}
+
+#discipline-logo{
+  width: 141px;
+  height: 141px;
+}
+
 .sign-in{
   color: black !important;
 }

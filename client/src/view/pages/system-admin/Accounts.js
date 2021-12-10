@@ -65,8 +65,9 @@ const Item = props => {
 			<TableCell> { props.username } </TableCell>
 			<TableCell> ADMINISTRATOR </TableCell>
 			<TableCell> 
-				<FormControlLabel 
-					control={<Switch checked={status} onChange={handleStatus}/>} 
+				<FormControlLabel
+					onDoubleClick={e => e.stopPropagation()}
+					control={<Switch checked={status} onChange={handleStatus} onDoubleClick={e => e.stopPropagation()}/>} 
 					label={ status ? 'Activated' : 'Deactivated' }
 				/>
 			</TableCell>
@@ -152,12 +153,27 @@ const AddUser = props => {
 	const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
 	const [id, setID] = React.useState( null );
+	const [firstname, setFirstname] = React.useState( props.firstname ?? '' );
+	const [lastname, setLastname] = React.useState( props.lastname ?? '' );
+	const [middlename, setMiddlename] = React.useState( props.middlename ?? '' );
 	const [username, setUsername] = React.useState( props.username ?? '' );
 	const [email, setEmail] = React.useState( props.email ?? '' );
 	const [password, setPassword] = React.useState( props.password ?? '' );
 	const [status, setStatus] = React.useState( props.status ?? 'activated' );
 
 	const { enqueueSnackbar } = useSnackbar();
+
+	const handleFirstName = async e => {
+		setFirstname( e.target.value );
+	}
+	
+	const handleLastName = async e => {
+		setLastname( e.target.value );
+	}
+
+	const handleMiddleName = async e => {
+		setMiddlename( e.target.value );
+	}
 
 	const handleName = async e => {
 		setUsername( e.target.value );
@@ -174,6 +190,9 @@ const AddUser = props => {
 	React.useEffect(() => {
 		if( props.editingMode ){
 			setID( props._id );
+			setFirstname( props.firstname );
+			setLastname( props.lastname );
+			setMiddlename( props.middlename );
 			setUsername( props.username );
 			setPassword( props.password );
 			setEmail( props.email );
@@ -181,6 +200,9 @@ const AddUser = props => {
 		}
 		else{
 			setID( null );
+			setFirstname( '' );
+			setLastname( '' );
+			setMiddlename( '' );
 			setUsername( '' );
 			setPassword( '' );
 			setEmail( '' );
@@ -218,9 +240,15 @@ const AddUser = props => {
 				    >	
 				    	<Stack spacing={3}>
 				    		<GenerateInputFields
+		    					firstname={firstname}
+		    					lastname={lastname}
+		    					middlename={middlename}
 		    					username={username ?? ''}
 		    					password={password ?? ''}
 		    					email={email ?? ''}
+	    						handleFirstName={handleFirstName}
+	    						handleLastName={handleLastName}
+	    						handleMiddleName={handleMiddleName}
 	    						handleName={handleName}
 	    						handleEmail={handleEmail}
 	    						handlePassword={handlePassword}
@@ -238,15 +266,24 @@ const AddUser = props => {
 									<Button 
 										autoFocus
 										onClick={() => {
-											if( username && password && status && email ){
-												axios.post('http://localhost:3000/create-user/admin', { username, password, status, email, role: 'admin' })
+											if( username && firstname && lastname && middlename && password && status ){
+												axios.post('http://localhost:3000/create-user/admin', { 
+													firstname,
+													lastname,
+													middlename,
+													username, 
+													password, 
+													status, 
+													email, 
+													role: 'admin' 
+												})
 												.then(() => {
 													props.fetchAccounts();
 													props.setOpen();
 													enqueueSnackbar('Successfully edited a user', { variant: 'success' });
 												})
-												.catch(() => {
-													enqueueSnackbar('Please try again', { variant: 'error' });
+												.catch( err => {
+													enqueueSnackbar( err.response.data.message ?? 'Please try again', { variant: 'error' });
 												});
 											}
 											else{
@@ -262,7 +299,7 @@ const AddUser = props => {
 									<Button 
 										autoFocus
 										onClick={() => {
-											axios.delete(`http://localhost:3000/delete-user/${ username }`)
+											axios.delete(`http://localhost:3000/delete-user/id/${ id }`)
 											.then(() => {
 												props.fetchAccounts();
 												props.setOpen();
@@ -278,15 +315,24 @@ const AddUser = props => {
 									<Button 
 										autoFocus
 										onClick={() => {
-											if( id && username && password && status && email ){
-												axios.post('http://localhost:3000/edit-user/admin', { id, username, password, status, email })
+											if( id && firstname && lastname && middlename && username && password && status ){
+												axios.post('http://localhost:3000/edit-user/admin', {
+													id, 
+													firstname,
+													lastname,
+													middlename,
+													username, 
+													password, 
+													status, 
+													email 
+												})
 												.then(() => {
 													props.fetchAccounts();
 													props.setOpen();
 													enqueueSnackbar('Successfully edited a user', { variant: 'success' });
 												})
-												.catch(() => {
-													enqueueSnackbar('Please try again', { variant: 'error' });
+												.catch( err => {
+													enqueueSnackbar( err.response.data.message ?? 'Please try again', { variant: 'error' });
 												});
 											}
 											else{
@@ -308,6 +354,27 @@ const AddUser = props => {
 
 const GenerateInputFields = props => (
 	<>
+		<TextField 
+			id="outlined-basic" 
+			label="First Name" 
+			variant="outlined"
+			value={props.firstname}
+			onChange={props.handleFirstName}
+		/>
+		<TextField 
+			id="outlined-basic" 
+			label="Middle Name" 
+			variant="outlined"
+			value={props.middlename}
+			onChange={props.handleMiddleName}
+		/>
+		<TextField 
+			id="outlined-basic" 
+			label="Last Name" 
+			variant="outlined"
+			value={props.lastname}
+			onChange={props.handleLastName}
+		/>
 		<TextField 
 			id="outlined-basic" 
 			label="Username" 

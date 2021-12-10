@@ -89,7 +89,7 @@ const Violation = props => {
 	const fetchViolationList = async() => {
 		axios.get('http://localhost:3000/violation-list')
 		.then( res => {
-			if( res.data?.length ){
+			if( res.data ){ // here
 				setViolationList( res.data.map( (viol, index) => ({ 
 					id: index,
 					...viol
@@ -113,9 +113,6 @@ const Violation = props => {
 	React.useEffect(() => {
 		if( deleteViol ){
 			let modifiedViolations = violationList.filter( viol => viol.id !== deleteViol.id );
-
-			if( modifiedViolations.length ){
-			}
 
 			setDeleteViol( null );
 		}
@@ -256,7 +253,7 @@ const ValidationForm = props => {
 									enqueueSnackbar('Successfully added a violation', { variant: 'success' });
 								})
 								.catch( err => {
-									enqueueSnackbar('Please try again!', { variant: 'error' });
+									enqueueSnackbar( err?.response?.data?.message ?? 'Please try again!', { variant: 'error' });
 								});
 
 								props.setViolation( violation => ({ id: violation.id, violationName, firstOffense, secondOffense, thirdOffense }));
@@ -382,7 +379,7 @@ const ValidationEditForm = props => {
 									enqueueSnackbar('Successfully deleted violation', { variant: 'success' });
 								})
 								.catch(() => {
-									setTimeout(() => handleDelete(), 5000);
+									enqueueSnackbar( 'Please try again!', { variant: 'error' });
 								});
 							}
 
@@ -410,8 +407,9 @@ const ValidationEditForm = props => {
 										props.fetchViolationList();
 										enqueueSnackbar('Successfully edited violation', { variant: 'success' });
 									})
-									.catch(() => {
-										setTimeout(() => handleEdit(), 5000);
+									.catch( err => {
+										enqueueSnackbar( err?.response?.data?.message ?? 'Please try again!', { variant: 'error' });
+										// setTimeout(() => handleEdit(), 5000);
 									});
 								}
 

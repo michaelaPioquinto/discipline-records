@@ -3,6 +3,8 @@ import { Redirect } from 'react-router-dom';
 import axios from 'axios';
 import uniqid from 'uniqid';
 
+import PrintPaper from '../../../components/PrintPaper';
+
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
@@ -78,7 +80,7 @@ const Dashboard = props => {
     let renderedItem = [];
 
     accounts.forEach( acc => {
-      if( acc.firstName.searchContain( search ) ){
+      if( acc.studentID.searchContain( search ) ){
         renderedItem.push( 
           <Item
             key={uniqid()}
@@ -134,8 +136,9 @@ const StudentForm = props => {
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   const { enqueueSnackbar } = useSnackbar();
 
+  const [printPaper, setPrintPaper] = React.useState( null );
   const [reportData, setReportData] = React.useState( null );
-  const [reports, setReports] = React.useState([]);
+  const [reports, setReports] = React.useState( [] );
 
   const fetchStudentReport = async () => {
     if( !props.item ) return;
@@ -164,7 +167,7 @@ const StudentForm = props => {
 
   React.useEffect(() => {
     if( reportData ){
-      reportData.report.forEach( rep => {
+      reportData?.report?.forEach?.( rep => {
         setReports( reports => [ ...reports, (
             <div key={uniqid()}>
                 <Stack direction="column" spacing={2}>
@@ -290,78 +293,106 @@ const StudentForm = props => {
                         />
                       : null
                   }
+                  <div className="container-fluid d-flex justify-content-center align-items-center">
+                    <Button 
+                      variant="standard" 
+                      onClick={() => {
+                        setPrintPaper( <PrintPaper {...reportData.student} {...reportData.report}/> );
+
+                        setTimeout(() => {
+                          const restorePage = document.body.innerHTML;
+                          const page = document.getElementById('print-page').innerHTML;
+
+                          document.body.innerHTML = page;
+                          window.print(); 
+
+                          document.body.innerHTML = restorePage;
+
+                          setPrintPaper( null );
+                        }, 1000);
+                      }}
+                    >
+                      PRINT
+                    </Button>
+                  </div>
                   <Divider/>
               </Stack>
             </div>
           )]);
       });
     }
+    else{
+      setReports( [] );
+    }
   }, [reportData]);
 
   React.useEffect(() => fetchStudentReport(), [props.item]);
 
   return(
-    <div>
-      <Dialog
-        fullScreen={fullScreen}
-        open={ props.isOpen }
-        onClose={ () => {
-          setReportData( null );
-          props.setOpen();
-        }}
-        maxWidth="md"
-        aria-labelledby="responsive-dialog-title"
-      >
-        <DialogTitle id="responsive-dialog-title">
-          {"You are viewing " + (reportData?.student?.firstName ?? '') + "'s data"}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            You are not allowed to modify these data.
-          </DialogContentText>
-          <Box
-            component="form"
-            sx={{
-              '& > :not(style)': { m: 1, width: '500px' },
-            }}
-            noValidate
-            autoComplete="off"
-            > 
-              <Stack spacing={3}>
-                {
-                  reportData
-                    ? (
-                      <>
-                        <TextField
-                          disabled 
-                          id="outlined-basic" 
-                          label="Student ID" 
-                          variant="outlined" 
-                          defaultValue={reportData?.student?.studentID}
-                        />
-                        <TextField
-                          disabled 
-                          id="outlined-basic" 
-                          label="Year" 
-                          variant="outlined" 
-                          defaultValue={reportData?.student?.yearSection}
-                        />
-                      </>
-                    )
-                    : null
-
-                }
-                { reports }
-              </Stack>
-            </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button autoFocus onClick={ props.setOpen }>
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
+    <>
+      { printPaper }
+      <div>
+        <Dialog
+          fullScreen={fullScreen}
+          open={ props.isOpen }
+          onClose={ () => {
+            setReportData( null );
+            setReports( [] );
+            props.setOpen();
+          }}
+          maxWidth="md"
+          aria-labelledby="responsive-dialog-title"
+        >
+          <DialogTitle id="responsive-dialog-title">
+            {"You are viewing " + (reportData?.student?.firstName ?? '') + "'s data"}
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              You are not allowed to modify these data.
+            </DialogContentText>
+            <Box
+              component="form"
+              sx={{
+                '& > :not(style)': { m: 1, width: '500px' },
+              }}
+              noValidate
+              autoComplete="off"
+              > 
+                <Stack spacing={3}>
+                  {
+                    reportData
+                      ? (
+                        <>
+                          <TextField
+                            disabled 
+                            id="outlined-basic" 
+                            label="Student ID" 
+                            variant="outlined" 
+                            defaultValue={reportData?.student?.studentID}
+                          />
+                          <TextField
+                            disabled 
+                            id="outlined-basic" 
+                            label="Year" 
+                            variant="outlined" 
+                            defaultValue={reportData?.student?.yearSection}
+                          />
+                        </>
+                      )
+                      : null
+                  }
+                  { reports }
+                </Stack>
+              </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button autoFocus onClick={ props.setOpen }>
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
+    </>
   );
 }
 

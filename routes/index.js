@@ -13,6 +13,8 @@ var Statistic = require('../models/Statistical');
 var Report = require('../models/report');
 var Archived = require('../models/archived');
 var Token = require('../models/token');
+var Trash = require('../models/trash');
+
 
 var yearTrackerPath = path.join( __dirname, '../data/year-tracker.json');
 
@@ -242,15 +244,23 @@ router.get('/violation-list', async ( req, res ) => {
 });
 
 router.post('/save-violation', async ( req, res ) => {
-	Sanction.create({ ...req.body }, err => {
-		if( err ) return res.sendStatus( 503 );
+  Sanction.findOne({ violationName: req.body.violationName }, (err, doc) => {
+    if( err ) return res.status( 503 ).json({ message: 'Please try again!' });
 
-		return res.sendStatus( 200 );
-	});
+    if( doc ){
+      return res.status( 403 ).json({ message: 'Violation name already exists!'});
+    }
+    else{
+    	Sanction.create({ ...req.body }, err => {
+    		if( err ) return res.sendStatus( 503 );
+
+    		return res.sendStatus( 200 );
+    	});
+    }
+  });
 });
 
 router.delete('/delete-violation/:id', async ( req, res ) => {
-
 	Sanction.deleteOne({ _id: req.params.id }, err => {
 		if( err ) return res.sendStatus( 503 );
 
@@ -266,15 +276,23 @@ router.put('/edit-violation/:id', async ( req, res ) => {
 		thirdOffense
 	} = req.body.item;
 
-	console.log(req.body.item);
-	Sanction.updateOne({ _id: req.params.id }, { violationName, firstOffense, secondOffense, thirdOffense }, err => {
-		if( err ) return res.sendStatus( 503 );
+  Sanction.findOne({ violationName: violationName }, (err, doc) => {
+    if( err ) return res.status( 503 ).json({ message: 'Please try again!' });
 
-		return res.sendStatus( 200 );
-	});
+    if( doc && doc._id.toString() !== req.params.id ){
+      return res.status( 403 ).json({ message: 'Violation name already exists!'});
+    }
+    else{
+      Sanction.updateOne({ _id: req.params.id }, { violationName, firstOffense, secondOffense, thirdOffense }, err => {
+    		if( err ) return res.sendStatus( 503 );
+
+    		return res.sendStatus( 200 );
+    	});
+    }
+  });
 });
 // router.post('/signin', async( req, res ) => {
-// 	const { username, password } = req.body;
+// 	const { username, password } = req.body;res
 
 // 	User.findOne({ username: username, password: password }, (err, doc) => {
 // 		if( err ) return res.sendStatus( 503 );
@@ -289,6 +307,66 @@ router.put('/edit-violation/:id', async ( req, res ) => {
 
 
 // ================= GLOBAL ACCESS ==================
+router.get('/trash/role/:role', async (req, res) => {
+  let data = null;
+
+  switch( req.params.role ){
+    case 'admin':
+      data = await Trash.find().where('role').in(['sysadmin', 'adminstaff']);      
+
+      return res.json( data );
+
+    case 'sysadmin':
+      data = await Trash.find().where('role').in(['admin']);      
+
+      return res.json( data );      
+
+    default:
+      data = await Trash.find().where('role').in(['sysadmin', 'adminstaff', 'admin']);      
+
+      return res.json( data );
+  } 
+});
+
+router.put('/restore-trash/id/:id', async (req, res) => {
+  Trash.findOne({ _id: req.params.id }, (err, doc) => {
+    if( err ) return res.status( 503 ).json({ message: 'Please try again!' });
+  
+    if( doc ){
+      const {
+        firstname,
+        middlename,
+        lastname,
+        username,
+        password,
+        email,
+        role
+      } = doc;
+
+      User.create({ firstname, middlename, lastname, username, password, email, role, status: 'activated' }, err => {
+        if( err ) return res.status( 503 ).json({ message: 'Please try again!' });
+
+        Trash.deleteOne({ _id: req.params.id }, (err, doc) => {
+          if( err ) return res.status( 503 ).json({ message: 'Please try again!' });
+
+          return res.sendStatus( 200 );
+        });
+      });
+    }    
+    else{
+      return res.end();
+    }
+  })
+});
+
+router.put('/delete-trash-permanently/id/:id', async (req, res) => {
+  Trash.deleteOne({ _id: req.params.id }, (err, doc) => {
+    if( err ) return res.status( 503 ).json({ message: 'Please try again!' });
+
+    return res.sendStatus( 200 );
+  });
+});
+
 router.get('/statistical-data', async( req, res ) => {
   fs.readFile( yearTrackerPath, async (err, data) => {
     try{
@@ -388,8 +466,6 @@ router.get('/student-data', async( req, res ) => {
 router.put('/change-user-status', async( req, res ) => {
   const { username, status } = req.body;
 
-  console.log( status );
-
   User.findOneAndUpdate({ username: username }, { status: status }, err => {
     if( err ) return res.sendStatus( 503 );
 
@@ -397,11 +473,34 @@ router.put('/change-user-status', async( req, res ) => {
   });
 });
 
-router.delete('/delete-user/:username', async( req, res ) => {
-  User.deleteOne({ username: req.params.username }, err => {
-    if( err ) return res.sendStatus( 503 );
+router.delete('/delete-user/id/:id', async( req, res ) => {
+  User.findOne({ _id: req.params.id }, (err, doc) => {
+    if( err ) return res.status( 503 ).json({ message: 'Please try again!' });
+  
+    if( doc ){
+      const {
+        firstname,
+        middlename,
+        lastname,
+        username,
+        password,
+        email,
+        role
+      } = doc;
 
-    return res.sendStatus( 200 );
+      Trash.create({ firstname, middlename, lastname, username, password, email, role }, err => {
+        if( err ) return res.status( 503 ).json({ message: 'Please try again!' });
+
+        User.deleteOne({ _id: req.params.id }, (err, doc) => {
+          if( err ) return res.status( 503 ).json({ message: 'Please try again!' });
+
+          return res.sendStatus( 200 );
+        });
+      });
+    }    
+    else{
+      return res.end();
+    }
   });
 });
 
@@ -428,10 +527,19 @@ router.post('/create-user/admin', async( req, res ) => {
       return res.json({ message: 'You must not try to use student ID as your username' });
     }
     else{
-      User.create({ ...req.body }, err => {
-        if( err ) return res.sendStatus( 503 );
+      User.findOne({ username: req.body.username }, (err, doc) => {
+        if( err ) return res.status( 503 ).json({ message: 'Please try again!' });
 
-        return res.sendStatus( 200 );
+        if( doc && doc._id.toString() !== req.body.id ){
+          return res.status( 403 ).json({ message: 'Username already exists!' });
+        }
+        else{
+          User.create({ ...req.body }, err => {
+            if( err ) return res.sendStatus( 503 );
+
+            return res.sendStatus( 200 );
+          });
+        }        
       });
     }
   });
@@ -439,16 +547,25 @@ router.post('/create-user/admin', async( req, res ) => {
 
 router.post('/edit-user/admin', async( req, res ) => {
   Student.findOne({ studentID: req.body.username }, (err, doc) => {
-    if( err ) return res.sendStatus( 503 );
+    if( err ) return res.status( 503 ).json({ message: 'Please try again!' });
 
     if( doc ){
       return res.json({ message: 'You must not try to use student ID as your username' });
     }
     else{
-      User.findOneAndUpdate({ _id: req.body.id }, { ...req.body }, err => {
-        if( err ) return res.sendStatus( 503 );
+      User.findOne({ username: req.body.username }, (err, doc) => {
+        if( err ) return res.status( 503 ).json({ message: 'Please try again!' });
 
-        return res.sendStatus( 200 );
+        if( doc && doc._id.toString() !== req.body.id ){
+          return res.status( 403 ).json({ message: 'Username already exists!' });
+        }
+        else{
+          User.findOneAndUpdate({ _id: req.body.id }, { ...req.body }, err => {
+            if( err ) return res.sendStatus( 503 );
+
+            return res.sendStatus( 200 );
+          });
+        }
       });
     }
   });
@@ -560,25 +677,43 @@ router.get('/archived-students', async( req, res ) => {
 
 
 router.post('/create-student', async( req, res ) => {
-  Student.create({ ...req.body }, err => {
-    if( err ) throw err;
+  Student.findOne({ studentID: req.body.studentID }, (err, doc) => {
+    if( err ) return res.status( 503 ).json({ message: 'Please try again!' });
 
-    return res.sendStatus( 200 );
+    if( doc ){
+      return res.status( 403 ).json({ message: 'Student ID already exists!'});
+    }
+    else{
+      Student.create({ ...req.body }, err => {
+        if( err ) throw err;
+
+        return res.sendStatus( 200 );
+      });
+    }
   });
 });
 
 
 router.put('/edit-student/:id', async( req, res ) => {
-  Student.findOneAndUpdate({ _id: req.params.id }, { ...req.body }, err => {
-    if( err ) return res.sendStatus( 503 );
+  Student.findOne({ studentID: req.body.studentID }, (err, doc) => {
+    if( err ) return res.status( 503 ).json({ message: 'Please try again!' });
 
-    return res.sendStatus( 200 );
+    if( doc && doc._id.toString() !== req.params.id ){
+      return res.status( 403 ).json({ message: 'Student ID already exists!'});
+    }
+    else{
+      Student.findOneAndUpdate({ _id: req.params.id }, { ...req.body }, err => {
+        if( err ) return res.sendStatus( 503 );
+
+        return res.sendStatus( 200 );
+      });
+    }
   });
 });
 
 
 router.delete('/delete-student/:id', async( req, res ) => {
-  Student.deleteOne({ _id: req.params.id }, err => {
+  Student.deleteOne({ _id: req.params.id }, eerr => {
     if( err ) return res.sendStatus( 503 );
 
     return res.sendStatus( 200 );

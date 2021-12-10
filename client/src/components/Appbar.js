@@ -277,7 +277,11 @@ const Appbar = props => {
           open={drawer}
           onClose={toggleDrawer(false)}
         >
-            { list() }
+        	<div className="continer-fluid p-2 d-flex justify-content-center align-items-center">
+						<img id="cct-logo" src="images/cctLogo_new.ico" alt="cct logo"/>
+        	</div>
+        	<Divider/>
+          { list() }
         </Drawer>
         { props.children }
 		</>

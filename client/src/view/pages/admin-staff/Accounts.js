@@ -37,7 +37,6 @@ import SearchContext from '../../../context/SearchContext';
 
 import Table from '../../../components/Table';
 
-
 const Item = props => {
 	const [bgColor, setBgColor] = React.useState('white');
 
@@ -71,7 +70,9 @@ const Item = props => {
 			<TableCell> { props.course } </TableCell>
 			<TableCell> { props.yearSection } </TableCell>
 			<TableCell> 
-				<IconButton onClick={() => handleArchive( props.studentID )}>
+				<IconButton onDoubleClick={e => e.stopPropagation()} onClick={e => {
+					handleArchive( props.studentID );
+				}}>
 					<ArchiveIcon fontSize="small"/>
 				</IconButton>
 			</TableCell>
@@ -139,7 +140,7 @@ const Accounts = props => {
 				head={['ID', 'First Name', 'Middle Name', 'Last Name', 'Course', 'Year & Section', 'Archive']}
 				content={ items }
 			/>
-			<AddUser 
+			<AddUser
 				open={addForm} 
 				setOpen={handleAddForm}
 				setEdit={handleEditForm} 
@@ -294,8 +295,8 @@ const AddUser = props => {
 												props.setOpen();
 												enqueueSnackbar('Successfully added a user', { variant: 'success' });
 											})
-											.catch(() => {
-												enqueueSnackbar('Please try again', { variant: 'error' });
+											.catch( err => {
+												enqueueSnackbar( err?.response?.data?.message ?? 'Please try again!', { variant: 'error' });
 											});
 										}}
 									>
@@ -338,8 +339,8 @@ const AddUser = props => {
 												props.setOpen();
 												enqueueSnackbar('Successfully edited a student', { variant: 'success' });
 											})
-											.catch(() => {
-												enqueueSnackbar('Please try again', { variant: 'error' });
+											.catch( err => {
+												enqueueSnackbar( err?.response?.data?.message ?? 'Please try again!', { variant: 'error' });
 											});
 										}}
 									>

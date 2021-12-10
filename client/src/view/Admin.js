@@ -11,6 +11,7 @@ const Dashboard = React.lazy(() => import('./pages/admin/Dashboard'));
 const Violation = React.lazy(() => import('./pages/admin/Violation'));
 const Handbook = React.lazy(() => import('./pages/admin/Handbook'));
 const Accounts = React.lazy(() => import('./pages/admin/Accounts'));
+const Trash = React.lazy(() => import('./pages/Trash'));
 
 const Admin = props => {
 	const [content, setContent] = React.useState({ name: 'Dashboard', cont: <Dashboard/> });
@@ -26,6 +27,7 @@ const Admin = props => {
 					{ title: 'Account', onClick: () => content.name === 'Account' ? null : setContent({ name: 'Account', cont: <Accounts/> }) },
 					{ title: 'Statistical', onClick: () => content.name === 'Statistical' ? null : setContent({ name: 'Statistical', cont: <Statistical/> }) },
 					{ title: 'Handbook', onClick: () => content.name === 'Handbook' ? null : setContent({ name: 'Handbook', cont: <Handbook/> }) },
+					{ title: 'Trash', onClick: () => content.name === 'Trash' ? null : setContent({ name: 'Trash', cont: <Trash role="admin"/> }) },
 				]}
 			/>
 			<React.Suspense 

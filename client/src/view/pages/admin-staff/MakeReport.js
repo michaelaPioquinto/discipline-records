@@ -3,6 +3,7 @@ import axios from 'axios';
 import uniqid from 'uniqid';
 import debounce from 'lodash.debounce';
 
+
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -72,7 +73,6 @@ const MakeReport = props => {
 		chairpersonName: '',
 		date2: '',
 		majorProblemBehavior: [],
-		minorProblemBehavior: [],
 		initialActionGiven: '',
 		administrativeDecision: [],
 		administrativeComment: '',
@@ -176,10 +176,6 @@ const MakeReport = props => {
 				state.majorProblemBehavior = action.data;
 				return state;
 
-			case 'minorProblemBehavior':
-				state.minorProblemBehavior = action.data;
-				return state;
-
 			case 'initialActionGiven':			
 				state.initialActionGiven = action.data;
 				return state;
@@ -198,50 +194,32 @@ const MakeReport = props => {
 	}
 
 	const handleSubmitReport = async() => {
-		let isAllowed = true;
-
 		setButton({ msg: 'Loading', isDisabled: true });
 
 		dispatch({ type: 'majorProblemBehavior', data: [...state.majorProblemBehavior, otherMajor] });
-		dispatch({ type: 'minorProblemBehavior', data: [...state.minorProblemBehavior, otherMinor] });
 		dispatch({ type: 'administrativeDecision', data: [...state.administrativeDecision, otherDecision] });
 
 		setTimeout(() => {
-			Object.keys({ ...state}).forEach( key => {
-				if(( key !== 'majorProblemBehavior' && key !== 'minorProblemBehavior' && key !== 'administrativeDecision') 
-					&& key !== 'images' && (!state[ key ] || !state[ key ].length) ){
+			axios.post('http://localhost:3000/save-report', state)
+			.then( async res => {
+				if( image ){
+					const formData = new FormData();
+					formData.append('reportImage', image );
 
-					console.log( key );
-					isAllowed = false;
-				}
-			});
-
-			if( isAllowed ){
-				axios.post('http://localhost:3000/save-report', state)
-				.then( async res => {
-					if( image ){
-						const formData = new FormData();
-						formData.append('reportImage', image );
-
-						try{
-							await axios.post(`http://localhost:3000/save-report-image`, formData)
-						}
-						catch( err ){
-							throw err;
-						}				
+					try{
+						await axios.post(`http://localhost:3000/save-report-image`, formData)
 					}
+					catch( err ){
+						throw err;
+					}				
+				}
 
-					setButton({ msg: 'Submit', isDisabled: false });
-					enqueueSnackbar( res.data.message, { variant: 'success' });
-				})
-				.catch( err => {
-					throw err;
-				});
-			}
-			else{
 				setButton({ msg: 'Submit', isDisabled: false });
-				return enqueueSnackbar( 'All fields must have a value', { variant: 'error' });
-			}
+				enqueueSnackbar( res.data.message, { variant: 'success' });
+			})
+			.catch( err => {
+				throw err;
+			});
 		}, 1000);
 	}
 
@@ -261,21 +239,21 @@ const MakeReport = props => {
 		}
 	}
 
-	const handleMinorProblemBehavior = (e, value) => {
-		const label = e.target.labels[0].innerText;
-		const labelExists = state.minorProblemBehavior.includes( label );
+	// const handleMinorProblemBehavior = (e, value) => {
+	// 	const label = e.target.labels[0].innerText;
+	// 	const labelExists = state.minorProblemBehavior.includes( label );
 
-		if( labelExists && !value ){
-			const newList = state.minorProblemBehavior.filter( val => val !== label );
-			dispatch({ type: 'minorProblemBehavior', data: newList });
-		}
-		else if( !labelExists && value ){
-			const newList = state.minorProblemBehavior;
-			newList.push( label );
+	// 	if( labelExists && !value ){
+	// 		const newList = state.minorProblemBehavior.filter( val => val !== label );
+	// 		dispatch({ type: 'minorProblemBehavior', data: newList });
+	// 	}
+	// 	else if( !labelExists && value ){
+	// 		const newList = state.minorProblemBehavior;
+	// 		newList.push( label );
 
-			dispatch({ type: 'minorProblemBehavior', data: newList });
-		}
-	}
+	// 		dispatch({ type: 'minorProblemBehavior', data: newList });
+	// 	}
+	// }
 
 	const handleAdministrativeDecision = (e, value) => {
 		const label = e.target.labels[0].innerText;
@@ -297,9 +275,12 @@ const MakeReport = props => {
 
 	return(
 		<div style={{ width: '100%', height: '90%', overflowY: 'auto' }} className="d-flex flex-column align-items-center">
-			<div className="col-12 d-flex flex-column justify-content-start align-items-start p-5">
-				<h4 className="text-uppercase">city college of tagaytay</h4>
-				<h1 className="text-uppercase">student incident report</h1>
+			<div className="col-12 px-5 d-flex flex-row justify-content-start align-items-center">
+				<img id="discipline-logo" src="images/discipline.png" alt="discipline office logo"/>
+				<div className="col-12 d-flex flex-column justify-content-start align-items-start p-5">
+					<h4 className="text-uppercase">city college of tagaytay</h4>
+					<h1 className="text-uppercase">student incident report</h1>
+				</div>
 			</div>
 			<div className="container-fluid">
 				<Divider/>
@@ -466,7 +447,7 @@ const MakeReport = props => {
 					<h5 className="text-uppercase"><b>problem behavior:</b></h5>
 				</div>
 
-				<div className="px-5 col-md-5 my-3 d-flex flex-column justify-content-between align-items-start">
+				{/*<div className="px-5 col-md-5 my-3 d-flex flex-column justify-content-between align-items-start">
 					<div className="col-12">
 						<p className="text-uppercase">minors:</p>
 					</div>
@@ -512,64 +493,77 @@ const MakeReport = props => {
 					/>
 
 					<OtherCheckBox onChange={value => setOtherMinor( value )}/>
-				</div>
+				</div>*/}
 
 				{/*================================================================================*/}
 
-				<div className="px-5 col-md-5 my-3 d-flex flex-column justify-content-center align-items-start">
-					<div className="col-12">
+				<div className="px-5 row col-md-12 my-3 d-flex flex-column justify-content-center align-items-center">
+					<div className="col-md-12">
 						<p className="text-uppercase">majors: (Automatic Office Referral)</p>
 					</div>
 
-					<FormControlLabel
-						label="Using another persons, ID/COR, lending of ID/COR"
-						control={<Checkbox onChange={handleMajorProblemBehavior}{...label}/>}
-					/>
-					
-					<FormControlLabel
-						label="Forging, Falsifying or Tampering of any Academic, Official Records of Documents"
-						control={<Checkbox onChange={handleMajorProblemBehavior}{...label}/>}
-					/>
+					<div className="row container-fluid">
+						<div className="col-md-6">
+							<FormControlLabel
+								label="Using another persons, ID/COR, lending of ID/COR"
+								control={<Checkbox onChange={handleMajorProblemBehavior} {...label}/>}
+							/>
+						</div>
 
-					<FormControlLabel
-						label="Unauthorized possession of examination materials, and other documents"
-						control={<Checkbox onChange={handleMajorProblemBehavior}{...label}/>}
-					/>
-
-					<FormControlLabel
-						label="Having somebody else take an examination for another"
-						control={<Checkbox onChange={handleMajorProblemBehavior}{...label}/>}
-					/>
-
-					<FormControlLabel
-						label="Cheating during examination"
-						control={<Checkbox onChange={handleMajorProblemBehavior}{...label}/>}
-					/>
-
-					<FormControlLabel
-						label="Plagiarism"
-						control={<Checkbox onChange={handleMajorProblemBehavior}{...label}/>}
-					/>
-
-					<FormControlLabel
-						label="Grave act of disrespect"
-						control={<Checkbox onChange={handleMajorProblemBehavior}{...label}/>}
-					/>
-
-					<FormControlLabel
-						label="Involvement in any form of attack to other person"
-						control={<Checkbox onChange={handleMajorProblemBehavior}{...label}/>}
-					/>
-
-					<FormControlLabel
-						label="Bullying in any form"
-						control={<Checkbox onChange={handleMajorProblemBehavior}{...label}/>}
-					/>
-
-					<OtherCheckBox onChange={value => setOtherMajor( value )}/>
-				</div>
-			</div>			
-
+						<div className="col-md-6">
+							<FormControlLabel
+								label="Forging, Falsifying or Tampering of any Academic, Official Records of Documents"
+								control={<Checkbox onChange={handleMajorProblemBehavior} {...label}/>}
+							/>
+						</div>
+						<div className="col-md-6">
+							<FormControlLabel
+								label="Unauthorized possession of examination materials, and other documents"
+								control={<Checkbox onChange={handleMajorProblemBehavior} {...label}/>}
+							/>
+						</div>
+						<div className="col-md-6">
+							<FormControlLabel
+								label="Having somebody else take an examination for another"
+								control={<Checkbox onChange={handleMajorProblemBehavior} {...label}/>}
+							/>
+						</div>
+						<div className="col-md-6">
+							<FormControlLabel
+								label="Cheating during examination"
+								control={<Checkbox onChange={handleMajorProblemBehavior} {...label}/>}
+							/>
+						</div>
+						<div className="col-md-6">
+							<FormControlLabel
+								label="Plagiarism"
+								control={<Checkbox onChange={handleMajorProblemBehavior} {...label}/>}
+							/>
+						</div>
+						<div className="col-md-6">
+							<FormControlLabel
+								label="Grave act of disrespect"
+								control={<Checkbox onChange={handleMajorProblemBehavior} {...label}/>}
+							/>
+						</div>
+						<div className="col-md-6">
+							<FormControlLabel
+								label="Involvement in any form of attack to other person"
+								control={<Checkbox onChange={handleMajorProblemBehavior}{...label}/>}
+							/>
+						</div>
+						<div className="col-md-6">
+							<FormControlLabel
+								label="Bullying in any form"
+								control={<Checkbox onChange={handleMajorProblemBehavior}{...label}/>}
+							/>
+						</div>
+						<div className="col-md-6">
+							<OtherCheckBox onChange={value => setOtherMajor( value )}/>
+						</div>
+					</div>
+				</div>			
+			</div>
 			<div className="row container-fluid d-flex flex-column justify-content-center align-items-center">
 				<div className="col-md-12 px-5 d-flex justify-content-start align-items-start">
 					<h5 className="text-uppercase"><b>administrative decision:</b></h5>
