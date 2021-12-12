@@ -222,7 +222,7 @@ const AddUser = props => {
 				<DialogTitle id="responsive-dialog-title">
 					{
 						!props.editingMode
-							? "Want to add a system administrator or an administrator staff?"
+							? "Want to add a administrator"
 							: "Edit this account?"
 					}
 				</DialogTitle>

@@ -586,10 +586,19 @@ router.get('/accounts/system-admin', async( req, res ) => {
 // =============== ADMINISTRATOR STAFF =================
 
 router.post('/save-report', async( req, res ) => {
-  Report.create({ ...req.body }, err => {
-    if( err ) return res.sendStatus( 503 );
+  Student.findOne({ studentID: req.body.studentID }, (err, doc) => {
+    if( err ) return res.status( 503 ).json({ message: 'Please try again!' });
 
-    return res.json({ message: 'Successfully saved report!'});
+    if( doc ){
+      Report.create({ ...req.body }, err => {
+        if( err ) return res.sendStatus( 503 );
+
+        return res.json({ message: 'Successfully saved report!'});
+      });
+    }
+    else{
+        return res.status( 403 ).json({ message: 'Student ID does not exist'});
+    }
   });
 });
 

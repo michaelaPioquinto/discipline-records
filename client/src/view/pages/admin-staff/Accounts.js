@@ -104,7 +104,7 @@ const Accounts = props => {
 		let renderedItem = [];
 
 		accounts.forEach( acc => {
-			if( acc.firstName.searchContain( search ) ){
+			if( acc.studentID.searchContain( search ) ){
 				renderedItem.push( 
 					<Item 
 						key={uniqid()} 

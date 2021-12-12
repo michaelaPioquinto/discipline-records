@@ -1,21 +1,6 @@
 // Admin
-// dashboard Nakokopya ung report nang iba [/]
-// Violation pag iisa nalang violation hindi na rerefresh pag dinelete [/]
-// Duplicate violation [/]
-// Trash [] - 
-// Account need all field [/]
-
-// Adstaff
-// Search student id [/]
-// Student duplicate [/]
-// Make report time incedent [/]
-// Send report redirect [] 
 // Picture must be jpg [] - bawal png?
 
-// Student
-// Pag sinasave picture black lang [/]  
-
-// Kapag mag ccreate ng account for admin, sysadmin and staff kailangan may basic info sa tao (name, email, etc) []
 // Yung design wag masyadong plain (sabi ni caraan) []
 
 // ======================================================================================

@@ -6,6 +6,7 @@ import { Route, Switch, Redirect } from 'react-router-dom';
 import LinearProgress from '@mui/material/LinearProgress';
 import { SnackbarProvider } from 'notistack';
 
+import PrintPaper from './components/PrintPaper';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -119,7 +120,10 @@ const Authentication = props => {
 	          break;
 
 	        default:
-	        	if( role === 'admin' ){
+	        	if( path.pathname.indexOf('/print-student-report') === 0 ){
+		          setToThisView( path.pathname );
+	        	}
+	        	else if( role === 'admin' ){
 		          setToThisView( '/admin' );
 	        	}
 	        	else if( role === 'sysadmin' ){
@@ -158,6 +162,16 @@ const Authentication = props => {
 	              allow 
 	                ? (
 	                    <>
+	                    	{
+	                    		role !== 'student'
+	                    			? (
+		                    				<Route exact path="/print-student-report/:studentID/reportIndex/:reportIndex">
+						                      <PrintPaper/>
+						                    </Route>
+					                    )
+					                  : null
+	                    	}
+
 	                      <Route exact path="/admin">
 	                        <Admin tools={tools}/>
 	                      </Route>
@@ -175,18 +189,11 @@ const Authentication = props => {
 	                      </Route>
 	                    </>
 	                  )
-	                : null
-	            }
-	            {
-	              allow === false 
-	                ? (
-	                    <>
-	                      <Route path="/sign-in">
-	                        <SignIn tools={tools}/>
-	                      </Route>
-	                    </>
-	                  )
-	                : null
+	                : (
+		                	<Route path="/sign-in">
+	                      <SignIn tools={tools}/>
+	                    </Route>
+                    )
 	            }
 	          </Switch>
 	          { view }

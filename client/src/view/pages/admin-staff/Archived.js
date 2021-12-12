@@ -74,7 +74,7 @@ const Archived = props => {
 		let renderedItem = [];
 
 		accounts.forEach( student => {
-			if( student.firstName.searchContain( search ) ){
+			if( student.studentID.searchContain( search ) ){
 				renderedItem.push( <Student key={uniqid()} {...student} handleUnarchive={handleUnarchive}/> );
 			}
 		});
