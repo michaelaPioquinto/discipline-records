@@ -308,22 +308,6 @@ const AddUser = props => {
 									<Button 
 										autoFocus
 										onClick={() => {
-											axios.delete(`http://localhost:3000/delete-student/${ props._id }`)
-											.then(() => {
-												props.fetchAccounts();
-												props.setOpen();
-												enqueueSnackbar('Successfully deleted a student', { variant: 'success' });
-											})
-											.catch(() => {
-												enqueueSnackbar('Please try again', { variant: 'error' });
-											});
-										}}
-									>
-										Delete
-									</Button>
-									<Button 
-										autoFocus
-										onClick={() => {
 											axios.put(`http://localhost:3000/edit-student/${ props._id }`, { 
 												studentID, 
 												firstName, 

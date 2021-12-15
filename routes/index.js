@@ -722,7 +722,7 @@ router.put('/edit-student/:id', async( req, res ) => {
 
 
 router.delete('/delete-student/:id', async( req, res ) => {
-  Student.deleteOne({ _id: req.params.id }, eerr => {
+  Student.deleteOne({ _id: req.params.id }, err => {
     if( err ) return res.sendStatus( 503 );
 
     return res.sendStatus( 200 );

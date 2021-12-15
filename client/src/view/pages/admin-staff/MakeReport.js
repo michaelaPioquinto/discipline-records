@@ -294,9 +294,9 @@ const MakeReport = props => {
 	}, [goHome]);
 
 	return(
-		<>
+		<div style={{ width: '100%', height: '100%' }} className="p-4">
 			{ goHome ? window.location.reload( true ) : null }
-			<div style={{ width: '100%', height: '90%', overflowY: 'auto' }} className="d-flex flex-column align-items-center">
+			<div style={{ width: '100%', height: '90%', overflowY: 'auto', backgroundColor: 'rgba(255, 255, 255, 0.8)' }} className="p-3 rounded d-flex flex-column align-items-center">
 				<div className="col-12 px-5 d-flex flex-row justify-content-start align-items-center">
 					<img id="discipline-logo" src="images/discipline.png" alt="discipline office logo"/>
 					<div className="col-12 d-flex flex-column justify-content-start align-items-start p-5">
@@ -699,7 +699,7 @@ const MakeReport = props => {
 					</Button>
 				</div>
 			</div>
-		</>
+		</div>
 	);
 }
 

@@ -137,6 +137,14 @@ const Appbar = props => {
 		>
 			<MenuItem onClick={handleProfileMenuOpen}>
 				<Stack>
+					<Typography
+						variant="h6"
+						noWrap
+						component="div"
+						sx={{ display: { xs: 'none', sm: 'block' }, letterSpacing: '1px' }}
+					>
+						<b>Discipline Records Management</b>
+					</Typography>
 					<Divider/>
 					<IconButton
 						size="small"
@@ -218,14 +226,9 @@ const Appbar = props => {
 					>
 						<MenuIcon />
 					</IconButton>
-		            <Typography
-						variant="h6"
-						noWrap
-						component="div"
-						sx={{ display: { xs: 'none', sm: 'block' } }}
-					>
-						{ props.title ?? 'Menu' }
-					</Typography>
+					<div className="col-7 d-flex justify-content-start align-items-center">
+						<b id="app-title" className="p-0 m-0">Discipline Records Management</b>
+					</div>
 					{
 						allowSearch
 							? (
@@ -243,6 +246,14 @@ const Appbar = props => {
 							: null
 					}
 					<Box sx={{ flexGrow: 1 }} />
+          <Typography
+						variant="h6"
+						noWrap
+						component="div"
+						sx={{ display: { xs: 'none', sm: 'block' } }}
+					>
+						{ props.title ?? 'Menu' }
+					</Typography>
 					<Box sx={{ display: { xs: 'none', md: 'flex' } }}>
 						<IconButton
 							size="large"
@@ -268,7 +279,7 @@ const Appbar = props => {
 							<MoreIcon />
 						</IconButton>
 					</Box>
-		        </Toolbar>
+	        </Toolbar>
 		    </AppBar>
 		    {renderMobileMenu}
 		    {renderMenu}

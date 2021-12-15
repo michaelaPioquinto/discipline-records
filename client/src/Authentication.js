@@ -23,6 +23,8 @@ import FormControl from '@mui/material/FormControl';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+import cctLogo from './images/cct-logo.ico';
+
 const Admin = React.lazy(() => import('./view/Admin'));
 const Student = React.lazy(() => import('./view/Student'));
 const SystemAdmin = React.lazy(() => import('./view/System-Admin'));
@@ -268,6 +270,7 @@ const SignIn = props => {
 			style={{ width: '100%', height: '100vh' }} 
 			className="sign-in d-flex flex-column justify-content-center align-items-center"
 		>
+			<img id="cct-logo" style={{ width: '200px', height: '200px' }} src={cctLogo} alt="cct-logo"/>
 			{
 				errMsg 
 					? <Alert variant="outlined" severity="error">
@@ -275,61 +278,62 @@ const SignIn = props => {
 					</Alert> 
 					: null
 			}
-			<div className="d-flex justify-content-center">
-				<Typography 
-					variant="h3" 
-					sx={{ 
-						color: 'black', 
-						fontFamily: 'Poppins',
-						letterSpacing: '5px'
-					}}
-				>
-					SIGN-IN
-				</Typography>
+			<div className="mb-3 d-flex justify-content-center">
+				<h2 className="text-uppercase text-center" style={{ letterSpacing: '3px', color: 'rgba(0, 0, 0, 0.4)'}}>
+					discpline records management
+				</h2>
 			</div>
 			<br/>
-			<div 
-				style={{
-					width: '100%',
-					height: '30%'
-				}} 
-				className="d-flex flex-column justify-content-around align-items-center"
-			>
-				<TextField sx={{width: '25ch' }} onChange={setUsername} id="sign-in-uname" label="username" variant="outlined" />
-				<Divider/>
-				<FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
-					<InputLabel htmlFor="sign-in-pass">Password</InputLabel>
-					<OutlinedInput 
-						id="outlined-adornment-password" 
-						type={ user.showPassword ? "text" : "password" }
-						value={ user.password } 
-						onChange={setPassword} 
-						endAdornment={
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label="toggle password visibility"
-                  onClick={handleClickShowPassword}
-                  onMouseDown={handleMouseDownPassword}
-                  edge="end"
-                >
-                  { user.showPassword ? <VisibilityOff sx={{ color: 'black' }}/> : <Visibility sx={{ color: 'black' }}/> }
-                </IconButton>
-              </InputAdornment>
-            }
-					/>
-				</FormControl>
-				<div className="d-flex flex-row justify-content-between align-items-center"> 
-					<Button 
-						onClick={handleSignin} 
-						disabled={ btnMsg === 'loading' ? true : false } 
-						sx={{borderColor: 'black', color: 'black'}} 
-						variant="outlined"
-						autoFocus
-					> 
-						{ btnMsg } 
-					</Button>
-				</div>
-			</div>			
+			<div className="container-fluid d-flex justify-content-center align-items-center">
+					<div 
+						style={{
+							backgroundColor: 'white',
+							width: 'fit-content',
+							height: '100%',
+							border: '1px solid rgba(0, 0, 0, 0.3)',
+							borderRadius: '10px'
+						}} 
+						className="p-3 d-flex flex-column justify-content-around align-items-center"
+					>
+						<div className="mb-3 d-flex justify-content-center">
+							<p style={{ letterSpacing: '3px', color: 'rgba(0, 0, 0, 0.7)', fontSize: '14px'}}>Sign in to start your session</p>
+						</div>
+						<TextField sx={{width: '6cm' }} onChange={setUsername} id="sign-in-uname" label="username" variant="outlined" />
+						<Divider/>
+						<FormControl sx={{ m: 3, width: '6cm' }} variant="outlined">
+							<InputLabel htmlFor="sign-in-pass">Password</InputLabel>
+							<OutlinedInput 
+								id="outlined-adornment-password" 
+								type={ user.showPassword ? "text" : "password" }
+								value={ user.password } 
+								onChange={setPassword} 
+								endAdornment={
+		              <InputAdornment position="end">
+		                <IconButton
+		                  aria-label="toggle password visibility"
+		                  onClick={handleClickShowPassword}
+		                  onMouseDown={handleMouseDownPassword}
+		                  edge="end"
+		                >
+		                  { user.showPassword ? <VisibilityOff sx={{ color: 'black' }}/> : <Visibility sx={{ color: 'black' }}/> }
+		                </IconButton>
+		              </InputAdornment>
+		            }
+							/>
+						</FormControl>
+						<div className="d-flex flex-row justify-content-between align-items-center"> 
+							<Button 
+								onClick={handleSignin} 
+								disabled={ btnMsg === 'loading' ? true : false } 
+								sx={{borderColor: 'black', color: 'white', backgroundColor: '#dd4b39'}} 
+								variant="filled"
+								autoFocus
+							> 
+								{ btnMsg } 
+							</Button>
+						</div>
+					</div>			
+			</div>
 		</div>
 	);
 }

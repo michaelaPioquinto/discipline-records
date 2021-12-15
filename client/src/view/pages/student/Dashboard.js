@@ -21,6 +21,12 @@ const Root = styled('div')(({ theme }) => ({
   },
 }));
 
+const CustomizedTextField = styled( TextField )({
+	backgroundColor: 'rgba(255, 255, 255, 0.9)',
+	border: 'none',
+	borderRadius: '5px',
+});
+
 const Dashboard = props => {
 	const [studentData, setStudentData] = React.useState( null );
 	const [reportsView, setReportsView] = React.useState( [] );
@@ -55,7 +61,7 @@ const Dashboard = props => {
 	}, [studentData]);
 
 	return(
-		<div style={{ width: '100%', height: '100%', overflow: 'auto' }} className="m-0 py-5 px-2 row d-flex justify-content-start align-items-center">
+		<div style={{ width: '100%', height: '100%', overflow: 'auto' }} className="m-0 py-5 px-2 d-flex flex-column justify-content-start align-items-center">
 			<div className="col-12 pl-2">
 				<h1 style={{ letterSpacing: '5px' }}><b>Hi, { studentData?.student?.firstName ?? '' }</b></h1>
 			</div>
@@ -146,7 +152,8 @@ const Report = props => {
 				height: '100%', 
 				overflowY: 'auto', 
 				border: '1px solid rgba(0, 0, 0, 0.5)',
-				borderRadius: '5px'
+				borderRadius: '5px',
+				backgroundColor: 'rgba(255, 255, 255, 0.8)'
 			}} 
 			className="d-flex flex-column justify-content-between align-items-center"
 		>
@@ -214,7 +221,7 @@ const SkeletonizedTextfield = props => (
 	<>
 		{
 			props?.data
-				? <TextField disabled={ props.disabled ?? true } label={props.label} defaultValue={props.data} sx={{ width: props.width ?? '7cm' }}/>
+				? <CustomizedTextField disabled={ props.disabled ?? true } label={props.label} variant="filled" defaultValue={props.data} sx={{ width: props.width ?? '7cm', border: 'none' }}/>
 				: <Skeleton width={ props.width ?? '7cm' } height="100px" />
 		}
 	</>
