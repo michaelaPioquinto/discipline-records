@@ -729,6 +729,13 @@ router.delete('/delete-student/:id', async( req, res ) => {
   });
 });
 
+router.get('/incident-number', async( req, res ) => {
+  Report.find({}).countDocuments(( err, count ) => {
+    if( err ) return res.sendStatus( 503 );
+
+    return res.json( count );
+  });
+});
 
 const incrementYearTracker = tracker => {
   return tracker.map( year => year += 1 );

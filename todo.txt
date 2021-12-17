@@ -1,0 +1,15 @@
+student
+  page - data - [/]
+
+dashboard
+  opacity - [/]
+  gagawin full name nalang - [/]
+
+archive table seselect anong sem and year i fefetch - []
+student activate and deactivate - [] 
+
+report
+  report list - [] - uneditable
+  nasa dialog box nalang nang student - [/]
+  
+statistical - []

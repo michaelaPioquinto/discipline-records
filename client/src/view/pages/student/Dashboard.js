@@ -60,10 +60,23 @@ const Dashboard = props => {
 		}
 	}, [studentData]);
 
+	const renderFullName = () => {
+		if( (!studentData?.student?.firstName && !studentData?.student?.lastname ) || !studentData?.student?.middleName )
+			return 'N/A';
+
+		const middleName = studentData?.student?.middleName ?? '';
+
+		return (
+			studentData?.student?.firstName + ' ' +
+			middleName + ' ' +
+			studentData?.student?.lastname 
+		);
+	}
+
 	return(
 		<div style={{ width: '100%', height: '100%', overflow: 'auto' }} className="m-0 py-5 px-2 d-flex flex-column justify-content-start align-items-center">
 			<div className="col-12 pl-2">
-				<h1 style={{ letterSpacing: '5px' }}><b>Hi, { studentData?.student?.firstName ?? '' }</b></h1>
+				<h1 style={{ letterSpacing: '5px' }}><b>Hello! {  (studentData?.student?.lastname ?? '') +', '+  (studentData?.student?.firstName ?? '') }</b></h1>
 			</div>
 			<div className="col-12">
 				<Root>
@@ -74,21 +87,21 @@ const Dashboard = props => {
 			</div>
 
 			<div className="row col-12 d-flex flex-row justify-content-between">
-				<div className="col-md-3 my-2 d-flex justify-content-center align-items-center">
-					<SkeletonizedTextfield label="Student ID" data={studentData?.student?.studentID} />
+				<div className="col-md-12 my-2 d-flex justify-content-center align-items-center">
+					<SkeletonizedTextfield width="100%" label="Student Name" data={studentData ? renderFullName() : null} />
 				</div>
-				<div className="col-md-3 my-2 d-flex justify-content-center align-items-center">
-					<SkeletonizedTextfield label="First Name" data={studentData?.student?.firstName} />
-				</div>
-				<div className="col-md-3 my-2 d-flex justify-content-center align-items-center">
+				{/*<div className="col-md-3 my-2 d-flex justify-content-center align-items-center">
 					<SkeletonizedTextfield label="Middle Name" data={studentData?.student?.middleName}/>
 				</div>
 				<div className="col-md-3 my-2 d-flex justify-content-center align-items-center">
 					<SkeletonizedTextfield label="Last Name" data={studentData?.student?.lastname}/>
-				</div>
+				</div>*/}
 			</div>
 
 			<div className="row col-12 d-flex flex-row justify-content-between">
+				<div className="col-md-3 my-2 d-flex justify-content-center align-items-center">
+					<SkeletonizedTextfield label="Student ID" data={studentData?.student?.studentID} />
+				</div>
 				<div className="col-md-3 my-2 d-flex justify-content-center align-items-center">
 					<SkeletonizedTextfield label="Course" data={ studentData?.student?.course } />
 				</div>
@@ -114,29 +127,35 @@ const Dashboard = props => {
 			<div className="col-12 d-flex justify-content-center align-items-center">
 				<div style={{ position: 'relative', width: '60%', minWidth: '350px' }} className="py-5 m-0">
 					{
-						studentData
+						studentData && studentData?.report?.length
 							? (
-								<>
-									<div className="col-12 my-3 d-flex justify-content-center align-items-center">
-										{ reportsView[ reportPage - 1 ] }
-									</div>
-									<div 
-										style={{
-											position: 'absolute',
-											bottom: '10%',
-											left: '50%',
-											transform: 'translate(-50%, -90%)',
-											width: 'fit-content',
-											height: 'fit-content',
-											backgroundColor: 'rgba(255, 255, 255, 0.4)',
-										}}
-										className="col-12 py-1 px-2 d-flex justify-content-center align-items-center"
-									>
-										<Pagination count={ reportsView.length } page={ reportPage } onChange={ handleSwitchPage }/>
-									</div>
-								</>
+									<>
+										<div className="col-12 my-3 d-flex justify-content-center align-items-center">
+											{ reportsView[ reportPage - 1 ] }
+										</div>
+										<div 
+											style={{
+												position: 'absolute',
+												bottom: '10%',
+												left: '50%',
+												transform: 'translate(-50%, -90%)',
+												width: 'fit-content',
+												height: 'fit-content',
+												backgroundColor: 'rgba(255, 255, 255, 0.4)',
+											}}
+											className="col-12 py-1 px-2 d-flex justify-content-center align-items-center"
+										>
+											<Pagination count={ reportsView.length } page={ reportPage } onChange={ handleSwitchPage }/>
+										</div>
+									</>
 								)
-							: null
+							: (
+									<div className="container-fluid text-center">
+										<h4 className="p-0 m-0">
+											<b className="p-0 m-0" style={{ color: 'rgba(0, 0, 0, 0.5)'}}>NO REPORTS</b>
+										</h4>
+									</div>
+								)
 					}	
 				</div>
 			</div>
@@ -217,31 +236,74 @@ const findSemester = data => {
 }
 
 
-const SkeletonizedTextfield = props => (
-	<>
-		{
-			props?.data
-				? <CustomizedTextField disabled={ props.disabled ?? true } label={props.label} variant="filled" defaultValue={props.data} sx={{ width: props.width ?? '7cm', border: 'none' }}/>
-				: <Skeleton width={ props.width ?? '7cm' } height="100px" />
-		}
-	</>
-);
+const SkeletonizedTextfield = props => {
+	const [state, setState] = React.useState('loading');
+	const [content, setContent] = React.useState( <Skeleton width={ props.width ?? '7cm' } height="100px" /> );
 
-const SkeletonizedImage = props => (
-	<>
-		{
-			props?.data
-				? <img 
-					src={props.data} 
-					style={{ 
-						width: props.width ?? '100%', 
-						height: props.height ?? '100%',
-						imageRendering: 'pixelated' 
-					}}
-				/>
-				: <Skeleton width={ props.width } height={ props.height } />
+	React.useEffect(() => {
+		if( props.data ){
+			setState('ok');
 		}
-	</>
-);
+		else{
+			setState('loading');
+
+			setTimeout(() => setState('no data'), 5000);
+		}
+	}, [props]);
+
+	React.useEffect(() => {
+		if( state === 'ok' ){
+			setContent(
+				<CustomizedTextField 
+					disabled={ props.disabled ?? true } 
+					label={props.label} 
+					variant="filled" 
+					defaultValue={props?.data} 
+					sx={{ width: props.width ?? '7cm', border: 'none' }}
+				/>
+			);	
+		}
+		else if( state === 'loading' ){
+			setContent( <Skeleton width={ props.width ?? '7cm' } height="100px" /> );
+		}
+		else{
+			setContent(
+				<CustomizedTextField 
+					disabled={ props.disabled ?? true } 
+					label={props.label} 
+					variant="filled" 
+					defaultValue="N/A" 
+					sx={{ width: props.width ?? '7cm', border: 'none' }}
+				/>
+			);
+		}
+	}, [state]);
+
+	return (
+		<>
+			{ content }
+		</>
+	)
+};
+
+const SkeletonizedImage = props => {
+	return(
+		<>
+			{
+				props?.data
+					? <img 
+						src={props.data} 
+						style={{ 
+							width: props.width ?? '100%', 
+							height: props.height ?? '100%',
+							imageRendering: 'pixelated' 
+						}}
+					/>
+					: <Skeleton width={ props.width } height={ props.height } />
+			}
+		</>
+	)
+};
+
 
 export default Dashboard;

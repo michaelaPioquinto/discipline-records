@@ -32,6 +32,7 @@ import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
 
 import Table from '../../../components/Table';
+import SearchContext from '../../../context/SearchContext';
 
 const Item = props => {
 	const [status, setStatus] = React.useState( props.status === 'activated' ? true : false );
@@ -84,6 +85,7 @@ const Accounts = props => {
 	const [addForm, setAddForm] = React.useState( false );
 	const [selectedItem, setSelectedItem] = React.useState( null );
 	const { enqueueSnackbar } = useSnackbar();
+	const search = React.useContext( SearchContext );
 
 	const fetchAccounts = async () => {
 		axios.get('http://localhost:3000/accounts/admin')
@@ -101,18 +103,20 @@ const Accounts = props => {
 		let renderedItem = [];
 
 		accounts.forEach( acc => {
-			renderedItem.push( 
-				<Item 
-					key={uniqid()} 
-					onDoubleClick ={handleEditForm} 
-					fetchAccounts={fetchAccounts}
-					{...acc}
-				/> 
-			);
+			if( acc.username.searchContain( search ) ){
+				renderedItem.push( 
+					<Item 
+						key={uniqid()} 
+						onDoubleClick ={handleEditForm} 
+						fetchAccounts={fetchAccounts}
+						{...acc}
+					/> 
+				);
+			}
 		});
 
 		setItems([...renderedItem]);
-	}, [accounts]);
+	}, [accounts, search]);
 
 	const handleAddForm = async () => {
 		setAddForm( addForm => !addForm );

@@ -116,7 +116,7 @@ const Violation = props => {
 		<div style={{ width: '100%', height: '80vh' }} className="p-3 d-flex flex-column">
       <Table
         style={{ width: '100%' }}
-        maxWidth={580}
+      	maxHeight={ 500 }
         head={['Violation Name', 'First Offense', 'Second Offense', 'Third Offense']}
         content={
           list.map( item => (

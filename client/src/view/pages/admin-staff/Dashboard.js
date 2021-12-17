@@ -51,6 +51,19 @@ const Root = styled('div')(({ theme }) => ({
 const Item = props => {
   const [bgColor, setBgColor] = React.useState('white');
 
+  const renderFullName = () => {
+    if( (!props?.firstName && !props?.lastname ) || !props?.middleName )
+      return 'N/A';
+
+    const middleName = props?.middleName ?? '';
+
+    return (
+      props.firstName + ' ' +
+      middleName + ' ' +
+      props.lastname 
+    );
+  }
+
   return(
     <TableRow
       sx={{ backgroundColor: bgColor, transition: '.1s ease-in-out' }} 
@@ -59,11 +72,8 @@ const Item = props => {
       onDoubleClick={() => props.onClick({ isOpen: true, item: {...props} })}
     >
       <TableCell> { props.studentID } </TableCell>
-      <TableCell> { props.firstName } </TableCell>
-      <TableCell> { props.lastname } </TableCell>
-      <TableCell> { props.middleName } </TableCell>
-      <TableCell> { props.course } </TableCell>
-      <TableCell> { props.yearSection } </TableCell>
+      <TableCell> { props ? renderFullName() : 'N/A' } </TableCell>
+      <TableCell> { props.course + ' ' + props.yearSection } </TableCell>
     </TableRow>
   );
 }
@@ -124,10 +134,14 @@ const Dashboard = props => {
         <Table
           style={{ width: '100%' }}
           maxHeight={ 500 }
-          head={['Student ID', 'First Name', 'Last Name', 'Middle Name', 'Course', 'Year & Section']}
+          head={['Student ID', 'Student Name', 'Course / Year / Section']}
           content={ items }
         />
-        <StudentForm restorePage={restorePage} setOpen={setOpen} item={editForm.item} isOpen={editForm.isOpen} />
+        {
+          editForm.item
+            ? <StudentForm restorePage={restorePage} setOpen={setOpen} item={editForm.item} isOpen={editForm.isOpen}/>
+            : null
+        }
       </div>
 		</div>
 	);
@@ -169,7 +183,6 @@ const StudentForm = props => {
 
   React.useEffect(() => {
     if( reportData ){
-      console.log( reportData );
       reportData?.report?.forEach?.((rep, index) => {
         setReports( reports => [ ...reports, (
             <div key={uniqid()}>
@@ -181,7 +194,7 @@ const StudentForm = props => {
                             id="outlined-basic" 
                             label={`Duty - ${ rep.semester }`} 
                             variant="outlined" 
-                            defaultValue={rep?.duty?.join?.(', ')}
+                            defaultValue={rep?.duty?.length ? rep?.duty?.join?.(', ') : ' ' }
                         />
                       : null
                   }
@@ -375,7 +388,14 @@ const StudentForm = props => {
             </Box>
         </DialogContent>
         <DialogActions>
-          <Button autoFocus onClick={ props.setOpen }>
+          <Button 
+            autoFocus 
+            onClick={() => {
+              setReportData( null );
+              setReports( [] );
+              props.setOpen();
+            }}
+          >
             Close
           </Button>
         </DialogActions>

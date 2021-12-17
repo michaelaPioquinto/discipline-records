@@ -5,6 +5,7 @@ import Cookies from 'js-cookie';
 
 import { styled, alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
@@ -44,7 +45,6 @@ const Search = styled('div')(({ theme }) => ({
     width: 'auto',
   },
 }));
-
 
 const SearchIconWrapper = styled('div')(({ theme }) => ({
   padding: theme.spacing(0, 2),
@@ -137,15 +137,6 @@ const Appbar = props => {
 		>
 			<MenuItem onClick={handleProfileMenuOpen}>
 				<Stack>
-					<Typography
-						variant="h6"
-						noWrap
-						component="div"
-						sx={{ display: { xs: 'none', sm: 'block' }, letterSpacing: '1px' }}
-					>
-						<b>Discipline Records Management</b>
-					</Typography>
-					<Divider/>
 					<IconButton
 						size="small"
 						aria-label="log out account of current user"
@@ -192,23 +183,23 @@ const Appbar = props => {
 	      onClick={toggleDrawer(false)}
 	      onKeyDown={toggleDrawer(false)}
 	    >
-			<List>
-				{props?.listItems?.map?.((item, index) => (
-					<ListItem 
-						key={uniqid()} 
-						button 
-						onClick={() => {
-							item.onClick();
-							setSearchAllow( props?.openSearchOn?.includes?.( item?.title ) ?? false );
-						}}
-					>
-						<ListItemIcon>
-							<ArrowForwardIosIcon fontSize="small" />
-						</ListItemIcon>
-						<ListItemText primary={item.title} />
-					</ListItem>
-				))}
-			</List>
+				<List>
+					{props?.listItems?.map?.((item, index) => (
+						<ListItem 
+							key={uniqid()} 
+							button 
+							onClick={() => {
+								item.onClick();
+								setSearchAllow( props?.openSearchOn?.includes?.( item?.title ) ?? false );
+							}}
+						>
+							<ListItemIcon>
+								<ArrowForwardIosIcon fontSize="small" />
+							</ListItemIcon>
+							<ListItemText primary={item.title} />
+						</ListItem>
+					))}
+				</List>
 	    </Box>
 	);
 	
@@ -226,7 +217,7 @@ const Appbar = props => {
 					>
 						<MenuIcon />
 					</IconButton>
-					<div className="col-7 d-flex justify-content-start align-items-center">
+					<div className="col-4 d-flex justify-content-start align-items-center">
 						<b id="app-title" className="p-0 m-0">Discipline Records Management</b>
 					</div>
 					{
@@ -293,6 +284,19 @@ const Appbar = props => {
         	</div>
         	<Divider/>
           { list() }
+          {
+          	props.tools.role === 'sysadmin'
+          		? (
+          				<>
+          					<Divider/>
+					          <br/>
+					          <div className="d-flex justify-content-center align-items-center">
+						          <Button variant="filled" sx={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', color: 'white'}}>back up</Button>
+					          </div>
+          				</>
+          			)
+          		: null
+          }
         </Drawer>
         { props.children }
 		</>

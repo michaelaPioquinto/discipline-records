@@ -1,10 +1,3 @@
-// Admin
-// Picture must be jpg [] - bawal png?
-
-// Yung design wag masyadong plain (sabi ni caraan) []
-
-// ======================================================================================
-
 import React from 'react';
 import { Redirect } from 'react-router-dom';
 import axios from 'axios';
@@ -167,7 +160,7 @@ const StudentForm = props => {
                       id="outlined-basic" 
                       label={`Duty - ${ rep.semester }`} 
                       variant="outlined" 
-                      defaultValue={rep?.duty?.join?.(', ')}
+                      defaultValue={rep?.duty?.length ? rep?.duty?.join?.(', ') : ' ' }
                   />
                   <TextField
                       disabled 
@@ -281,7 +274,14 @@ const StudentForm = props => {
             </Box>
         </DialogContent>
         <DialogActions>
-          <Button autoFocus onClick={ props.setOpen }>
+          <Button 
+            autoFocus 
+            onClose={ () => {
+              setReportData( null );
+              setReports( [] );
+              props.setOpen();
+            }}
+          >
             Close
           </Button>
         </DialogActions>
