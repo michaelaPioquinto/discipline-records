@@ -80,7 +80,7 @@ const Item = props => {
     >
       <TableCell> { props.studentID } </TableCell>
       <TableCell> { props ? renderFullName() : 'N/A' } </TableCell>
-      <TableCell> { props.course + ' ' + props.yearSection } </TableCell>
+      <TableCell> { props.course } </TableCell>
       {
         props?.openReport 
           ? (
@@ -92,7 +92,7 @@ const Item = props => {
                   sx={{ color: 'red', borderColor: 'red' }} 
                   startIcon={<ReportGmailerrorredIcon/>}
                 >
-                  REPORT
+                  add incident
                 </Button>
               </TableCell>
             )
@@ -107,12 +107,13 @@ const Dashboard = props => {
   const restorePage = document.body.innerHTML;
 
 	// Fetch user data
-  const [head, setHead] = React.useState(['Student ID', 'Student Name', 'Course / Year / Section']);
+  const [head, setHead] = React.useState(['Student ID', 'Student Name', 'Course']);
 	const [accounts, setAccounts] = React.useState( [] );
   const [items, setItems] = React.useState( [] );
   const [editForm, setEditForm] = React.useState({ isOpen: false, item: null });
   const [selected, setSelected] = React.useState( null );
   const [incidentNumber, setIncidentNumber] = React.useState( null );
+  const [semester, setSemester] = React.useState( null );
 
   const search = React.useContext( SearchContext );
   
@@ -167,14 +168,26 @@ const Dashboard = props => {
     setEditForm({ isOpen: false, item: null });
   }
 
+  const getSchoolYearAndSemester = async() => {
+    axios.get(`http://localhost:3000/get-current-school-year-semester`)
+    .then( res => {
+      setSemester( res?.data?.semester + ' semester' );
+    })
+    .catch( err => {
+      throw err;
+    });
+  }
+
 	React.useEffect(() => {
     fetchStudentData();
     if( props?.role && props?.role === 'adminstaff' ){
-      setHead(head => [...head, 'Report']);
+      setHead(head => [...head, 'Action']);
     }
 	}, []);
 
   React.useEffect(() => fetchIncidentNumber(), []);
+  React.useEffect(() => getSchoolYearAndSemester(), []);
+
 
 	return(
 		<div style={{ width: '100%', height: 'fit-content' }}>
@@ -189,6 +202,7 @@ const Dashboard = props => {
         { 
           selected 
             ? <MakeReportForm 
+                semester={semester}
                 data={selected} 
                 setOpen={() => setSelected( null )} 
                 isOpen={ selected ? true : false }
@@ -211,6 +225,7 @@ const StudentForm = props => {
   const [reportData, setReportData] = React.useState( null );
   const [reports, setReports] = React.useState( [] );
   const [page, setPage] = React.useState( 1 );
+  const [yearSemester, setYearSemester] = React.useState( null );
 
   const fetchStudentReport = async () => {
     if( !props.item ) return;
@@ -235,6 +250,15 @@ const StudentForm = props => {
       
       throw err;
     });
+
+    axios.get(`http://localhost:3000/get-current-school-year-semester`)
+    .then( res => {
+      setYearSemester( res.data );
+    })
+    .catch( err => {
+      
+      throw err;
+    });
   } 
 
   React.useEffect(() => {
@@ -255,13 +279,12 @@ const StudentForm = props => {
                       ? <TextField
                             disabled 
                             id="outlined-basic"
-                            label={`Duty - ${ rep.semester }`} 
+                            label={`Duty - ${ yearSemester.semester } semester`} 
                             variant="outlined" 
                             defaultValue={rep?.duty?.length ? rep?.duty?.join?.(', ') : ' ' }
                         />
                       : null
                   }
-
                   {
                     rep?.semester 
                       ? <TextField
@@ -273,7 +296,6 @@ const StudentForm = props => {
                         />
                       : null
                   }
-
                   {
                     rep?.images && rep?.images?.length
                       ? (
@@ -424,7 +446,7 @@ const StudentForm = props => {
           > 
             <Stack spacing={3}>
               {
-                reportData
+                reportData && yearSemester
                   ? (
                     <>
                       <TextField
@@ -440,6 +462,21 @@ const StudentForm = props => {
                         label="Year" 
                         variant="outlined" 
                         defaultValue={reportData?.student?.yearSection}
+                      />
+                      <TextField
+                        disabled 
+                        id="outlined-basic" 
+                        label="Semester" 
+                        variant="outlined" 
+                        defaultValue={yearSemester?.semester}
+                      />
+
+                      <TextField
+                        disabled 
+                        id="outlined-basic" 
+                        label="School Year" 
+                        variant="outlined" 
+                        defaultValue={yearSemester?.schoolYear}
                       />
                       <Divider/>
                     </>
@@ -530,7 +567,7 @@ const MakeReportForm = props => {
 
   const initState = {
     studentID: props?.data?.studentID ?? '',
-    semester: '1st semester',
+    semester: props?.semester,
     reportedBy: '', 
     role: '', 
     duty: [],
@@ -837,14 +874,7 @@ const MakeReportForm = props => {
               </div>
 
               <div className="col-md-12 d-flex justify-content-start align-items-start">
-                <Autocomplete
-                    defaultValue={state.semester}
-                    sx={{ width: '300px', margin: '10px' }}
-                    options={['1st semester', '2nd semester']}
-                    onChange={(e, data) => dispatch({ type: 'semester', data })}
-                    onInputChange={(e, data) => dispatch({ type: 'semester', data })}
-                    renderInput={ params => <TextField { ...params} label="Semester" variant="standard"/> }
-                  />
+                <TextField disabled sx={{ width: '300px', margin: '10px' }} defaultValue={state.semester} required onChange={e => dispatch({ type: 'semester', data: e.target.value })} label="Semester" variant="standard"/>
               </div>
 
               <div className="col-md-12">

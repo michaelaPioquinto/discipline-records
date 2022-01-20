@@ -28,33 +28,40 @@ import TableCell from '@mui/material/TableCell';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
-import ArchiveIcon from '@mui/icons-material/Archive';
+
+// import ArchiveIcon from '@mui/icons-material/Archive';
 import UnarchiveIcon from '@mui/icons-material/Unarchive';
 import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import SearchContext from '../../../context/SearchContext';
 
 import Table from '../../../components/Table';
 
+
 const Item = props => {
 	const [bgColor, setBgColor] = React.useState('white');
+	const [status, setStatus] = React.useState( props.status );
 
-	const handleArchive = e => {
-		debouncedChangeStatus();
+	const handleStatus = e => {
+		changeStatus();
 	}
 
 	const changeStatus = async () => {
-		axios.put('http://localhost:3000/archive-student', { 
-			studentID: props.studentID 
+		axios.put(`http://localhost:3000/change-student-status`, { studentID : props.studentID })
+		.then(res => {
+			console.log( res.data );
+			setStatus( res.data );
+			props.fetchAccounts();
 		})
-		.then(() => props.fetchAccounts())
 		.catch( err => {
-			setTimeout(() => changeStatus(), 5000);
+			throw err;
+			// setTimeout(() => changeStatus(), 5000);
 		});
 	}
 
-	const debouncedChangeStatus = debounce(changeStatus, 500);
+	const debouncedChangeStatus = debounce(handleStatus, 500);
 
 	return(
 		<TableRow 
@@ -64,18 +71,16 @@ const Item = props => {
 			onDoubleClick={() => props.onDoubleClick({ editingMode: true, ...props })}
 		>
 			<TableCell> { props.studentID } </TableCell>
-			<TableCell> { props.firstName } </TableCell>
-			<TableCell> { props.lastname } </TableCell>
-			<TableCell> { props.middleName } </TableCell>
+			<TableCell> { `${props.firstName} ${props.middleName} ${props.lastname}` } </TableCell>
 			<TableCell> { props.course } </TableCell>
 			<TableCell> { props.yearSection } </TableCell>
-			<TableCell> 
-				<IconButton onDoubleClick={e => e.stopPropagation()} onClick={e => {
-					handleArchive( props.studentID );
-				}}>
-					<ArchiveIcon fontSize="small"/>
-				</IconButton>
-			</TableCell>
+			{/*<TableCell> 
+				<FormControlLabel
+					onDoubleClick={e => e.stopPropagation()} 
+					control={<Switch checked={status === 'activated' ? true : false} onDoubleClick={e => e.stopPropagation()} onChange={() => debouncedChangeStatus()}/>} 
+					label={ status === 'activated' ? 'Activated' : 'Deactivated' }
+				/>
+			</TableCell>*/}
 		</TableRow>
 	);
 }
@@ -137,7 +142,7 @@ const Accounts = props => {
 			<Table
 				maxHeight={ 500 }
 				style={{ width: '100%' }}
-				head={['ID', 'First Name', 'Middle Name', 'Last Name', 'Course', 'Year & Section', 'Archive']}
+				head={['ID', 'Full Name', 'Course', 'Year & Section']}
 				content={ items }
 			/>
 			<AddUser
@@ -167,7 +172,7 @@ const AddUser = props => {
 	const [password, setPassword] = React.useState( props.password ?? '' );
 	const [yearSection, setYearSection] = React.useState( props.yearSection ?? '' );
 	const [course, setCourse] = React.useState( props.course ?? '' );
-	const [archived, setArchived] = React.useState( props.archived ?? { isArchived: false, date: new Date().getFullYear() });
+	// const [archived, setArchived] = React.useState( props.archived ?? { isArchived: false, date: new Date().getFullYear() });
 
 	const { enqueueSnackbar } = useSnackbar();
 
@@ -287,8 +292,7 @@ const AddUser = props => {
 												middleName, 
 												password, 
 												course, 
-												yearSection,
-												archived
+												yearSection
 											})
 											.then(() => {
 												props.fetchAccounts();
@@ -315,8 +319,7 @@ const AddUser = props => {
 												middleName, 
 												password, 
 												course, 
-												yearSection,
-												archived
+												yearSection
 											})
 											.then(() => {
 												props.fetchAccounts();

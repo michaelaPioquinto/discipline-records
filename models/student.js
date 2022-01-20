@@ -8,8 +8,9 @@ const studentSchema = new Schema({
 	middleName: { type: String, required: true },
 	password: { type: String, required: true },
 	course: { type: String, required: true },
+	semester: { type: String, default: '1st' },
 	yearSection: { type: String, required: true },
-	archived: { isArchived: Boolean, year: String }
+	status: { type: String, default: 'activated' }
 });
 
 

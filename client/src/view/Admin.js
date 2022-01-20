@@ -9,10 +9,11 @@ import TableSkeleton from '../components/TableSkeleton';
 import LinearProgress from '@mui/material/LinearProgress';
 
 const Statistical = React.lazy(() => import('./pages/admin/Statistical'));
-const Dashboard = React.lazy(() => import('./pages/Dashboard'));
+const SchoolYears = React.lazy(() => import('./pages/admin/SchoolYears'));
 const Violation = React.lazy(() => import('./pages/admin/Violation'));
 const Handbook = React.lazy(() => import('./pages/admin/Handbook'));
 const Accounts = React.lazy(() => import('./pages/admin/Accounts'));
+const Dashboard = React.lazy(() => import('./pages/Dashboard'));
 const Trash = React.lazy(() => import('./pages/Trash'));
 
 const Admin = props => {
@@ -34,6 +35,7 @@ const Admin = props => {
 					{ title: 'Dashboard', onClick: () => content.name === 'Dashboard' ? null : setContent({ name: 'Dashboard', cont: <Dashboard search={searchContent}/> }) },
 					{ title: 'Violation', onClick: () =>  content.name === 'Validation' ? null : setContent({ name: 'Violation', cont: <Violation search={searchContent}/> })},
 					{ title: 'Account', onClick: () => content.name === 'Account' ? null : setContent({ name: 'Account', cont: <Accounts search={searchContent}/> }) },
+					{ title: 'School Year & Semester', onClick: () => content.name === 'School Year & Semester' ? null : setContent({ name: 'School Year & Semester', cont: <SchoolYears search={searchContent}/> }) },
 					{ title: 'Statistical', onClick: () => content.name === 'Statistical' ? null : setContent({ name: 'Statistical', cont: <Statistical/> }) },
 					{ title: 'Handbook', onClick: () => content.name === 'Handbook' ? null : setContent({ name: 'Handbook', cont: <Handbook/> }) },
 					{ title: 'Trash', onClick: () => content.name === 'Trash' ? null : setContent({ name: 'Trash', cont: <Trash role="admin"/> }) },

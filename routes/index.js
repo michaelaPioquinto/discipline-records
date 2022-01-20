@@ -14,6 +14,7 @@ var Report = require('../models/report');
 var Archived = require('../models/archived');
 var Token = require('../models/token');
 var Trash = require('../models/trash');
+var SchoolYear = require('../models/schoolYear');
 
 
 var yearTrackerPath = path.join( __dirname, '../data/year-tracker.json');
@@ -54,7 +55,7 @@ router.post('/sign-in', async (req, res, next) => {
     if( err ) return res.sendStatus( 500 );
 
     if( doc ){
-      if( doc.archived.isArchived ){
+      if( doc.status === 'deactivated' ){
         return res.status( 403 ).json({ message: 'This account is deactivated.' });
       }
       else{
@@ -307,6 +308,73 @@ router.put('/edit-violation/:id', async ( req, res ) => {
 
 
 // ================= GLOBAL ACCESS ==================
+router.get('/report', async(req, res) => {
+  Report.find({}, (err, doc) => {
+    if( err ) return res.sendStatus( 503 );
+
+    if( doc ){
+      return res.json( doc );
+    }
+  });
+});
+
+router.put('/change-school-year-semester-status/:id', async(req, res) => {
+  SchoolYear.findOneAndUpdate({ _id: req.params.id }, { status: req.body.status }, (err, doc) => {
+
+    return res.sendStatus( 200 );
+  });
+});
+
+router.get('/school-year-and-semester', async( req, res ) => {
+  SchoolYear.find({}, (err, doc) => {
+    if( err ) return res.sendStatus( 503 );
+
+    if( doc ){
+      return res.json( doc );
+    }
+  });
+});
+
+router.post('/create-school-year', async( req, res ) => {
+  const sy = req.body;
+
+  delete sy._id;
+
+  SchoolYear.create({ ...sy }, err => {
+    if( err ) return res.sendStatus( 503 );
+
+    return res.sendStatus( 200 );
+  });
+});
+
+router.put('/edit-school-year', async( req, res ) => {
+  const sy = req.body;
+
+  SchoolYear.findOneAndUpdate({ _id: sy._id }, { ...sy }, err => {
+    if( err ) {
+      return res.sendStatus( 503 );
+    }
+
+    return res.sendStatus( 200 );
+  });
+});
+
+router.get('/get-current-school-year-semester', async(req, res) => {
+  SchoolYear.find({}, (err, docs) => {
+    if( err ) return res.sendStatus( 503 );
+
+    if( docs ){
+      docs.forEach( doc => {
+        if( doc.status === 'activated' ){
+          return res.json( doc );
+        }
+      });
+
+      return res.end();
+    }
+  });
+});
+
 router.get('/trash/role/:role', async (req, res) => {
   let data = null;
 
@@ -451,16 +519,30 @@ router.get('/student-report/:id', async( req, res ) => {
 });
 
 router.get('/student-data', async( req, res ) => {
-	try{
-    const result = await Student.find().$where(function() {
-      return this.archived.isArchived === false;
-    });
+	// Student.find({}, (err, doc) => {
+ //    if( err ) return res.sendStatus( 503 );
 
-		return res.json( result );
-  }
-  catch( err ){
-    return res.sendStatus( 503 );
-  }
+ //    if( doc ){
+ //      const activated = [];
+ //      const deactivated = [];
+
+ //      return res.json( doc );
+ //    }
+ //  });
+ try{
+   const deactivatedStudents = await Student.find().$where(function() {
+    return this.status === 'deactivated';
+   }).sort({ studentID: 1 });
+
+   const activatedStudents = await Student.find().$where(function() {
+    return this.status === 'activated';
+   }).sort({ studentID: 1 });;
+
+   return res.json([ ...activatedStudents, ...deactivatedStudents ]);
+ }
+ catch( err ){
+  return res.sendStatus( 503 );
+ }
 });
 
 router.put('/change-user-status', async( req, res ) => {
@@ -615,20 +697,17 @@ router.post('/save-report-image', async( req, res ) => {
   });
 });
 
-router.put('/archive-student', async( req, res ) => {
+router.put('/change-student-status', async( req, res ) => {
   Student.findOne({ studentID: req.body.studentID }, async (err, doc) => {
     if( err ) return res.sendStatus( 503 );
 
     if( doc ){
-      const isArchived = doc.archived.isArchived;
-      doc.archived = {
-        isArchived: !isArchived,
-        year: new Date().getFullYear()
-      };
+      const status = doc.status;
+      doc.status = status === 'activated' ? 'deactivated' : 'activated';
 
       try{
         await doc.save();
-        return res.sendStatus( 200 );
+        return res.json( status === 'activated' ? 'deactivated' : 'activated' );
       }
       catch( err ) {
         throw err

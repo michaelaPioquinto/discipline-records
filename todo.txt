@@ -1,15 +1,39 @@
-student
-  page - data - [/]
-
-dashboard
-  opacity - [/]
-  gagawin full name nalang - [/]
-
-archive table seselect anong sem and year i fefetch - []
-student activate and deactivate - [] 
-
-report
-  report list - [] - uneditable
-  nasa dialog box nalang nang student - [/]
-  
-statistical - []
+ADMINISTRATIVE STAFF
+  DASHBOARD
+    FIELD Report = Action [/]
+    Report Button = Add Incedent [/] 
+    Course / Year / Section = Course [/]   
+    pag double click sa Student []
+      Student ID
+      Semester (mang gagaling to sa active na year and sem sa admin) - [/]
+      Year (mang gagaling to sa active na year and sem sa admin) - [/]
+      Duty - [/]
+      Duty Hr - [how should I do this? Still ambiguous]
+      Report = Violation(minor or major) 
+        example Not wearing ID Matic may concatinate na First Offense pag nag duplicate         
+        ung report magiging Second and Third Offense ung susunod na report
+      Evidence - [/]
+      Adminstrative Decision - [/]
+      Remarks 
+      Administrative Comments
+        pag pindot nang submit(may lalabas na preview nung na fillup nya tsaka nya ma susubmit)        
+  ACCOUNTS
+    Student ID - [/]
+    FullName - [/]
+    Course - [/]
+      PAG DOUBLECLICK - [/]
+        Student ID - [/]
+        FullName - [/] - bawal kasi di malalaman ng system kapag first ba or middle name ang inedit
+        Course - [/]
+        Password - [/]
+  REPORTS
+    Incident NO.
+    Student ID
+    Yr ( eto eh mang gagaling sa active na year and sem sa may admin)
+    Sem ( eto eh mang gagaling sa active na year and sem sa may admin)
+    Violation 
+    Archive
+ADMINISTRATOR 
+  Active Year and Sem 
+    Year And Sem (active or deactive) - [/]
+    Create Year and Sem - [/]
