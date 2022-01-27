@@ -10,28 +10,43 @@ import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
+import Button from '@mui/material/Button';
 
 import IconButton from '@mui/material/IconButton';
 import ArchiveIcon from '@mui/icons-material/Archive';
 
+import { useSnackbar } from 'notistack';
 import SearchContext from '../../../context/SearchContext';
+import Pagination from '@mui/material/Pagination';
 
 
-const Student = props => {
+const Report = props => {
 	const { handleArchive } = props;
+	const [behaviors, setBehaviors] = React.useState( [] );
+
+	React.useEffect(() => {
+		if( props.majorProblemBehavior.length || props.minorProblemBehavior.length ){
+			setBehaviors( props.minorProblemBehavior.push( ...props.majorProblemBehavior ) );
+		}
+	}, [props]);
 
 	return(
 		<TableRow>
 			<TableCell> { props.studentID } </TableCell>
-			<TableCell> { props.firstName } </TableCell>
-			<TableCell> { props.lastname } </TableCell>
-			<TableCell> { props.middleName } </TableCell>
-			<TableCell> { props.course } </TableCell>
-			<TableCell> 
-				<IconButton onClick={() => handleArchive( props.studentID )}>
-					<ArchiveIcon/>
-				</IconButton>
-			</TableCell>
+			<TableCell> { props.studentName } </TableCell>
+			<TableCell> { props.incidentDescription } </TableCell>
+			<TableCell> { props.reportedBy } </TableCell>
+			<TableCell> { props.dateOfReport } </TableCell>
+			<TableCell> { behaviors?.join?.(', ') } </TableCell>
+			{
+				props.status === 'activated'
+					? <TableCell> 
+						<IconButton onClick={() => handleArchive( props )}>
+							<ArchiveIcon/>
+						</IconButton>
+					</TableCell>
+					: null
+			}
 		</TableRow>
 	);
 }
@@ -41,13 +56,17 @@ const Archived = props => {
 	const [reports, setReports] = React.useState([]);
 	const [renderedReports, setRenderedReports] = React.useState([]);
 	const [items, setItems] = React.useState([]);
+	const [currentView, setCurrentView] = React.useState( 'activated' );
+	const [page, setPage] = React.useState( 1 );
+
 	// const [yearOptions, setYearOptions] = React.useState([]);
 	// const [yearSelected, setYearSelected] = React.useState( '' );
 	
 	const search = React.useContext( SearchContext );
+	const { enqueueSnackbar } = useSnackbar();
 
 	const getReports = async() => {
-		axios.get('http://localhost:3000/reports')
+		axios.get('http://localhost:3000/report')
 		.then( res => {
 			setReports([ ...res.data ]);
 		})
@@ -56,85 +75,84 @@ const Archived = props => {
 		});
 	}
 
-	const handleArchive = reportId => {
-		axios.put(`http://localhost:3000/archive-report`, { reportId })
-		.then( res => {
-			getReports();
-		})
-		.catch( err => {
-			throw err;
-		});
-	}
+	const handleArchive = async ({ _id }) => {
+	    axios.put(`http://localhost:3000/archive-report/${ _id }`)
+	    .then(() => {
+	      getReports();
+	    })
+	    .catch( err => {
+	      enqueueSnackbar( 'Please try again later', { variant: 'error' });       
+	    });
+  	}
 
 	// const handleYearSelection = ( e, data ) => {
 	// 	setYearSelected( data );
 	// }
 
 	React.useEffect(() => {
-		let renderedItem = [];
+		let filtered = [];
+		let chunkSet = [];
+		const chunksLimit = 7;
 
-		items.forEach( item => {
-			if( report.incidentDescription.searchContain( search ) ){
-				renderedItem.push( <Item key={uniqid()} {...item}/> );
+		const addToFilteredItems = item => filtered.push( <Report key={uniqid()} {...item} handleArchive={handleArchive}/> );
+
+		reports?.forEach?.( item => {
+			if( item?.studentName?.searchContain?.( search ) && item?.status === currentView ){
+				addToFilteredItems( item );
 			}
 		});
 
-		setRenderedReports([ ...renderedItem ]);
-	}, [accounts, search]);
-	
-	// React.useEffect(() => {
-	// 	const students = [];
-	// 	const years = []
+		if( reports.length ){
+			let index = 0;
+			do{
+				const chunk = filtered.slice(index, index + chunksLimit);
 
-	// 	const getYear = student => {
-	// 		if( !years.includes(student.archived.year) ){ 
-	// 			years.push( student.archived.year ); 
-	// 		}
-	// 	};
+				chunkSet.push( chunk );	
 
+				index += chunksLimit;
+			}
+			while( chunkSet.length < Math.floor( filtered.length / chunksLimit ) + (filtered % chunksLimit === 0 ? 0 : 1 ));
+		}
 
-	// 	archivedStudents.forEach( getYear );
-
-	// 	setAccounts([ ...archivedStudents ]);
-	// 	setYearOptions([ ...years ]);
-	// }, [archivedStudents]);
+		setRenderedReports([ ...chunkSet ]);
+	}, [reports, search, currentView]);	
 
 
-	// React.useEffect(() => {
-	// 	const students = []
+	React.useEffect(() => {
+		if( renderedReports.length ){
+			if( page === renderedReports.length && !renderedReports[ renderedReports.length - 1 ].length ){
+				if( page - 1 > 0 ){
+					setPage( page => page - 1 );
+				}
+			}
+		}
+	}, [renderedReports, page]);
 
-	// 	if( yearSelected && yearSelected?.length ){
-	// 		archivedStudents?.forEach?.( student => {
-	// 			if( student.archived.year.includes( yearSelected ) )
-	// 				students.push( student );
-	// 		});
-	// 	}
-	// 	else{
-	// 		archivedStudents?.forEach?.( student => {
-	// 			students.push( student );
-	// 		});
-	// 	}
-
-	// 	setAccounts([ ...students ]);
-	// }, [yearSelected]);
-
-	// React.useEffect(() => console.log(renderedStudents), [renderedStudents]);
-
-	React.useEffect(() => getArchived(), []);
+	React.useEffect(() => getReports(), []);
 
 	return(
 		<div style={{ width: '100%', height: '100%' }} className="d-flex justify-content-center align-items-start">
 			<Paper sx={{ width: '95%', height: '80%', marginTop: '10px' }} elevation={5}>
-				<Stack direction="column" justifyContent="center" alignItems="center">
-					<div className="col-11">
-						<Table
-							maxHeight={330}
-							style={{ width: '100%' }}
-							head={['Incident No.', 'Reported By', 'Reported Student','Incident Description', 'Date of incident', 'Archive']}
-							content={[...renderedStudents]}
-						/>
+				<div style={{ height: '90%' }}>
+					<Table
+						maxHeight="100%"
+						style={{ width: '100%' }}
+						head={
+							currentView === 'activated'
+								? ['Student ID', 'Student Name', 'Incident Description', ' Reported By', 'Date Of Report', 'Problem Behavior', 'Action']
+								: ['Student ID', 'Student Name', 'Incident Description', ' Reported By', 'Date Of Report', 'Problem Behavior']
+						}
+						content={renderedReports[ page - 1 ]}
+					/>
+				</div>
+				<div style={{ width: '100%', height: '10%' }} className="row py-2 px-1">
+					<div className="col-8">
+						<Pagination count={ renderedReports.length } page={ page } onChange={(_, value) => setPage( value )}/>
 					</div>
-				</Stack>
+					<div className="col-4">
+						<Button onClick={() => setCurrentView( currentView => currentView === 'activated' ? 'deactivated' : 'activated' )}>{ currentView === 'activated' ? 'deactivated' : 'activated' }</Button>
+					</div>
+				</div>
 			</Paper>
 		</div>
 	);

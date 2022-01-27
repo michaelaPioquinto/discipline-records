@@ -14,6 +14,7 @@ const reportsSchema = new Schema({
 	dateOfIncident: String,
 	courseYearSection: String,
 	timeOfIncident: String,
+	dutyHrs: String,
 	location: String,
 	specificArea: String,
 	images: [ String ],
@@ -26,10 +27,15 @@ const reportsSchema = new Schema({
 	employeeDate: String,
 	headName: String,
 	headDate: String,
+	minorProblemBehavior: [ String ],
 	majorProblemBehavior: [ String ],
 	initialActionGiven: String,
 	administrativeDecision: [ String ],
-	administrativeComment: String
+	administrativeComment: String,
+	firstOffenses: [ String ],
+	secondOffenses: [ String ],
+	thirdOffenses: [ String ],
+	status: { type: String, default: 'activated' }
 });
 
 

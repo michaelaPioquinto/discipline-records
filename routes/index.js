@@ -17,7 +17,7 @@ var Trash = require('../models/trash');
 var SchoolYear = require('../models/schoolYear');
 
 
-var yearTrackerPath = path.join( __dirname, '../data/year-tracker.json');
+// var yearTrackerPath = path.join( __dirname, '../data/year-tracker.json');
 
 const requestAccessToken = ( user ) => {
   return jwt.sign( user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '24h' } );
@@ -42,7 +42,6 @@ const authentication = (req, res, next) => {
 /* GET home page. */
 router.get('/verify-me', authentication, async (req, res, next) => {
   // If a request came here then it is authorized
- 	console.log( req.user );
  	
   return res.json({ username: req.user.name, role: req.user.role, message: `Welcome ${ req.user.username }`});
 });
@@ -308,6 +307,34 @@ router.put('/edit-violation/:id', async ( req, res ) => {
 
 
 // ================= GLOBAL ACCESS ==================
+router.put('/archive-report/:reportId', async( req, res ) => {
+  // archive report
+  Report.findOneAndUpdate({ _id: req.params.reportId }, { status: 'deactivated' }, err => {
+    if( err ) return res.sendStatus( 503 );
+
+    return res.sendStatus( 200 );
+  });
+});
+
+router.put('/duty-update/:reportId', async( req, res ) => {
+  Report.findOne({ _id: req.params.reportId }, (err, doc) => {
+    if( err ) return res.sendStatus( 503 );
+
+    if( doc ){
+      doc.dutyHrs = req.body.dutyHrs;
+
+      doc.save( err => {
+        if( err ) return res.sendStatus( 503 );
+
+        return res.sendStatus( 200 );
+      });
+    }
+    else{
+      return res.end();
+    }
+  });
+});
+
 router.get('/report', async(req, res) => {
   Report.find({}, (err, doc) => {
     if( err ) return res.sendStatus( 503 );
@@ -436,56 +463,61 @@ router.put('/delete-trash-permanently/id/:id', async (req, res) => {
 });
 
 router.get('/statistical-data', async( req, res ) => {
-  fs.readFile( yearTrackerPath, async (err, data) => {
-    try{
-        years = JSON.parse( data );
+  Statistic.find({}, (err, docs) => {
+    if( err ) return res.status( 503 ).json({ message: 'Please try again!' });
 
-        let violatorsNumPerYear = {
-          firstSemester : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-          secondSemester : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
-        };
-
-
-        let firstSem = await Report.find()
-          .$where(`[${years.yearTracker}].includes(Number( this.dateOfReport.split('-')[0] ))`)
-          .and([{ semester: '1st semester' }]);
-
-        let secondSem = await Report.find()
-          .$where(`[${years.yearTracker}].includes(Number( this.dateOfReport.split('-')[0] ))`)
-          .and([{ semester: '2nd semester' }]);
-
-        let memoizedID = [];
-
-        firstSem.forEach( item => {
-          if( memoizedID.includes( item.studentID ) ) return;
-          memoizedID.push( item.studentID );
-
-          let index = years.yearTracker.indexOf(Number( item.dateOfReport.split('-')[0] ));
-
-          if( index >= 0 ) violatorsNumPerYear.firstSemester[ index ] += 1; 
-        });
-
-        memoizedID = [];
-
-        secondSem.forEach( item => {
-          if( memoizedID.includes( item.studentID ) ) return;
-          memoizedID.push( item.studentID );
-
-          let index = years.yearTracker.indexOf(Number( item.dateOfReport.split('-')[0] ));
-
-          if( index >= 0 ) violatorsNumPerYear.secondSemester[ index ] += 1; 
-        });
-
-        return res.json({
-          years: years.yearTracker,
-          firstSem: violatorsNumPerYear.firstSemester,
-          secondSem: violatorsNumPerYear.secondSemester
-        });
-    }
-    catch( err ){
-      return res.sendStatus( 503 );
-    }
+    return res.json( docs );   
   });
+  // fs.readFile( yearTrackerPath, async (err, data) => {
+  //   try{
+  //       years = JSON.parse( data );
+
+  //       let violatorsNumPerYear = {
+  //         firstSemester : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+  //         secondSemester : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+  //       };
+
+
+  //       let firstSem = await Report.find()
+  //         .$where(`[${years.yearTracker}].includes(Number( this.dateOfReport.split('-')[0] ))`)
+  //         .and([{ semester: '1st semester' }]);
+
+  //       let secondSem = await Report.find()
+  //         .$where(`[${years.yearTracker}].includes(Number( this.dateOfReport.split('-')[0] ))`)
+  //         .and([{ semester: '2nd semester' }]);
+
+  //       let memoizedID = [];
+
+  //       firstSem.forEach( item => {
+  //         if( memoizedID.includes( item.studentID ) ) return;
+  //         memoizedID.push( item.studentID );
+
+  //         let index = years.yearTracker.indexOf(Number( item.dateOfReport.split('-')[0] ));
+
+  //         if( index >= 0 ) violatorsNumPerYear.firstSemester[ index ] += 1; 
+  //       });
+
+  //       memoizedID = [];
+
+  //       secondSem.forEach( item => {
+  //         if( memoizedID.includes( item.studentID ) ) return;
+  //         memoizedID.push( item.studentID );
+
+  //         let index = years.yearTracker.indexOf(Number( item.dateOfReport.split('-')[0] ));
+
+  //         if( index >= 0 ) violatorsNumPerYear.secondSemester[ index ] += 1; 
+  //       });
+
+  //       return res.json({
+  //         years: years.yearTracker,
+  //         firstSem: violatorsNumPerYear.firstSemester,
+  //         secondSem: violatorsNumPerYear.secondSemester
+  //       });
+  //   }
+  //   catch( err ){
+  //     return res.sendStatus( 503 );
+  //   }
+  // });
 });
 
 router.get('/student-report/:id', async( req, res ) => {
@@ -672,10 +704,329 @@ router.post('/save-report', async( req, res ) => {
     if( err ) return res.status( 503 ).json({ message: 'Please try again!' });
 
     if( doc ){
-      Report.create({ ...req.body }, err => {
+      Report.find({ studentID: req.body.studentID }, (err, docs) => {
         if( err ) return res.sendStatus( 503 );
 
-        return res.json({ message: 'Successfully saved report!'});
+        // const updateOffenses = (doc, index, length) => {
+        //   const minorOffenses = [];
+        //   const majorOffenses = [];
+
+        //   doc.minorProblemBehavior.forEach( offense => {
+        //     if( req.body.minorProblemBehavior.includes( offense ) ){
+        //       minorOffenses.push( offense );
+        //     }
+        //   });
+
+        //   doc.majorProblemBehavior.forEach( offense => {
+        //     if( req.body.majorProblemBehavior.includes( offense ) ){
+        //       majorOffenses.push( offense );
+        //     }
+        //   });
+
+        //   minorOffenses.forEach( offense => {
+        //     if( doc.thirdOffenses.includes( offense ) ){
+        //       return;
+        //     }
+        //     else if( doc.secondOffenses.includes( offense ) ){
+        //       doc.thirdOffenses.push( offense );
+        //     }
+        //     else if( doc.firstOffenses.includes( offense ) ){
+        //       doc.secondOffenses.push( offense );
+        //     }
+        //     else{
+        //       doc.firstOffenses.push( offense );
+        //     }
+        //   });
+
+        //   majorOffenses.forEach( offense => {
+        //     if( doc.thirdOffenses.includes( offense ) ){
+        //       return;
+        //     }
+        //     else if( doc.secondOffenses.includes( offense ) ){
+        //       doc.thirdOffenses.push( offense );
+        //     }
+        //     else if( doc.firstOffenses.includes( offense ) ){
+        //       doc.secondOffenses.push( offense );
+        //     }
+        //     else{
+        //       doc.firstOffenses.push( offense );
+        //     }
+        //   });
+
+        //   Report.create({ 
+        //     ...req.body, 
+        //     firstOffenses: [ ...doc.firstOffenses ],
+        //     secondOffenses: [ ...doc.secondOffenses ],
+        //     thirdOffenses: [ ...doc.thirdOffenses ]  
+        //   }, err => {
+        //     if( err ) return res.sendStatus( 503 );
+
+        //     const currentYear = new Date().getFullYear();
+
+        //     const updateStatistical = callback => {
+        //       Statistic.findOne({ year: currentYear }, async (err, doc) => {
+        //         if( err ) return res.sendStatus( 503 );
+
+        //         if( doc ){
+        //           callback( doc );
+        //         }
+        //         else{
+        //           try{
+        //             const newDoc = await Statistic.create({ year: currentYear });
+
+        //             callback( newDoc );
+        //           }
+        //           catch( err ){
+        //             return res.sendStatus( 503 );
+        //           }
+        //         }
+        //       });
+        //     }
+
+        //     doc.save( err => {
+        //       if( err ) return res.sendStatus( 503 );
+
+        //       SchoolYear.findOne({ status: 'activated' }, (err, doc) => {
+        //         if( err ) return res.sendStatus( 503 );
+
+        //         if( doc ){
+        //           const { semester } = doc;
+
+        //           switch( semester ){
+        //             case '1st':
+        //               updateStatistical( doc => {
+        //                 doc.semester1 += 1;
+        //                 doc.save( err => {
+        //                   if( err ) return res.sendStatus( 503 );
+
+        //                   if( index === length - 1 ){
+        //                     return res.json({ message: 'Successfully saved report!'});
+        //                   }
+        //                 });
+        //               });
+        //               break;
+
+        //             case '2nd':
+        //               updateStatistical( doc => {
+        //                 doc.semester2 += 1;
+        //                 doc.save( err => {
+        //                   if( err ) return res.sendStatus( 503 );
+
+        //                   if( index === length - 1 ){
+        //                     return res.json({ message: 'Successfully saved report!'});
+        //                   }
+        //                 });
+        //               });
+        //               break;
+
+        //             default:
+        //               return res.sendStatus( 503 );
+        //           }
+        //         }
+        //       });
+        //     });
+        //   });
+        // }
+        /*
+            Check how many previous reports' offenses are in the current report
+            offenses to see any duplication, hence we can update offenses
+            from first to third offense.
+        */
+        const offenseList = [ ...req.body.minorProblemBehavior, ...req.body.majorProblemBehavior ]; // Current offenses
+        const offenses = {}; // Offense Tracker (This is where we can see if the offense will be at its first or third-offense).
+
+        const updateOffenses = (doc, index, length) => {
+          doc.minorProblemBehavior.forEach( offense => {
+            if( offenseList.includes( offense ) ){ // Check if the previous offense exists in current offenses.
+              if( offenses[ offense ] ){ // if that offense also exists in the tracker then increment by 1.
+                offenses[ offense ] += 1;
+              }
+              else{ // Else track it.
+                offenses[ offense ] = 1;
+              }
+            }
+          });
+
+          doc.majorProblemBehavior.forEach( offense => {
+            if( offenseList.includes( offense ) ){ // Check if the previous offense exists in current offenses.
+              if( offenses[ offense ] ){ // if that offense also exists in the tracker then increment by 1.
+                offenses[ offense ] += 1;
+              }
+              else{ // Else track it.
+                offenses[ offense ] = 1;
+              }
+            }
+          });
+        }      
+
+        const updateDocs = ( doc, index, length, { firstOffenses, secondOffenses, thirdOffenses }) => {
+          doc.firstOffenses = Array( ...new Set([ ...doc.firstOffenses, ...firstOffenses ]));
+          doc.secondOffenses = Array( ...new Set([ ...doc.secondOffenses, ...secondOffenses ]));
+          doc.thirdOffenses = Array( ...new Set([ ...doc.thirdOffenses, ...thirdOffenses ]));
+
+          doc.save( err => {
+            if( err ) return res.sendStatus( 503 );
+
+            if( index === length - 1 )return res.json({ message: 'Successfully saved report!'});
+          });
+        }  
+
+        if( docs && docs.length ){
+            docs.forEach(doc => updateOffenses( doc ));
+
+            const firstOffenses = [];
+            const secondOffenses = [];
+            const thirdOffenses = [];
+
+            Object.keys( offenses ).forEach( key => { // Determine if the offense record's rate, then act accordingly
+              if( offenses[ key ] >= 2 ){
+                thirdOffenses.push( key );
+              }
+              else if( offenses[ key ] === 1  ){
+                secondOffenses.push( key );
+              }
+              else if( !offenses[ key ] ){
+                firstOffenses.push( key );
+              }
+            });
+
+            Report.create({ 
+              ...req.body, 
+              firstOffenses: [ ...firstOffenses ],
+              secondOffenses: [ ...secondOffenses ],
+              thirdOffenses: [ ...thirdOffenses ]  
+            }, err => {
+              if( err ) return res.sendStatus( 503 );
+
+              const currentYear = new Date().getFullYear();
+
+              const updateStatistical = callback => {
+                Statistic.findOne({ year: currentYear }, async (err, doc) => {
+                  if( err ) return res.sendStatus( 503 );
+
+                  if( doc ){
+                    callback( doc );
+                  }
+                  else{
+                    try{
+                      const newDoc = await Statistic.create({ year: currentYear });
+
+                      callback( newDoc );
+                    }
+                    catch( err ){
+                      return res.sendStatus( 503 );
+                    }
+                  }
+                });
+              }
+
+              SchoolYear.findOne({ status: 'activated' }, (err, doc) => {
+                  if( err ) return res.sendStatus( 503 );
+
+                  if( doc ){
+                    const { semester } = doc;
+
+                    switch( semester ){
+                      case '1st':
+                        updateStatistical( doc => {
+                          doc.semester1 += 1;
+
+                          doc.save( err => {
+                            if( err ) return res.sendStatus( 503 );
+                          });
+                        });
+                        break;
+
+                      case '2nd':
+                        updateStatistical( doc => {
+                          doc.semester2 += 1;
+
+                          doc.save( err => {
+                            if( err ) return res.sendStatus( 503 );
+                          });
+                        });
+                        break;
+
+                      default:
+                        return res.sendStatus( 503 );
+                    }
+                  }
+                });
+            });
+
+            docs.forEach(( doc, index ) => updateDocs( doc, index, docs.length, { firstOffenses, secondOffenses, thirdOffenses }));
+        }
+        else{
+          Report.create({ 
+            ...req.body, 
+            firstOffenses: [
+              ...req.body.minorProblemBehavior,
+              ...req.body.majorProblemBehavior
+              ], 
+            secondOffenses: [], 
+            thirdOffenses: [] 
+          }, err => {
+            if( err ) return res.sendStatus( 503 );
+
+            const currentYear = new Date().getFullYear();
+
+            const updateStatistical = callback => {
+              Statistic.findOne({ year: currentYear }, async (err, doc) => {
+
+                if( err ) return res.sendStatus( 503 );
+
+                if( doc ){
+                  callback( doc );
+                }
+                else{
+                  try{
+                    const newDoc = await Statistic.create({ year: currentYear });
+
+                    callback( newDoc );
+                  }
+                  catch( err ){
+                    return res.sendStatus( 503 );
+                  }
+                }
+              });
+            }
+
+            SchoolYear.findOne({ status: 'activated' }, (err, doc) => {
+              if( err ) return res.sendStatus( 503 );
+
+              if( doc ){
+                const { semester } = doc;
+
+                switch( semester ){
+                  case '1st':
+                    updateStatistical( doc => {
+                      doc.semester1 += 1;
+                      doc.save( err => {
+                        if( err ) return res.sendStatus( 503 );
+
+                        return res.json({ message: 'Successfully saved report!'});
+                      });
+                    });
+                    break;
+
+                  case '2nd':
+                    updateStatistical( doc => {
+                      doc.semester2 += 1;
+                      doc.save( err => {
+                        if( err ) return res.sendStatus( 503 );
+
+                        return res.json({ message: 'Successfully saved report!'});
+                      });
+                    });
+                    break;
+
+                  default:
+                    return res.sendStatus( 503 );
+                }
+              }
+            });
+          });
+        }
       });
     }
     else{
@@ -685,16 +1036,30 @@ router.post('/save-report', async( req, res ) => {
 });
 
 router.post('/save-report-image', async( req, res ) => {
-  if( !req.files ) return res.status( 404 );
+  if( !req.files ) return res.sendStatus( 404 );
   
-  const image = req.files.reportImage;
-  const destination = path.join(__dirname, '../client/public/images/reports', image.name);
+  const createPath = ({ name }) => path.join(__dirname, '../client/public/images/reports', name);
 
-  image.mv( destination, err => {
-    if( err ) return res.sendStatus( 503 );
+  const image = req.files['reportImage[]'];
+  const destination = image.map( img => createPath( img ));
 
-    return res.sendStatus( 200 );
+  image.forEach( async (img, index) => {
+    try{
+      await img.mv( destination[ index ] );
+
+      if( index === image.length - 1 ){
+        return res.sendStatus( 200 );
+      }
+    }
+    catch( err ){
+      return res.sendStatus( 503 );
+    }
   });
+  // image.mv( destination, err => {
+  //   if( err ) return res.sendStatus( 503 );
+
+  //   return res.sendStatus( 200 );
+  // });
 });
 
 router.put('/change-student-status', async( req, res ) => {
@@ -757,7 +1122,6 @@ router.get('/archived-students', async( req, res ) => {
     return res.json( result );
   }
   catch (err) {
-    console.log( err );
     return res.sendStatus( 503 );
   }
 });

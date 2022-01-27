@@ -3,9 +3,9 @@ const { Schema } = mongoose;
 
 
 const statisticalSchema = new Schema({
-	semester: { type: String, required: true },
+	semester1: { type: Number, default: 0 },
+	semester2: { type: Number, default: 0 },
 	year: { type: Number, required: true },
-	violators: { type: Number, required: true }
 });
 
 

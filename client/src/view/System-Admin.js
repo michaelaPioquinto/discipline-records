@@ -6,8 +6,8 @@ import SearchContext from '../context/SearchContext';
 import LinearProgress from '@mui/material/LinearProgress';
 
 const Dashboard = React.lazy(() => import('./pages/Dashboard'));
-const Handbook = React.lazy(() => import('./pages/system-admin/Handbook'));
-const Statistical = React.lazy(() => import('./pages/system-admin/Statistical'));
+const Handbook = React.lazy(() => import('./pages/Handbook'));
+const Statistical = React.lazy(() => import('./pages/Statistical'));
 const Violation = React.lazy(() => import('./pages/system-admin/Violation'));
 const Accounts = React.lazy(() => import('./pages/system-admin/Accounts'));
 const Trash = React.lazy(() => import('./pages/Trash'));

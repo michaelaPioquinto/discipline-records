@@ -7,7 +7,7 @@ import TableSkeleton from '../components/TableSkeleton';
 import LinearProgress from '@mui/material/LinearProgress';
 
 const Dashboard = React.lazy(() => import('./pages/student/Dashboard'));
-const Handbook = React.lazy(() => import('./pages/student/Handbook'));
+const Handbook = React.lazy(() => import('./pages/Handbook'));
 
 const Student = props => {
 	const [content, setContent] = React.useState({ name: 'Dashboard', cont: <Dashboard name={ props.tools.name }/> });

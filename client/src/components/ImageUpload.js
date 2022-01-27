@@ -1,5 +1,6 @@
 import React from 'react';
 import uniqid from 'uniqid';
+import debounce from 'lodash.debounce';
 
 import Stack from '@mui/material/Stack';
 import Chip from '@mui/material/Chip';
@@ -20,9 +21,23 @@ const ImageUpload = props => {
 		fileInput.setAttribute('type', 'file');
 		fileInput.setAttribute('accept', 'image/*');
 
+		if( props.imageLimit === Infinity ){
+			fileInput.setAttribute('multiple', '');
+		}
+
 		fileInput.addEventListener('input', e => {
-			if( e?.target?.files?.[0] && !imageChips.includes( e?.target?.files?.[0].name ) )
-				setImages( images => [...images, e?.target?.files?.[0]] );
+			if( e?.target?.files ){
+				const fileNameList = Object.values( e?.target?.files )?.map?.( file => file.name );
+				const filteredFiles = [];
+
+				fileNameList.forEach(( name, index ) => {
+					if( !imageChips.includes( name ) ){
+						filteredFiles.push( e.target.files[ index ] );
+					}
+				});
+
+				setImages( images => [ ...images, ...filteredFiles ] );
+			}
 		});
 
 		fileInput.click();
@@ -46,11 +61,10 @@ const ImageUpload = props => {
 
 			const newImages = [];
 			images.forEach( img => {
-				newImages.push( img.name );
+				newImages.push( img?.name );
 			});
 
 			setImageChips([ ...newImages ]);
-
 		}
 		else{
 			setImageChips( [] );
@@ -68,7 +82,8 @@ const ImageUpload = props => {
 	return(
 		<div 
 			style={{ 
-				width: props?.width ?? '50%', 
+				width: props?.width ?? '500px',
+				overflowX: 'hidden', 
 				height: props?.height ?? 'fit-content', 
 				backgroundColor: 'rgba( 0, 0, 0, 0.1 )',
 				borderRadius: '25px',
@@ -94,7 +109,7 @@ const ImageUpload = props => {
 					{ props?.label ?? 'Add an Image' }
 				</p>
 			</div>
-			<div className="no-scrollbar col-10 p-0 m-0 d-flex align-items-center">
+			<div style={{ width: '90%' }} className="no-scrollbar col-10 p-0 m-0 d-flex align-items-center">
 				<Stack direction="row" spacing={3} justifyContent="center" alignItems="center">
 					{
 						[...imageChips.map( (name, index) => (
@@ -103,7 +118,7 @@ const ImageUpload = props => {
 								sx={{ borderColor: 'rgba(0, 0, 0, 0.4)' }}
 								label={name} 
 								variant="outlined" 
-								onDelete={() => handleDelete( index )}
+								onDelete={() => debounce( handleDelete, 50 )( index )}
 							/>
 						))]	
 					}

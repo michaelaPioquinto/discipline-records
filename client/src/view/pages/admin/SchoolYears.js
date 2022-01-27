@@ -137,13 +137,17 @@ const Accounts = props => {
 				head={['School Year', 'Semester', 'Status']}
 				content={ items }
 			/>
-			<AddUser 
-				open={addForm} 
-				setOpen={handleAddForm}
-				setEdit={handleEditForm} 
-				fetchSchoolYears={fetchSchoolYears} 
-				{ ...selectedItem }
-			/>
+			{
+				selectedItem
+					? <AddUser 
+							open={addForm} 
+							setOpen={handleAddForm}
+							setEdit={handleEditForm} 
+							fetchSchoolYears={fetchSchoolYears} 
+							{ ...selectedItem }
+						/> 
+					: null
+			}
 			<div style={{ position: 'absolute', bottom: '15px', right: '15px' }}>
 				<IconButton style={{ backgroundColor: 'rgba(25, 25, 21, 0.9)' }} onClick={handleAddForm}>
 					<AddIcon style={{ color: 'white' }}/>
@@ -163,8 +167,8 @@ const AddUser = props => {
 
 	const initState = {
 		_id: props?._id ?? '',
-		schoolYear: props?.schoolYear ?? `${yearToday}-${yearToday + 1}`,
-		semester: props?.semester ?? '1st'
+		schoolYear: props?.schoolYear,
+		semester: props?.semester
 	}
 
 	const reducer = (state, action) => {
@@ -174,7 +178,7 @@ const AddUser = props => {
 				return state;
 
 			case 'semester':
-				state.schoolYear = action.data;
+				state.semester = action.data;
 				return state;
 
 			default:
@@ -188,9 +192,10 @@ const AddUser = props => {
 		if( !value ) return 'School Year is empty';
 
 		try{
+			const currentYear = new Date().getFullYear();
 			const years = value.split('-');
 
-			if(( years.length > 2 && years.length < 2 ) ||
+			if( years[0].length > currentYear.length || ( years.length > 2 || years.length < 2 ) ||
 				( isNaN( years[0] ) || isNaN( years[1] ) ) ||
 				years[ 0 ] === years[ 1 ]
 				) return 'Incorrect School Year Format';
@@ -256,9 +261,9 @@ const AddUser = props => {
 									placeHolder: 'Ex: 2018-2019'
 								},
 								{
-									label: 'School Year',
+									label: 'Semester',
 									value: item.semester,
-									onChange: e => dispatch({ type: 'schoolYear', data: (e.target.value).replaceAll(' ', '') }),
+									onChange: e => dispatch({ type: 'semester', data: (e.target.value).replaceAll(' ', '') }),
 									placeHolder: 'Ex: 1st'
 								}	
 			    			]}

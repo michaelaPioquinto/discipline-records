@@ -47,6 +47,11 @@ import Chip from '@mui/material/Chip';
 import { styled } from '@mui/material/styles';
 import ReportGmailerrorredIcon from '@mui/icons-material/ReportGmailerrorred';
 
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
+
 const Root = styled('div')(({ theme }) => ({
   width: '100%',
   ...theme.typography.body2,
@@ -261,8 +266,29 @@ const StudentForm = props => {
     });
   } 
 
+  const handleDutyUpdate = async ({ _id }, val) => {
+    axios.put(`http://localhost:3000/duty-update/${ _id }`, { dutyHrs: val })
+    .catch( err => {
+      enqueueSnackbar( 'Please try again later', { variant: 'error' });       
+    });
+  }
+
+  const debouncedDutyUpdate = debounce( handleDutyUpdate, 1000 );
+
+  const handleArchive = async ({ _id }) => {
+    axios.put(`http://localhost:3000/archive-report/${ _id }`)
+    .then(() => {
+      fetchStudentReport();
+    })
+    .catch( err => {
+      enqueueSnackbar( 'Please try again later', { variant: 'error' });       
+    });
+  }
+
   React.useEffect(() => {
     if( reportData ){
+      const reports = [];
+
       reportData?.report?.forEach?.((rep, index) => {
         // if( !rep?.semester && !rep?.duty?.length &&
         //     !rep?.incidentDescription && !rep?.majorProblemBehavior?.length &&
@@ -271,144 +297,221 @@ const StudentForm = props => {
         //   ) 
         //   return;
 
-        setReports( reports => [ ...reports, (
-            <div key={uniqid()}>
-                <Stack direction="column" spacing={2}>
-                  {
-                    rep?.semester 
-                      ? <TextField
+        if( rep.status === 'activated' ){
+          reports.push(
+              <div key={uniqid()}>
+                  <Stack direction="column" spacing={2}>
+                    {
+                      rep?.semester && yearSemester?.semester
+                        ? <> 
+                            <TextField
+                              disabled 
+                              id="outlined-basic"
+                              label={`Duty - ${ yearSemester?.semester } semester`} 
+                              variant="outlined" 
+                              defaultValue={rep?.duty?.length ? rep?.duty?.join?.(', ') : ' ' }
+                            />
+                            <TextField
+                              id="outlined-basic"
+                              label={`Duty hours- ${ yearSemester?.semester } semester`} 
+                              variant="outlined" 
+                              defaultValue={rep?.dutyHrs ? rep?.dutyHrs : '0' }
+                              onChange={e => rep ? debouncedDutyUpdate( rep, e.target.value ) : null}
+                            /> 
+                          </>
+                        : null
+                    }
+                    {
+                      rep?.semester 
+                        ? <TextField
                             disabled 
-                            id="outlined-basic"
-                            label={`Duty - ${ yearSemester.semester } semester`} 
+                            id="outlined-basic" 
+                            label="Report" 
                             variant="outlined" 
-                            defaultValue={rep?.duty?.length ? rep?.duty?.join?.(', ') : ' ' }
-                        />
-                      : null
-                  }
-                  {
-                    rep?.semester 
-                      ? <TextField
-                          disabled 
-                          id="outlined-basic" 
-                          label="Report" 
-                          variant="outlined" 
-                          defaultValue={rep?.incidentDescription}
-                        />
-                      : null
-                  }
-                  {
-                    rep?.images && rep?.images?.length
-                      ? (
-                          <div className="container-fluid">
-                            <Stack direction="column">
-                              <div className="col-12">
-                                <p><b>Evidence</b></p>
-                              </div>
-                              <div className="col-12 d-flex justify-content-center align-items-center">
-                                <img 
-                                  style={{ 
-                                    imageRendering: 'pixelated', 
-                                    width: '50%', 
-                                    height: '50%' 
-                                  }} 
-                                  src={rep.images[0]} 
-                                  alt="Evidence"
-                                />
-                              </div>
-                            </Stack>
-                          </div>
-                        )
-                      : (
-                          <div className="container-fluid text-center">
-                            <p> NO EVIDENCE </p>
-                          </div>
-                        )
-                  }
+                            defaultValue={rep?.incidentDescription}
+                          />
+                        : null
+                    }
+                    {
+                      rep?.images && rep?.images?.length
+                        ? (
+                            <div className="container-fluid">
+                              <Stack direction="column">
+                                <div className="col-12">
+                                  <p><b>Evidence</b></p>
+                                </div>
+                                <div className="col-12 d-flex justify-content-center align-items-center">
+                                  {/*<img 
+                                    style={{ 
+                                      imageRendering: 'pixelated', 
+                                      width: '50%', 
+                                      height: '50%' 
+                                    }} 
+                                    src={rep.images[0]} 
+                                    alt="Evidence"
+                                  />*/}
+                                  <ImageList sx={{ width: 500, height: 450 }} cols={3} rowHeight={164}>
+                                    {
+                                      rep?.images?.map( image => (
+                                          <ImageListItem key={uniqid()}>
+                                              <img
+                                                src={image}
+                                                // srcSet={`${item.img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
+                                                alt=""
+                                                loading="lazy"
+                                              />
+                                          </ImageListItem>
+                                        ))
+                                    }
+                                  </ImageList>
+                                </div>
+                              </Stack>
+                            </div>
+                          )
+                        : (
+                            <div className="container-fluid text-center">
+                              <p> NO EVIDENCE </p>
+                            </div>
+                          )
+                    }
 
-                  {
-                    rep?.semester 
-                      ? <TextField
-                          disabled 
-                          id="outlined-basic" 
-                          label="Semester" 
-                          variant="outlined" 
-                          defaultValue={rep?.semester}
-                        />
-                      : null
-                  }
+                    {
+                      yearSemester?.semester 
+                        ? <TextField
+                            disabled 
+                            id="outlined-basic" 
+                            label="Semester" 
+                            variant="outlined" 
+                            defaultValue={yearSemester?.semester}
+                          />
+                        : null
+                    }
 
-                  {
-                    rep?.majorProblemBehavior?.length && rep?.semester
-                      ? <Root>
-                          <Divider textAlign="left">
-                            <Chip label={`GRIEVANCE - ${ rep.semester }`}/>
-                          </Divider>
-                        </Root>
-                      : null
-                  }
-                  
-                  {
-                    rep?.majorProblemBehavior?.length
-                      ? <TextField
-                          disabled 
-                          id="outlined-basic" 
-                          label={`Major Problem Behavior`} 
-                          variant="outlined" 
-                          defaultValue={rep?.majorProblemBehavior?.join?.(', ')}
-                        />
-                      : null
-                  }
+                    {
+                      rep?.majorProblemBehavior?.length && yearSemester?.semester
+                        ? <Root>
+                            <Divider textAlign="left">
+                              <Chip label={`GRIEVANCE - ${ yearSemester.semester }`}/>
+                            </Divider>
+                          </Root>
+                        : null
+                    }
+                    
+                    {
+                      rep?.minorProblemBehavior?.length
+                        ? <TextField
+                            sx={{ width: '100%', margin: '50px' }}
+                            id="standard-multiline-flexible"
+                            label={`Minor Problem Behavior`} 
+                            multiline
+                            disabled
+                            rows={10}
+                            variant="outlined" 
+                            defaultValue={rep?.minorProblemBehavior?.map?.( offense => {
+                              if( rep?.thirdOffenses?.includes( offense ) ){
+                                return `${offense}-(Third Offense)`;             
+                              }
+                              else if( rep?.secondOffenses?.includes( offense ) ){
+                                return `${offense}-(Second Offense)`;
+                              }
+                              else if( rep?.firstOffenses?.includes( offense ) ){
+                                return `${offense}-(First Offense)`;
+                              }
+                              else{
+                                return offense;
+                              }
+                            })?.join?.(', ')}
+                          />
+                        : null
+                    }
 
-                  {
-                    rep?.initialActionGiven
-                      ? <TextField
-                          disabled 
-                          id="outlined-basic" 
-                          label={`Initial Action Given`} 
-                          variant="outlined" 
-                          defaultValue={rep?.initialActionGiven}
-                        />
-                      : null
-                  }
+                    {
+                      rep?.majorProblemBehavior?.length
+                        ? <TextField
+                            sx={{ width: '100%', margin: '50px' }}
+                            id="standard-multiline-flexible"
+                            label={`Major Problem Behavior`} 
+                            multiline
+                            disabled
+                            rows={10}
+                            variant="outlined" 
+                            defaultValue={rep?.majorProblemBehavior?.map?.( offense => {
+                              if( rep?.thirdOffenses?.includes( offense ) ){
+                                return `${offense}-(Third Offense)`;             
+                              }
+                              else if( rep?.secondOffenses?.includes( offense ) ){
+                                return `${offense}-(Second Offense)`;
+                              }
+                              else if( rep?.firstOffenses?.includes( offense ) ){
+                                return `${offense}-(First Offense)`;
+                              }
+                              else{
+                                return offense;
+                              }
+                            })?.join?.(', ')}
+                          />
+                        : null
+                    }
 
-                  {
-                    rep?.administrativeDecision?.length
-                      ? <TextField
-                          disabled 
-                          id="outlined-basic" 
-                          label={`Administrative Decision`} 
-                          variant="outlined" 
-                          defaultValue={rep?.administrativeDecision}
-                        />
-                      : null
-                  }
+                    {
+                      rep?.initialActionGiven
+                        ? <TextField
+                            disabled 
+                            id="outlined-basic" 
+                            label={`Initial Action Given`} 
+                            variant="outlined" 
+                            defaultValue={rep?.initialActionGiven}
+                          />
+                        : null
+                    }
 
-                  {
-                    rep?.administrativeComment
-                      ? <TextField
-                          disabled 
-                          id="outlined-basic" 
-                          label={`Administrative Comment`} 
-                          variant="outlined" 
-                          defaultValue={rep?.administrativeComment}
-                        />
-                      : null
-                  }
-                  <div className="container-fluid d-flex justify-content-center align-items-center">
-                    <Button 
-                      variant="outlined" 
-                      onClick={() => {
-                        window.open(`/print-student-report/${reportData?.student?.studentID}/reportIndex/${index}`, '_blank');
-                      }}
-                    >
-                      print
-                    </Button>
-                  </div>
-                  <Divider/>
-              </Stack>
-            </div>
-          )]);
+                    {
+                      rep?.administrativeDecision?.length
+                        ? <TextField
+                            disabled 
+                            id="outlined-basic" 
+                            label={`Administrative Decision`} 
+                            variant="outlined" 
+                            defaultValue={rep?.administrativeDecision}
+                          />
+                        : null
+                    }
+
+                    {
+                      rep?.administrativeComment
+                        ? <TextField
+                            disabled 
+                            id="outlined-basic" 
+                            label={`Administrative Comment`} 
+                            variant="outlined" 
+                            defaultValue={rep?.administrativeComment}
+                          />
+                        : null
+                    }
+                    <div className="container-fluid d-flex justify-content-around align-items-center">
+                      <Button 
+                        variant="outlined" 
+                        onClick={() => {
+                          window.open(`/print-student-report/${reportData?.student?.studentID}/reportIndex/${index}`, '_blank');
+                        }}
+                      >
+                        print
+                      </Button>
+                      <Button 
+                        variant="outlined" 
+                        onClick={() => rep ? handleArchive?.( rep ) : null}
+                      >
+                        Archive
+                      </Button>
+                    </div>
+                    <Divider/>
+                </Stack>
+              </div>
+            );
+        }
       });
+
+      setReports([ ...reports ]);
     }
     else{
       setReports( [] );
@@ -544,7 +647,9 @@ const MakeReportForm = props => {
   const [otherMajor, setOtherMajor] = React.useState( '' );
   const [otherDecision, setOtherDecision] = React.useState( '' );
   const [image, setImage] = React.useState( null );
-  
+  const [isAdminDecisionCheckboxDisabled, setIsAdminDecisionCheckboxDisabled] = React.useState( false );
+  const [currentRadioInput, setCurrentRadioInput] = React.useState( '' );
+
   const renderFullName = () => {
     if( !props?.data?.firstName && !props?.data?.lastname )
       return null;
@@ -571,13 +676,14 @@ const MakeReportForm = props => {
     reportedBy: '', 
     role: '', 
     duty: [],
-    dateOfReport: dateNow() ?? '', 
+    dateOfReport: `${dateNow().split('-')[1]}-${dateNow().split('-')[2]}-${dateNow().split('-')[0]}`, 
     incidentNo: props?.incidentNumber, 
     studentName: renderFullName() ?? '', 
     dateOfIncident: '', 
     courseYrSection: renderCourseYrSection() ?? '', 
     timeOfIncident: '', 
-    location: '', 
+    location: '',
+    dutyHrs: '0', 
     specificAreaLocation: '', 
     additionalPersonInvolved: '', 
     witnesses: '', 
@@ -589,11 +695,14 @@ const MakeReportForm = props => {
     date1: dateNow() ?? '',
     chairpersonName: '',
     date2: dateNow() ?? '',
+    minorProblemBehavior: [],
     majorProblemBehavior: [],
     initialActionGiven: '',
     administrativeDecision: [],
     administrativeComment: '',
   }
+
+  const today = new Date().toISOString().split('T')[0];
 
   const reducer = (state, action) => {
     switch( action.type ){
@@ -618,7 +727,7 @@ const MakeReportForm = props => {
         return state;
 
       case 'dateOfReport':
-        state.dateOfReport = renderDate(action.data);
+        state.dateOfReport = today;
         return state;
 
       case 'incidentNo':
@@ -645,6 +754,10 @@ const MakeReportForm = props => {
         state.location = action.data;
         return state;
 
+      case 'dutyHrs':
+        state.dutyHrs = action.data;
+        return state;
+
       case 'specificAreaLocation':
         state.specificAreaLocation = action.data;
         return state;
@@ -662,7 +775,7 @@ const MakeReportForm = props => {
         return state;
 
       case 'images':      
-        state.images = action.data ? ['/images/reports/' + action.data.name] : [];
+        state.images = action.data ? [ ...action.data.map(({ name }) => '/images/reports/' + name) ] : [];
         return state;
 
       case 'descriptionOfUnacceptable':
@@ -678,7 +791,7 @@ const MakeReportForm = props => {
         return state;
 
       case 'date1':
-        state.date1 = renderDate( action.data );
+        state.date1 = today;
         return state;
 
       case 'chairpersonName':
@@ -686,7 +799,11 @@ const MakeReportForm = props => {
         return state;
 
       case 'date2':
-        state.date2 = renderDate( action.data );
+        state.date2 = today;
+        return state;
+
+      case 'minorProblemBehavior':
+        state.minorProblemBehavior = action.data;
         return state;
 
       case 'majorProblemBehavior':
@@ -710,11 +827,22 @@ const MakeReportForm = props => {
     }
   }
 
+  const radioLabels = [
+      'Suspension',
+      'Dismissal',
+      'Exclusion',
+      'Expulsion',
+    ];
+
   const handleSubmitReport = async() => {
     setButton({ msg: 'Loading', isDisabled: true });
 
     if( otherMajor.length ){
       dispatch({ type: 'majorProblemBehavior', data: [...state.majorProblemBehavior, otherMajor] });
+    }
+
+    if( otherMinor.length ){
+      dispatch({ type: 'minorProblemBehavior', data: [...state.minorProblemBehavior, otherMinor] });
     }
 
     if( otherDecision.length ){
@@ -727,7 +855,10 @@ const MakeReportForm = props => {
         .then( async res => {
           if( image ){
             const formData = new FormData();
-            formData.append('reportImage', image );
+
+            image.forEach( img => {
+              formData.append('reportImage[]', img );
+            });
 
             try{
               await axios.post(`http://localhost:3000/save-report-image`, formData)
@@ -769,35 +900,44 @@ const MakeReportForm = props => {
     }
   }
 
-  // const handleMinorProblemBehavior = (e, value) => {
-  //  const label = e.target.labels[0].innerText;
-  //  const labelExists = state.minorProblemBehavior.includes( label );
+  const handleMinorProblemBehavior = (e, value) => {
+   const label = e.target.labels[0].innerText;
+   const labelExists = state.minorProblemBehavior.includes( label );
 
-  //  if( labelExists && !value ){
-  //    const newList = state.minorProblemBehavior.filter( val => val !== label );
-  //    dispatch({ type: 'minorProblemBehavior', data: newList });
-  //  }
-  //  else if( !labelExists && value ){
-  //    const newList = state.minorProblemBehavior;
-  //    newList.push( label );
+   if( labelExists && !value ){
+     const newList = state.minorProblemBehavior.filter( val => val !== label );
+     dispatch({ type: 'minorProblemBehavior', data: newList });
+   }
+   else if( !labelExists && value ){
+     const newList = state.minorProblemBehavior;
+     newList.push( label );
 
-  //    dispatch({ type: 'minorProblemBehavior', data: newList });
-  //  }
-  // }
+     dispatch({ type: 'minorProblemBehavior', data: newList });
+   }
+  }
 
   const handleAdministrativeDecision = (e, value) => {
     const label = e.target.labels[0].innerText;
     const labelExists = state.administrativeDecision.includes( label );
 
-    if( labelExists && !value ){
-      const newList = state.administrativeDecision.filter( val => val !== label );
-      dispatch({ type: 'administrativeDecision', data: newList });
+    if( e?.target?.value && radioLabels?.includes( e?.target?.value ) ){
+      dispatch({ type: 'administrativeDecision', data: [ e?.target?.value ] });
+      setCurrentRadioInput( e?.target?.value );
+      setIsAdminDecisionCheckboxDisabled( true );
     }
-    else if( !labelExists && value ){
-      const newList = state.administrativeDecision;
-      newList.push( label );
+    else{
+      // setIsAdminDecisionCheckboxDisabled( false );
 
-      dispatch({ type: 'administrativeDecision', data: newList });
+      if( labelExists && !value ){
+        const newList = state.administrativeDecision.filter( val => val !== label );
+        dispatch({ type: 'administrativeDecision', data: newList });
+      }
+      else if( !labelExists && value ){
+        const newList = state.administrativeDecision;
+        newList.push( label );
+
+        dispatch({ type: 'administrativeDecision', data: newList });
+      }
     }
   }
 
@@ -820,8 +960,8 @@ const MakeReportForm = props => {
       </DialogTitle>
       <DialogContent>
         {/*insert content here*/}
-        <div style={{ width: '100%', height: '100%' }} className="p-4">
-          <div style={{ width: '100%', height: '90%', overflowY: 'auto', backgroundColor: 'rgba(255, 255, 255, 0.8)' }} className="p-3 rounded d-flex flex-column align-items-center">
+        <div style={{ width: '100%', height: '100%', overflowX: 'hidden' }} className="p-4">
+          <div style={{ width: '100%', height: '90%', overflowY: 'auto', overflowX: 'hidden', backgroundColor: 'rgba(255, 255, 255, 0.8)' }} className="p-3 rounded d-flex flex-column align-items-center">
             <div className="col-12 px-5 d-flex flex-row justify-content-start align-items-center">
               <img id="discipline-logo" src="images/discipline.png" alt="discipline office logo"/>
               <div className="col-12 d-flex flex-column justify-content-start align-items-start p-5">
@@ -841,7 +981,7 @@ const MakeReportForm = props => {
               </div>
               <div className="col-md-6 d-flex justify-content-center align-items-center my-5">
                 <Stack spacing={2}>
-                  <TextField disabled sx={{ width: '300px' }} defaultValue={state.dateOfReport} helperText="Date of Report" onChange={e => dispatch({ type: 'dateOfReport', data: e.target.value })} type="date" variant="standard"/>
+                  <TextField sx={{ width: '300px' }} defaultValue={today} disabled helperText="Date of Report" onChange={e => dispatch({ type: 'dateOfReport', data: e.target.value })} type="date" variant="standard"/>
                   <TextField disabled sx={{ width: '300px' }} defaultValue={state.incidentNo} label="Incident no." onChange={e => dispatch({ type: 'incidentNo', data: e.target.value })} type="number" variant="standard"/>
                 </Stack>
               </div>
@@ -884,6 +1024,10 @@ const MakeReportForm = props => {
                 />
               </div>
 
+              <div className="col-md-12">
+                <TextField sx={{ width: '300px', margin: '10px' }} defaultValue={state.dutyHrs} required onChange={e => dispatch({ type: 'dutyHrs', data: e.target.value })} label="Duty Time" variant="standard"/>
+              </div>
+
               <div className="col-md-12 d-flex justify-content-center align-items-center">
                 <TextField sx={{ width: '80vw', margin: '10px' }} onChange={e => dispatch({ type: 'location', data: e.target.value })} label="Location" variant="standard"/>
               </div>
@@ -908,7 +1052,6 @@ const MakeReportForm = props => {
                 label="Incident Description"
                 multiline
                 rows={10}
-                maxRows={4}
                 onChange={e => dispatch({ type: 'incidentDescription', data: e.target.value })}
                 variant="filled"
               />
@@ -919,9 +1062,9 @@ const MakeReportForm = props => {
                 </Divider>
               </Root>
               
-              <ImageUpload imageLimit={1} getImages={ data => {
-                dispatch({ type: 'images', data: data?.[0] });
-                setImage( data?.[0] );
+              <ImageUpload imageLimit={Infinity} getImages={ data => {
+                dispatch({ type: 'images', data: data });
+                setImage( data );
               }}/>  
               <br/>
 
@@ -935,7 +1078,6 @@ const MakeReportForm = props => {
                 label="Description of Unacceptable / Unsafe Behavior or Conditions (If applicable)"
                 multiline
                 rows={10}
-                maxRows={4}
                 onChange={e => dispatch({ type: 'descriptionOfUnacceptable', data: e.target.value })}
                 variant="filled"
               />
@@ -946,31 +1088,18 @@ const MakeReportForm = props => {
                 label="Resulting Action Executed or Planned"
                 multiline
                 rows={10}
-                maxRows={4}
                 onChange={e => dispatch({ type: 'resultingActionExecuted', data: e.target.value })}
                 variant="filled"
               />
             </div>
 
-            <div className="row container-fluid d-flex flex-column justify-content-center align-items-center">
-              <div className="row col-12 d-flex flex-row justify-content-around align-items-center m-3">
-                <div className="col-md-4 d-flex justify-content-center  align-items-center">
-                  <TextField sx={{ width: '7cm', margin: '5px' }} onChange={e => dispatch({ type: 'employeeName', data: e.target.value })} label="Faculty / Employee Name" variant="standard"/>
-                </div>
-
-                <div className="col-md-4 d-flex justify-content-center align-items-center">
-                  <TextField disabled sx={{ width: '7cm', margin: '5px' }} defaultValue={state.date1} onChange={e => dispatch({ type: 'date1', data: e.target.value })} helperText="Date" type="date" variant="standard"/>
-                </div>
+            <div className="row container-fluid">
+              <div className="col-md-3 d-flex flex-row justify-content-around align-items-center m-3">
+                <TextField sx={{ width: '7cm', margin: '5px' }} onChange={e => dispatch({ type: 'employeeName', data: e.target.value })} label="Faculty / Employee Name" variant="standard"/>
               </div>
 
-              <div className="row col-12 d-flex flex-row justify-content-around align-items-center m-3">
-                <div className="col-md-5 d-flex justify-content-center align-items-center">
-                  <TextField sx={{ width: '7cm', margin: '5px' }} onChange={e => dispatch({ type: 'chairpersonName', data: e.target.value })} label="Head / Chairperson Name" variant="standard"/>
-                </div>
-
-                <div className="col-md-5 d-flex justify-content-center align-items-center">
-                  <TextField disabled sx={{ width: '7cm', margin: '5px' }} defaultValue={state.date2} onChange={e => dispatch({ type: 'date2', data: e.target.value })} helperText="Date" type="date" variant="standard"/>
-                </div>
+              <div className="col-md-3 d-flex flex-row justify-content-around align-items-center m-3">
+                <TextField sx={{ width: '7cm', margin: '5px' }} onChange={e => dispatch({ type: 'chairpersonName', data: e.target.value })} label="Head / Chairperson Name" variant="standard"/>
               </div>
             </div>
 
@@ -987,53 +1116,66 @@ const MakeReportForm = props => {
                 <h5 className="text-uppercase"><b>problem behavior:</b></h5>
               </div>
 
-              {/*<div className="px-5 col-md-5 my-3 d-flex flex-column justify-content-between align-items-start">
+
+              <div className="px-5 row col-md-12 my-3 d-flex flex-column justify-content-center align-items-center">
                 <div className="col-12">
                   <p className="text-uppercase">minors:</p>
                 </div>
 
-                <FormControlLabel
-                  label="Not wearing prescribed school uniform"
-                  control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
-                />
-                
-                <FormControlLabel
-                  label="Not wearing I.D"
-                  control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
-                />
-
-                <FormControlLabel
-                  label="Dress Code"
-                  control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
-                />
-
-                <FormControlLabel
-                  label="Using vulgar words and rough behavior"
-                  control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
-                />
-
-                <FormControlLabel
-                  label="Loitering"
-                  control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
-                />
-
-                <FormControlLabel
-                  label="Littering"
-                  control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
-                />
-
-                <FormControlLabel
-                  label="Careless / unauthorized use of school property "
-                  control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
-                />
-
-                <FormControlLabel
-                  label="Unauthorized posting of announcements, posters and notices."
-                  control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
-                />
-
-                <OtherCheckBox onChange={value => setOtherMinor( value )}/>
-              </div>*/}
+                <div className="row container-fluid">
+                  <div className="col-md-6">  
+                    <FormControlLabel
+                      label="Not wearing prescribed school uniform"
+                      control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
+                    />
+                  </div>
+                  <div className="col-md-6">  
+                    <FormControlLabel
+                      label="Not wearing I.D"
+                      control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
+                    />
+                  </div>
+                  <div className="col-md-6">  
+                    <FormControlLabel
+                      label="Dress Code"
+                      control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
+                    />
+                  </div>
+                  <div className="col-md-6">  
+                    <FormControlLabel
+                      label="Using vulgar words and rough behavior"
+                      control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
+                    />
+                  </div>
+                  <div className="col-md-6">  
+                    <FormControlLabel
+                      label="Loitering"
+                      control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
+                    />
+                  </div>
+                  <div className="col-md-6">  
+                    <FormControlLabel
+                      label="Littering"
+                      control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
+                    />
+                  </div>
+                  <div className="col-md-6">  
+                    <FormControlLabel
+                      label="Careless / unauthorized use of school property "
+                      control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
+                    />
+                  </div>
+                  <div className="col-md-6">  
+                    <FormControlLabel
+                      label="Unauthorized posting of announcements, posters and notices."
+                      control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
+                    />
+                  </div>
+                  <div className="col-md-6">  
+                    <OtherCheckBox onChange={value => setOtherMinor( value )}/>
+                  </div>
+                </div>
+              </div>
 
               {/*================================================================================*/}
 
@@ -1111,78 +1253,172 @@ const MakeReportForm = props => {
               <div className="row col-md-12">
                 <div className="col-md-4">
                   <FormControlLabel
-                    label="Conference w/ student "
-                    control={<Checkbox onChange={handleAdministrativeDecision} {...label}/>}
+                    label="Conference w/ student"
+                    control={
+                      !isAdminDecisionCheckboxDisabled
+                        ? <Checkbox onChange={handleAdministrativeDecision} {...label}/>
+                        : <Checkbox key={uniqid()} disabled={true} checked={false}/>
+                      }
                   />
                 </div>
 
                 <div className="col-md-4">
                   <FormControlLabel
                     label="Parent contact"
-                    control={<Checkbox onChange={handleAdministrativeDecision} {...label}/>}
+                    control={
+                      !isAdminDecisionCheckboxDisabled
+                        ? <Checkbox onChange={handleAdministrativeDecision} {...label}/>
+                        : <Checkbox key={uniqid()} disabled={true} checked={false}/>
+                      }
                   />
                 </div>
 
                 <div className="col-md-4">
                   <FormControlLabel
                     label="Detention"
-                    control={<Checkbox onChange={handleAdministrativeDecision} {...label}/>}
+                    control={
+                      !isAdminDecisionCheckboxDisabled
+                        ? <Checkbox onChange={handleAdministrativeDecision} {...label}/>
+                        : <Checkbox key={uniqid()} disabled={true} checked={false}/>
+                      }
                   />
                 </div>
 
                 <div className="col-md-4">
                   <FormControlLabel
                     label="Community Service"
-                    control={<Checkbox onChange={handleAdministrativeDecision} {...label}/>}
+                    control={
+                      !isAdminDecisionCheckboxDisabled
+                        ? <Checkbox onChange={handleAdministrativeDecision} {...label}/>
+                        : <Checkbox key={uniqid()} disabled={true} checked={false}/>
+                      }
                   />
                 </div>
 
                 <div className="col-md-4">
                   <FormControlLabel
                     label="Oral Reprimand / Written Apology from the Students"
-                    control={<Checkbox onChange={handleAdministrativeDecision} {...label}/>}
+                    control={
+                      !isAdminDecisionCheckboxDisabled
+                        ? <Checkbox onChange={handleAdministrativeDecision} {...label}/>
+                        : <Checkbox key={uniqid()} disabled={true} checked={false}/>
+                      }
                   />
                 </div>
 
                 <div className="col-md-4">
                   <FormControlLabel
                     label="Oral and Written Reprimand / Written Apology from the Students and Counselling"
-                    control={<Checkbox onChange={handleAdministrativeDecision} {...label}/>}
-                  />
-                </div>
-
-                <div className="col-md-4">
-                  <FormControlLabel
-                    label="Suspension"
-                    control={<Checkbox onChange={handleAdministrativeDecision} {...label}/>}
-                  />
-                </div>
-
-                <div className="col-md-4">
-                  <FormControlLabel
-                    label="Dismissal"
-                    control={<Checkbox onChange={handleAdministrativeDecision} {...label}/>}
-                  />
-                </div>
-
-                <div className="col-md-4">
-                  <FormControlLabel
-                    label="Exclusion"
-                    control={<Checkbox onChange={handleAdministrativeDecision} {...label}/>}
-                  />
-                </div>
-
-                <div className="col-md-4">
-                  <FormControlLabel
-                    label="Expulsion"
-                    control={<Checkbox onChange={handleAdministrativeDecision} {...label}/>}
+                    control={
+                      !isAdminDecisionCheckboxDisabled
+                        ? <Checkbox onChange={handleAdministrativeDecision} {...label}/>
+                        : <Checkbox key={uniqid()} disabled={true} checked={false}/>
+                      }
                   />
                 </div>
 
                 <div className="col-5">
-                  <OtherCheckBox onChange={value => setOtherDecision( value )}/>
+                  <OtherCheckBox disabled={isAdminDecisionCheckboxDisabled} onChange={value => setOtherDecision( value )}/>
                 </div>
+                {/*<div className="col-md-4">
+                  <FormControlLabel
+                    label="Conference w/ student"
+                    control={<Checkbox disabled={isAdminDecisionCheckboxDisabled} onChange={handleAdministrativeDecision} {...label}/>}
+                  />
+                </div>
+
+                <div className="col-md-4">
+                  <FormControlLabel
+                    label="Parent contact"
+                    control={<Checkbox disabled={isAdminDecisionCheckboxDisabled} onChange={handleAdministrativeDecision} {...label}/>}
+                  />
+                </div>
+
+                <div className="col-md-4">
+                  <FormControlLabel
+                    label="Detention"
+                    control={<Checkbox disabled={isAdminDecisionCheckboxDisabled} onChange={handleAdministrativeDecision} {...label}/>}
+                  />
+                </div>
+
+                <div className="col-md-4">
+                  <FormControlLabel
+                    label="Community Service"
+                    control={<Checkbox disabled={isAdminDecisionCheckboxDisabled} onChange={handleAdministrativeDecision} {...label}/>}
+                  />
+                </div>
+
+                <div className="col-md-4">
+                  <FormControlLabel
+                    label="Oral Reprimand / Written Apology from the Students"
+                    control={<Checkbox disabled={isAdminDecisionCheckboxDisabled} onChange={handleAdministrativeDecision} {...label}/>}
+                  />
+                </div>
+
+                <div className="col-md-4">
+                  <FormControlLabel
+                    label="Oral and Written Reprimand / Written Apology from the Students and Counselling"
+                    control={<Checkbox disabled={isAdminDecisionCheckboxDisabled} onChange={handleAdministrativeDecision} {...label}/>}
+                  />
+                </div>
+
+                <div className="col-5">
+                  <OtherCheckBox disabled={isAdminDecisionCheckboxDisabled} onChange={value => setOtherDecision( value )}/>
+                </div>*/}
+                  
+                <div className="col-12 my-5">
+                  <Divider/>
+                </div>
+
+                <RadioGroup
+                  row
+                  aria-labelledby="demo-row-radio-buttons-group-label"
+                  name="row-radio-buttons-group"
+                  value={currentRadioInput}
+                  onChange={handleAdministrativeDecision}
+                >
+                  <div className="col-md-4">
+                    <FormControlLabel
+                      value="Suspension"
+                      label="Suspension"
+                      control={<Radio />}
+                    />
+                  </div>
+
+                  <div className="col-md-4">
+                    <FormControlLabel
+                      value="Dismissal"
+                      label="Dismissal"
+                      control={<Radio />}
+                    />
+                  </div>
+
+                  <div className="col-md-4">
+                    <FormControlLabel
+                      value="Exclusion"
+                      label="Exclusion"
+                      control={<Radio />}
+                    />
+                  </div>
+
+                  <div className="col-md-4">
+                    <FormControlLabel
+                      value="Expulsion"
+                      label="Expulsion"
+                      control={<Radio />}
+                    />
+                  </div>
+                </RadioGroup>
               </div>
+              <Button 
+                onClick={() => {
+                  setCurrentRadioInput( '' );
+                  setIsAdminDecisionCheckboxDisabled( false );
+                  dispatch({ type: 'administrativeDecision', data: [] });
+                }}
+              >
+                clear radio buttons
+              </Button>
             </div>
             
             <div className="col-12 d-flex justify-content-center align-items-center">
@@ -1192,7 +1428,6 @@ const MakeReportForm = props => {
                 label="Initial Action Given"
                 multiline
                 rows={10}
-                // maxRows={4}
                 onChange={e => dispatch({ type: 'initialActionGiven', data: e.target.value })}
                 variant="filled"
               />
@@ -1205,7 +1440,6 @@ const MakeReportForm = props => {
                 label="Administrative Comments and/or Follow Up:"
                 multiline
                 rows={10}
-                // maxRows={4}
                 onChange={e => dispatch({ type: 'administrativeComment', data: e.target.value })}
                 variant="filled"
               />
@@ -1248,11 +1482,15 @@ const OtherCheckBox = props => {
     setValue( e.target.value );
   }
 
-  const debouncedValuePassing = debounce(props?.onChange, 1000);
+  const debouncedValuePassing = debounce(props?.onChange, 50);
 
   React.useEffect(() => {
     if( !isChecked ){
       setValue( '' );
+    }
+
+    if( props.disabled ){
+      setIsChecked( false );
     }
 
     if( isChecked && !value.length ){
@@ -1264,7 +1502,7 @@ const OtherCheckBox = props => {
 
     debouncedValuePassing?.( value, key );
 
-  }, [isChecked, value]);
+  }, [isChecked, value, props]);
 
   return(
     <FormControlLabel
@@ -1278,7 +1516,11 @@ const OtherCheckBox = props => {
           helperText={ isChecked ? 'Enter text here' : '' }
         />
       }
-      control={<Checkbox checked={isChecked} onChange={handleChecked} {...label}/>}
+      control={
+        !props?.disabled
+          ? <Checkbox onChange={handleChecked} {...label}/>
+          : <Checkbox key={uniqid()} checked={false} disabled={true} {...label}/>
+      }
     />
   );
 }

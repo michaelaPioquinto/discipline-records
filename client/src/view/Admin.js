@@ -8,10 +8,10 @@ import TableSkeleton from '../components/TableSkeleton';
 
 import LinearProgress from '@mui/material/LinearProgress';
 
-const Statistical = React.lazy(() => import('./pages/admin/Statistical'));
+const Statistical = React.lazy(() => import('./pages/Statistical'));
 const SchoolYears = React.lazy(() => import('./pages/admin/SchoolYears'));
 const Violation = React.lazy(() => import('./pages/admin/Violation'));
-const Handbook = React.lazy(() => import('./pages/admin/Handbook'));
+const Handbook = React.lazy(() => import('./pages/Handbook'));
 const Accounts = React.lazy(() => import('./pages/admin/Accounts'));
 const Dashboard = React.lazy(() => import('./pages/Dashboard'));
 const Trash = React.lazy(() => import('./pages/Trash'));

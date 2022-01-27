@@ -18,7 +18,7 @@ var dbURI = 'mongodb://localhost:27017/disciplineRecord';
 /**
  * Create HTTP server.
  */
-
+ 
 var server = http.createServer(app);
 
 mongoose.connect(dbURI, { useUnifiedTopology: true, useNewUrlParser: true })
