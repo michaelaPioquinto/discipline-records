@@ -73,9 +73,7 @@ const Statistical = props => {
 			tempData.reverse();
 			for( let i = 0; i < 10 ; i++ ){
 				if( tempData.length > i ){
-					const label = `${tempData[ i ].year}-${tempData[ i ].year + 1}`;
-
-					currentLabels.push( label );
+					currentLabels.push( tempData[ i ].year );
 				}
 				else{
 					break;
@@ -90,9 +88,6 @@ const Statistical = props => {
 				semester1List.push( semester1 );
 				semester2List.push( semester2 );
 			});
-
-			console.log( semester1List );
-			console.log( semester2List );
 
 			setDatasets([
 				{
@@ -112,7 +107,7 @@ const Statistical = props => {
 			data.forEach( datum => {
 				tempStatsHistory.push(
 					<TableRow>
-						<TableCell align="left"> {`${ datum.year }-${ datum.year + 1 }`} </TableCell>
+						<TableCell align="left"> { datum.year } </TableCell>
 						<TableCell align="right"> { datum.semester1 } </TableCell>
 						<TableCell align="right"> { datum.semester2 } </TableCell>
 						<TableCell align="right"> { datum.semester1 + datum.semester2 }</TableCell>

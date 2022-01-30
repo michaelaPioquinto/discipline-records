@@ -9,9 +9,14 @@ import Skeleton from '@mui/material/Skeleton';
 import Pagination from '@mui/material/Pagination';
 import Divider from '@mui/material/Divider';
 import Chip from '@mui/material/Chip';
+import ImageList from '@mui/material/ImageList';
+import ImageListItem from '@mui/material/ImageListItem';
 
 import SummarizeIcon from '@mui/icons-material/Summarize';
 import ContactMailIcon from '@mui/icons-material/ContactMail';
+
+import SchoolYearAndSemester from '../../../context/SchoolYearAndSemester.js';
+
 
 const Root = styled('div')(({ theme }) => ({
   width: '100%',
@@ -28,9 +33,11 @@ const CustomizedTextField = styled( TextField )({
 });
 
 const Dashboard = props => {
+	const selectedYearAndSem = React.useContext( SchoolYearAndSemester );
 	const [studentData, setStudentData] = React.useState( null );
 	const [reportsView, setReportsView] = React.useState( [] );
 	const [reportPage, setReportPage] = React.useState( 1 );
+	const [duties, setDuties] = React.useState( null );
 
 	const handleSwitchPage = ( _, value ) => {
 		setReportPage( value );
@@ -52,13 +59,59 @@ const Dashboard = props => {
 		if( studentData && studentData?.report?.length ){
 			const reps = [];
 
+			// console.log( props.selectedYearAndSem );
 			studentData.report.forEach( rep => {
-				reps.push( <Report key={ uniqid() } {...rep}/> );
+				const yearStarted = Number(new Date().getFullYear().toString().slice( 0, 2 ) + studentData?.student?.studentID?.slice?.( 0, 2 ));
+
+				const semester = selectedYearAndSem?.split?.('-')?.[ 2 ] ?? '1st semester' ;
+				const year1 = selectedYearAndSem?.split?.('-')?.[ 0 ]?.replaceAll?.(' ', '') ?? yearStarted;
+				const year2 = selectedYearAndSem?.split?.('-')?.[ 1 ]?.replaceAll?.(' ', '') ?? yearStarted;
+				
+				const dateReport = rep.dateOfReport.split('-')[ 2 ];
+
+				const addToReps = () => {
+					setDuties(
+							<div className="col-md-3 my-2 d-flex justify-content-center align-items-center">
+								<SkeletonizedTextfield 
+									label="Duty / Duties" 
+									data={ rep.duty }
+								/>
+							</div>
+						);
+
+					reps.push( 
+						<Report 
+							key={ uniqid() } 
+							{...rep}
+						/> 
+					);
+				}
+
+				switch( semester?.replaceAll?.(' ', '') ){
+					case '1stsemester':
+						if( dateReport === year1 || dateReport === yearStarted ){
+							addToReps();
+						}
+						break;
+
+					case '2ndsemester':
+						if( dateReport === year1 || dateReport === year2 ){
+							addToReps();
+						}
+						break;
+
+					default:
+						return;
+				}
 			});
+
+			if( !reps.length ){
+				setDuties( null );
+			}
 
 			setReportsView([ ...reps ]);
 		}
-	}, [studentData]);
+	}, [studentData, selectedYearAndSem]);
 
 	const renderFullName = () => {
 		if( (!studentData?.student?.firstName && !studentData?.student?.lastname ) || !studentData?.student?.middleName )
@@ -109,12 +162,7 @@ const Dashboard = props => {
 					<SkeletonizedTextfield label="Year & Section" data={ studentData?.student?.yearSection } />
 				</div>
 				
-				<div className="col-md-3 my-2 d-flex justify-content-center align-items-center">
-					<SkeletonizedTextfield 
-						label="Duty / Duties" 
-						data={ studentData ? getDuties( studentData?.report ) : null }
-					/>
-				</div>
+				{ duties }
 			</div>
 
 			<div className="col-12">
@@ -185,7 +233,7 @@ const Report = props => {
 			</div>
 			<Divider sx={{ margin: '5px 0px 5px 0px', width: '100%' }}/>
 			<div className="col-12 p-3 d-flex justify-content-center align-items-center" style={{ height: 'fit-content' }}>
-				<SkeletonizedImage data={ props.images?.[ 0 ] } width="500px" height="500px"/>
+				<SkeletonizedImage images={ props.images } width="500px" height="500px"/>
 			</div>
 		</div>	
 	);
@@ -290,20 +338,34 @@ const SkeletonizedImage = props => {
 	return(
 		<>
 			{
-				props?.data
-					? <img 
-						src={props.data} 
-						style={{ 
-							width: props.width ?? '100%', 
-							height: props.height ?? '100%',
-							imageRendering: 'pixelated' 
-						}}
-					/>
+				props?.images
+					? <ImageList sx={{ width: '100%', height: '100%' }} cols={3} rowHeight={164}>
+          	{
+              props?.images?.map( image => (
+                  <ImageListItem key={uniqid()}>
+                      <img
+                        src={image}
+                        // srcSet={`${item.img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
+                        alt=""
+                        loading="lazy"
+                      />
+                  </ImageListItem>
+                ))
+            }
+					 </ImageList> 
 					: <Skeleton width={ props.width } height={ props.height } />
 			}
 		</>
 	)
 };
 
+// <img 
+// 	src={props.data} 
+// 	style={{ 
+// 		width: props.width ?? '100%', 
+// 		height: props.height ?? '100%',
+// 		imageRendering: 'pixelated' 
+// 	}}
+// />
 
 export default Dashboard;

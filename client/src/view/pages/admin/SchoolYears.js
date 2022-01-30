@@ -137,17 +137,13 @@ const Accounts = props => {
 				head={['School Year', 'Semester', 'Status']}
 				content={ items }
 			/>
-			{
-				selectedItem
-					? <AddUser 
-							open={addForm} 
-							setOpen={handleAddForm}
-							setEdit={handleEditForm} 
-							fetchSchoolYears={fetchSchoolYears} 
-							{ ...selectedItem }
-						/> 
-					: null
-			}
+			<AddUser 
+				open={addForm} 
+				setOpen={handleAddForm}
+				setEdit={handleEditForm} 
+				fetchSchoolYears={fetchSchoolYears} 
+				{ ...selectedItem }
+			/> 
 			<div style={{ position: 'absolute', bottom: '15px', right: '15px' }}>
 				<IconButton style={{ backgroundColor: 'rgba(25, 25, 21, 0.9)' }} onClick={handleAddForm}>
 					<AddIcon style={{ color: 'white' }}/>

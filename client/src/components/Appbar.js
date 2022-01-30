@@ -29,6 +29,13 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Divider from '@mui/material/Divider';
 
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import TreeView from '@mui/lab/TreeView';
+import TreeItem from '@mui/lab/TreeItem';
+import ListAltIcon from '@mui/icons-material/ListAlt';
+import Chip from '@mui/material/Chip';
+
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -70,6 +77,13 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
+const Root = styled('div')(({ theme }) => ({
+  width: '100%',
+  ...theme.typography.body2,
+  '& > :not(style) + :not(style)': {
+    marginTop: theme.spacing(2),
+  },
+}));
 
 const Appbar = props => {
 	const [drawer, setDrawer] = React.useState( false );
@@ -111,7 +125,7 @@ const Appbar = props => {
 			Cookies.remove('token');
 			Cookies.remove('rtoken');
 
-			props.tools.setView('/sign-in')
+			props.tools.setView('/sign-in');
 		})
 		.catch( err => {
 			setTimeout(() => handleSignout(), 5000);
@@ -297,10 +311,125 @@ const Appbar = props => {
           			)
           		: null
           }
+          { props.tools.role === 'student' ? <StudentTreeView setSelectedYearAndSem={props.setSelectedYearAndSem} studentID={props.tools.name}/> : null }
         </Drawer>
         { props.children }
 		</>
 	)
+}
+
+const StudentTreeView = props => {
+	const [schoolYear, setSchoolYear] = React.useState( [] );
+
+	const [selected, setSelected] = React.useState( Number(Cookies.get('slctd')) ?? 2 );
+	const [expanded, setExpanded] = React.useState( [Cookies.get('xpndd')] ?? ['1'] );
+	const [label, setLabel] = React.useState( '' );
+
+	React.useEffect(() => {
+		if( props.studentID ){
+			const schoolYears = [];
+
+			/*
+				Finding school year is based on the student ID. Our school ID's first two digits are indicating what year
+				we enrolled. 
+
+				For example: 1801201
+
+				The "18" in "1801201" means that the year the student enrolled was on 2018, but we can not assume that the year will be 
+				in the range of 2000, so we have to get the current year and get the first two digits of it.
+
+				For example: 2022
+
+				The "20" in "2022" means the current year is in the range of 2000, so when we get into 3000 we can still get the exact year
+				the student enrolled.
+			*/
+			const yearStarted = Number(new Date().getFullYear().toString().slice( 0, 2 ) + props.studentID.slice( 0, 2 ));
+			let currentSchoolYear = yearStarted;
+
+			for( let i = 0; i < 4; i++ ){
+				schoolYears.push( `${currentSchoolYear}-${currentSchoolYear + 1}` );
+				currentSchoolYear += 1;
+			}
+
+			setSchoolYear([ ...schoolYears ]);
+		}
+	}, [props]);
+
+	const getSemester = sem => Number( sem ) % 2 === 0 ? '1st semester' : '2nd semester';
+
+	React.useEffect(() => {
+		if( schoolYear.length ){
+			if( String( selected ) === '2' || String( selected ) === '3' ){
+				Cookies.set('slctd', selected);
+				setLabel( `${schoolYear[ 0 ]} - ${getSemester( selected )}` );
+			}
+			else if( String( selected ) === '6' || String( selected ) === '7' ){
+				Cookies.set('slctd', selected);
+				setLabel( `${schoolYear[ 1 ]} - ${getSemester( selected )}` );
+			}
+			else if( String( selected ) === '10' || String( selected ) === '11' ){
+				Cookies.set('slctd', selected);
+				setLabel( `${schoolYear[ 2 ]} - ${getSemester( selected )}` );
+			}
+			else if( String( selected ) === '14' || String( selected ) === '15' ){
+				Cookies.set('slctd', selected);
+				setLabel( `${schoolYear[ 3 ]} - ${getSemester( selected )}` );
+			}
+		}
+	}, [selected, schoolYear]);
+
+	React.useEffect(() => {
+		Cookies.set('xpndd', [expanded?.[ 0 ]]);
+	}, [expanded]);
+
+	React.useEffect(() => {
+		Cookies.set('crrntslctd', label);
+		props?.setSelectedYearAndSem?.( label );
+	}, [label]);
+
+	return(
+			<>
+				<Root>
+					<Divider textAlign="left" sx={{ width: '100%', margin: '50px 0px 25px 0px'}}>
+						<Chip 
+							icon={<ListAltIcon fontSize="small"/>} 
+							sx={{ borderColor: 'black', padding: '0px 5px 0px 5px' }} 
+							variant="outlined" label={label}
+						/>
+					</Divider>
+				</Root>
+				<TreeView
+	        aria-label="controlled"
+	        defaultCollapseIcon={<ExpandMoreIcon fontSize="large"/>}
+	        defaultExpandIcon={<ChevronRightIcon fontSize="large"/>}
+	        selected={selected}
+	        expanded={expanded}
+	        onNodeToggle={(_, nodeIds) => setExpanded( nodeIds )}
+	        onNodeSelect={(_, nodeIds) => setSelected( nodeIds )}
+	        // expanded={expanded}
+	      >
+	        <TreeItem nodeId="1" label={schoolYear[ 0 ]}>
+	          <TreeItem nodeId="2" label="1st semester" />
+	          <TreeItem nodeId="3" label="2nd semester" />
+	        </TreeItem>
+	        
+	        <TreeItem nodeId="5" label={schoolYear[ 1 ]}>
+	          <TreeItem nodeId="6" label="1st semester" />
+	          <TreeItem nodeId="7" label="2nd semester" />
+	        </TreeItem>
+
+	        <TreeItem nodeId="9" label={schoolYear[ 2 ]}>
+	          <TreeItem nodeId="10" label="1st semester" />
+	          <TreeItem nodeId="11" label="2nd semester" />
+	        </TreeItem>
+
+	        <TreeItem nodeId="13" label={schoolYear[ 3 ]}>
+	          <TreeItem nodeId="14" label="1st semester" />
+	          <TreeItem nodeId="15" label="2nd semester" />
+	        </TreeItem>
+	      </TreeView>
+      </>
+		)
 }
 
 export default Appbar;

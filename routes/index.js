@@ -391,13 +391,20 @@ router.get('/get-current-school-year-semester', async(req, res) => {
     if( err ) return res.sendStatus( 503 );
 
     if( docs ){
+      let activatedDoc = null;
+
       docs.forEach( doc => {
         if( doc.status === 'activated' ){
-          return res.json( doc );
+          activatedDoc = doc;
         }
       });
-
-      return res.end();
+      
+      if( activatedDoc ){
+        return res.status( 200 ).json( activatedDoc );
+      }
+      else{
+        return res.end();
+      }
     }
   });
 });
@@ -701,132 +708,18 @@ router.get('/accounts/system-admin', async( req, res ) => {
 
 router.post('/save-report', async( req, res ) => {
   Student.findOne({ studentID: req.body.studentID }, (err, doc) => {
-    if( err ) return res.status( 503 ).json({ message: 'Please try again!' });
+    if( err ){ 
+      console.log( err );
+      return res.status( 503 ).json({ message: 'Please try again!' });
+    }
 
     if( doc ){
       Report.find({ studentID: req.body.studentID }, (err, docs) => {
-        if( err ) return res.sendStatus( 503 );
+        if( err ){ 
+          console.log( err );
+          return res.sendStatus( 503 );
+        }
 
-        // const updateOffenses = (doc, index, length) => {
-        //   const minorOffenses = [];
-        //   const majorOffenses = [];
-
-        //   doc.minorProblemBehavior.forEach( offense => {
-        //     if( req.body.minorProblemBehavior.includes( offense ) ){
-        //       minorOffenses.push( offense );
-        //     }
-        //   });
-
-        //   doc.majorProblemBehavior.forEach( offense => {
-        //     if( req.body.majorProblemBehavior.includes( offense ) ){
-        //       majorOffenses.push( offense );
-        //     }
-        //   });
-
-        //   minorOffenses.forEach( offense => {
-        //     if( doc.thirdOffenses.includes( offense ) ){
-        //       return;
-        //     }
-        //     else if( doc.secondOffenses.includes( offense ) ){
-        //       doc.thirdOffenses.push( offense );
-        //     }
-        //     else if( doc.firstOffenses.includes( offense ) ){
-        //       doc.secondOffenses.push( offense );
-        //     }
-        //     else{
-        //       doc.firstOffenses.push( offense );
-        //     }
-        //   });
-
-        //   majorOffenses.forEach( offense => {
-        //     if( doc.thirdOffenses.includes( offense ) ){
-        //       return;
-        //     }
-        //     else if( doc.secondOffenses.includes( offense ) ){
-        //       doc.thirdOffenses.push( offense );
-        //     }
-        //     else if( doc.firstOffenses.includes( offense ) ){
-        //       doc.secondOffenses.push( offense );
-        //     }
-        //     else{
-        //       doc.firstOffenses.push( offense );
-        //     }
-        //   });
-
-        //   Report.create({ 
-        //     ...req.body, 
-        //     firstOffenses: [ ...doc.firstOffenses ],
-        //     secondOffenses: [ ...doc.secondOffenses ],
-        //     thirdOffenses: [ ...doc.thirdOffenses ]  
-        //   }, err => {
-        //     if( err ) return res.sendStatus( 503 );
-
-        //     const currentYear = new Date().getFullYear();
-
-        //     const updateStatistical = callback => {
-        //       Statistic.findOne({ year: currentYear }, async (err, doc) => {
-        //         if( err ) return res.sendStatus( 503 );
-
-        //         if( doc ){
-        //           callback( doc );
-        //         }
-        //         else{
-        //           try{
-        //             const newDoc = await Statistic.create({ year: currentYear });
-
-        //             callback( newDoc );
-        //           }
-        //           catch( err ){
-        //             return res.sendStatus( 503 );
-        //           }
-        //         }
-        //       });
-        //     }
-
-        //     doc.save( err => {
-        //       if( err ) return res.sendStatus( 503 );
-
-        //       SchoolYear.findOne({ status: 'activated' }, (err, doc) => {
-        //         if( err ) return res.sendStatus( 503 );
-
-        //         if( doc ){
-        //           const { semester } = doc;
-
-        //           switch( semester ){
-        //             case '1st':
-        //               updateStatistical( doc => {
-        //                 doc.semester1 += 1;
-        //                 doc.save( err => {
-        //                   if( err ) return res.sendStatus( 503 );
-
-        //                   if( index === length - 1 ){
-        //                     return res.json({ message: 'Successfully saved report!'});
-        //                   }
-        //                 });
-        //               });
-        //               break;
-
-        //             case '2nd':
-        //               updateStatistical( doc => {
-        //                 doc.semester2 += 1;
-        //                 doc.save( err => {
-        //                   if( err ) return res.sendStatus( 503 );
-
-        //                   if( index === length - 1 ){
-        //                     return res.json({ message: 'Successfully saved report!'});
-        //                   }
-        //                 });
-        //               });
-        //               break;
-
-        //             default:
-        //               return res.sendStatus( 503 );
-        //           }
-        //         }
-        //       });
-        //     });
-        //   });
-        // }
         /*
             Check how many previous reports' offenses are in the current report
             offenses to see any duplication, hence we can update offenses
@@ -865,9 +758,12 @@ router.post('/save-report', async( req, res ) => {
           doc.thirdOffenses = Array( ...new Set([ ...doc.thirdOffenses, ...thirdOffenses ]));
 
           doc.save( err => {
-            if( err ) return res.sendStatus( 503 );
+            if( err ){ 
+              console.log( err );
+              return res.sendStatus( 503 );
+            }
 
-            if( index === length - 1 )return res.json({ message: 'Successfully saved report!'});
+            if( index === length - 1 ) return res.json({ message: 'Successfully saved report!'});
           });
         }  
 
@@ -896,62 +792,77 @@ router.post('/save-report', async( req, res ) => {
               secondOffenses: [ ...secondOffenses ],
               thirdOffenses: [ ...thirdOffenses ]  
             }, err => {
-              if( err ) return res.sendStatus( 503 );
-
-              const currentYear = new Date().getFullYear();
-
-              const updateStatistical = callback => {
-                Statistic.findOne({ year: currentYear }, async (err, doc) => {
-                  if( err ) return res.sendStatus( 503 );
-
-                  if( doc ){
-                    callback( doc );
-                  }
-                  else{
-                    try{
-                      const newDoc = await Statistic.create({ year: currentYear });
-
-                      callback( newDoc );
-                    }
-                    catch( err ){
-                      return res.sendStatus( 503 );
-                    }
-                  }
-                });
+              if( err ){ 
+                console.log( err );
+                return res.sendStatus( 503 );
               }
 
               SchoolYear.findOne({ status: 'activated' }, (err, doc) => {
-                  if( err ) return res.sendStatus( 503 );
+                if( err ){ 
+                  console.log( err );
+                  return res.sendStatus( 503 );
+                }
 
-                  if( doc ){
-                    const { semester } = doc;
+                if( doc ){
+                  const { schoolYear, semester } = doc;
 
-                    switch( semester ){
-                      case '1st':
-                        updateStatistical( doc => {
-                          doc.semester1 += 1;
-
-                          doc.save( err => {
-                            if( err ) return res.sendStatus( 503 );
-                          });
-                        });
-                        break;
-
-                      case '2nd':
-                        updateStatistical( doc => {
-                          doc.semester2 += 1;
-
-                          doc.save( err => {
-                            if( err ) return res.sendStatus( 503 );
-                          });
-                        });
-                        break;
-
-                      default:
+                  const updateStatistical = callback => {
+                    Statistic.findOne({ year: schoolYear }, async (err, doc) => {
+                      if( err ){ 
+                        console.log( err );
                         return res.sendStatus( 503 );
-                    }
+                      }
+
+                      if( doc ){
+                        callback( doc );
+                      }
+                      else{
+                        try{
+                          const newDoc = await Statistic.create({ year: schoolYear });
+
+                          callback( newDoc );
+                        }
+                        catch( err ){
+                          return res.sendStatus( 503 );
+                        }
+                      }
+                    });
                   }
-                });
+
+                  switch( semester ){
+                    case '1st':
+                      updateStatistical( doc => {
+                        doc.semester1 += 1;
+                        doc.save( err => {
+                          if( err ){ 
+                            console.log( err );
+                            return res.sendStatus( 503 );
+                          }
+
+                          return res.json({ message: 'Successfully saved report!'});
+                        });
+                      });
+                      break;
+
+                    case '2nd':
+                      updateStatistical( doc => {
+                        doc.semester2 += 1;
+                        doc.save( err => {
+                          if( err ){ 
+                            console.log( err );
+                            return res.sendStatus( 503 );
+                          }
+
+                          return res.json({ message: 'Successfully saved report!'});
+                        });
+                      });
+                      break;
+
+                    default:
+                      return res.sendStatus( 503 );
+                  }
+                }
+              });
             });
 
             docs.forEach(( doc, index ) => updateDocs( doc, index, docs.length, { firstOffenses, secondOffenses, thirdOffenses }));
@@ -966,43 +877,52 @@ router.post('/save-report', async( req, res ) => {
             secondOffenses: [], 
             thirdOffenses: [] 
           }, err => {
-            if( err ) return res.sendStatus( 503 );
-
-            const currentYear = new Date().getFullYear();
-
-            const updateStatistical = callback => {
-              Statistic.findOne({ year: currentYear }, async (err, doc) => {
-
-                if( err ) return res.sendStatus( 503 );
-
-                if( doc ){
-                  callback( doc );
-                }
-                else{
-                  try{
-                    const newDoc = await Statistic.create({ year: currentYear });
-
-                    callback( newDoc );
-                  }
-                  catch( err ){
-                    return res.sendStatus( 503 );
-                  }
-                }
-              });
+            if( err ) {
+              console.log( err );
+              return res.sendStatus( 503 );
             }
 
             SchoolYear.findOne({ status: 'activated' }, (err, doc) => {
-              if( err ) return res.sendStatus( 503 );
+              if( err ){ 
+                console.log( err );
+                return res.sendStatus( 503 );
+              }
 
               if( doc ){
-                const { semester } = doc;
+                const { schoolYear, semester } = doc;
+
+                const updateStatistical = callback => {
+                  Statistic.findOne({ year: schoolYear }, async (err, doc) => {
+                    if( err ){ 
+                      console.log( err );
+                      return res.sendStatus( 503 );
+                    }
+
+                    if( doc ){
+                      callback( doc );
+                    }
+                    else{
+                      try{
+                        const newDoc = await Statistic.create({ year: schoolYear });
+
+                        callback( newDoc );
+                      }
+                      catch( err ){
+                        return res.sendStatus( 503 );
+                      }
+                    }
+                  });
+                }
 
                 switch( semester ){
                   case '1st':
                     updateStatistical( doc => {
                       doc.semester1 += 1;
                       doc.save( err => {
-                        if( err ) return res.sendStatus( 503 );
+                        if( err ){ 
+                          console.log( err );
+                          return res.sendStatus( 503 );
+                        }
 
                         return res.json({ message: 'Successfully saved report!'});
                       });
@@ -1013,7 +933,10 @@ router.post('/save-report', async( req, res ) => {
                     updateStatistical( doc => {
                       doc.semester2 += 1;
                       doc.save( err => {
-                        if( err ) return res.sendStatus( 503 );
+                        if( err ){ 
+                          console.log( err );
+                          return res.sendStatus( 503 );
+                        }
 
                         return res.json({ message: 'Successfully saved report!'});
                       });
@@ -1041,6 +964,7 @@ router.post('/save-report-image', async( req, res ) => {
   const createPath = ({ name }) => path.join(__dirname, '../client/public/images/reports', name);
 
   const image = req.files['reportImage[]'];
+
   const destination = image.map( img => createPath( img ));
 
   image.forEach( async (img, index) => {

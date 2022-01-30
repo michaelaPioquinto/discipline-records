@@ -5,7 +5,7 @@ const { Schema } = mongoose;
 const statisticalSchema = new Schema({
 	semester1: { type: Number, default: 0 },
 	semester2: { type: Number, default: 0 },
-	year: { type: Number, required: true },
+	year: { type: String, required: true },
 });
 
 
