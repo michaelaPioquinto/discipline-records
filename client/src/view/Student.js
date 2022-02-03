@@ -13,12 +13,19 @@ const Handbook = React.lazy(() => import('./pages/Handbook'));
 
 
 const Student = props => {
-	const [selectedYearAndSem, setSelectedYearAndSem] = React.useState( Cookies.get('crrntslctd') );
+	const [selectedYearAndSem, setSelectedYearAndSem] = React.useState( '' );
 	const [content, setContent] = React.useState({ name: 'Dashboard', cont: <Dashboard name={ props.tools.name } selectedYearAndSem={selectedYearAndSem}/> });
 
-	// React.useEffect(() => {
-	// 	console.log( selectedYearAndSem );
-	// }, [selectedYearAndSem]);
+	React.useEffect(() => {
+		if( !selectedYearAndSem.length ){
+			const yearStarted = new Date().getFullYear().toString().slice( 0, 2 ) + props?.tools?.name?.slice?.( 0, 2 );
+
+			setSelectedYearAndSem( Cookies.get('crrntslctd')?.length ? Cookies.get('crrntslctd') : `${yearStarted}-${Number(yearStarted) + 1} - 1st semester`);
+
+			Cookies.set('slctd', Cookies.get('slctd')?.length ? Cookies.get('slctd') : 2 );
+			Cookies.set('xpndd', Cookies.get('xpndd')?.length ? Cookies.get('xpndd') : JSON.stringify(['1']) );
+		}
+	}, [selectedYearAndSem]);
 
 	return(
 		<SchoolYearAndSemester.Provider value={selectedYearAndSem}>

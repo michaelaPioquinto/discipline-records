@@ -26,9 +26,16 @@ const Report = props => {
 
 	React.useEffect(() => {
 		if( props.majorProblemBehavior.length || props.minorProblemBehavior.length ){
-			setBehaviors( props.minorProblemBehavior.push( ...props.majorProblemBehavior ) );
+			const problemBehavior = [ ...props.minorProblemBehavior ];
+			problemBehavior.push( ...props.majorProblemBehavior );
+
+			setBehaviors([ ...problemBehavior ]);
 		}
 	}, [props]);
+
+	React.useEffect(() => {
+		console.log( behaviors );
+	}, [behaviors]);
 
 	return(
 		<TableRow>
@@ -150,7 +157,7 @@ const Archived = props => {
 						<Pagination count={ renderedReports.length } page={ page } onChange={(_, value) => setPage( value )}/>
 					</div>
 					<div className="col-4">
-						<Button onClick={() => setCurrentView( currentView => currentView === 'activated' ? 'deactivated' : 'activated' )}>{ currentView === 'activated' ? 'deactivated' : 'activated' }</Button>
+						<Button onClick={() => setCurrentView( currentView => currentView === 'activated' ? 'deactivated' : 'activated' )}>{ currentView === 'activated' ? 'Non-archived' : 'Archived' }</Button>
 					</div>
 				</div>
 			</Paper>

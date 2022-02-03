@@ -34,6 +34,7 @@ import UnarchiveIcon from '@mui/icons-material/Unarchive';
 import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ArchiveIcon from '@mui/icons-material/Archive';
 
 import SearchContext from '../../../context/SearchContext';
 
@@ -44,14 +45,13 @@ const Item = props => {
 	const [bgColor, setBgColor] = React.useState('white');
 	const [status, setStatus] = React.useState( props.status );
 
-	const handleStatus = e => {
+	const handleStatus = () => {
 		changeStatus();
 	}
 
 	const changeStatus = async () => {
 		axios.put(`http://localhost:3000/change-student-status`, { studentID : props.studentID })
 		.then(res => {
-			console.log( res.data );
 			setStatus( res.data );
 			props.fetchAccounts();
 		})
@@ -74,13 +74,16 @@ const Item = props => {
 			<TableCell> { `${props.firstName} ${props.middleName} ${props.lastname}` } </TableCell>
 			<TableCell> { props.course } </TableCell>
 			<TableCell> { props.yearSection } </TableCell>
-			{/*<TableCell> 
-				<FormControlLabel
+			<TableCell> 
+				{/*<FormControlLabel
 					onDoubleClick={e => e.stopPropagation()} 
 					control={<Switch checked={status === 'activated' ? true : false} onDoubleClick={e => e.stopPropagation()} onChange={() => debouncedChangeStatus()}/>} 
 					label={ status === 'activated' ? 'Activated' : 'Deactivated' }
-				/>
-			</TableCell>*/}
+				/>*/}
+				<IconButton onDoubleClick={e => e.stopPropagation()} onClick={() => debouncedChangeStatus()}>
+					<ArchiveIcon/>
+				</IconButton>
+			</TableCell>
 		</TableRow>
 	);
 }
@@ -109,15 +112,23 @@ const Accounts = props => {
 		let renderedItem = [];
 
 		accounts.forEach( acc => {
-			if( acc.studentID.searchContain( search ) ){
-				renderedItem.push( 
-					<Item 
-						key={uniqid()} 
-						onDoubleClick ={handleEditForm} 
-						fetchAccounts={fetchAccounts}
-						{...acc}
-					/> 
-				);
+			if( acc?.status === 'activated' ){
+				if( acc?.studentID?.searchContain?.( search ) ||
+					acc?.firstName?.toLowerCase?.()?.includes?.( search?.toLowerCase?.() ) ||
+					acc?.lastname?.toLowerCase?.()?.includes?.( search?.toLowerCase?.() ) ||
+					acc?.middleName?.toLowerCase?.()?.includes?.( search?.toLowerCase?.() ) ||
+					acc?.yearSection?.toLowerCase?.()?.includes?.( search?.toLowerCase?.() ) ||
+					acc?.course?.toLowerCase?.()?.includes?.( search?.toLowerCase?.() )
+				 ){
+					renderedItem.push( 
+						<Item 
+							key={uniqid()} 
+							onDoubleClick ={handleEditForm} 
+							fetchAccounts={fetchAccounts}
+							{...acc}
+						/> 
+					);
+				}
 			}
 		});
 
@@ -142,7 +153,7 @@ const Accounts = props => {
 			<Table
 				maxHeight={ 500 }
 				style={{ width: '100%' }}
-				head={['ID', 'Full Name', 'Course', 'Year & Section']}
+				head={['ID', 'Full Name', 'Course', 'Year & Section', 'Archive']}
 				content={ items }
 			/>
 			<AddUser

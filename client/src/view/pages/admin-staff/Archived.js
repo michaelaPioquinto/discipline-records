@@ -57,7 +57,7 @@ const Archived = props => {
 	}
 
 	const handleUnarchive = studentID => {
-		axios.put(`http://localhost:3000/unarchive-student`, { studentID })
+		axios.put(`http://localhost:3000/change-student-status`, { studentID })
 		.then( res => {
 			getArchived();
 		})
@@ -87,11 +87,10 @@ const Archived = props => {
 		const years = []
 
 		const getYear = student => {
-			if( !years.includes(student.archived.year) ){ 
-				years.push( student.archived.year ); 
+			if( !years.includes( student?.dateArchived ) ){ 
+				years.push( student.dateArchived ); 
 			}
 		};
-
 
 		archivedStudents.forEach( getYear );
 
@@ -105,7 +104,7 @@ const Archived = props => {
 
 		if( yearSelected && yearSelected?.length ){
 			archivedStudents?.forEach?.( student => {
-				if( student.archived.year.includes( yearSelected ) )
+				if( student.dateArchived.includes( yearSelected ) )
 					students.push( student );
 			});
 		}

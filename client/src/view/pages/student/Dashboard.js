@@ -37,7 +37,8 @@ const Dashboard = props => {
 	const [studentData, setStudentData] = React.useState( null );
 	const [reportsView, setReportsView] = React.useState( [] );
 	const [reportPage, setReportPage] = React.useState( 1 );
-	const [duties, setDuties] = React.useState( null );
+	const [duties, setDuties] = React.useState( [] );
+	const [dutyHrs, setDutyHrs] = React.useState( [] );
 
 	const handleSwitchPage = ( _, value ) => {
 		setReportPage( value );
@@ -58,55 +59,43 @@ const Dashboard = props => {
 	React.useEffect(() => {
 		if( studentData && studentData?.report?.length ){
 			const reps = [];
+			const dtys = [];
+			const dtyHrs = [];
 
-			// console.log( props.selectedYearAndSem );
 			studentData.report.forEach( rep => {
+				if( rep.status === 'deactivated' ) return;
+				
 				const yearStarted = Number(new Date().getFullYear().toString().slice( 0, 2 ) + studentData?.student?.studentID?.slice?.( 0, 2 ));
 
-				const semester = selectedYearAndSem?.split?.('-')?.[ 2 ] ?? '1st semester' ;
-				const year1 = selectedYearAndSem?.split?.('-')?.[ 0 ]?.replaceAll?.(' ', '') ?? yearStarted;
-				const year2 = selectedYearAndSem?.split?.('-')?.[ 1 ]?.replaceAll?.(' ', '') ?? yearStarted;
+				const semester = selectedYearAndSem?.split?.('-')?.[ 2 ]?.replaceAll?.(' ', '') ?? '1stsemester' ;
+				const year = selectedYearAndSem?.split?.(' ')?.[ 0 ]?.replaceAll?.(' ', '') ?? yearStarted;
 				
-				const dateReport = rep.dateOfReport.split('-')[ 2 ];
+				const reportYear = rep.schoolYear;
 
-				const addToReps = () => {
-					setDuties(
-							<div className="col-md-3 my-2 d-flex justify-content-center align-items-center">
-								<SkeletonizedTextfield 
-									label="Duty / Duties" 
-									data={ rep.duty }
-								/>
-							</div>
-						);
+				const addToReps = currRep => {
+					dtys.push( currRep.duty );
+					dtyHrs.push( currRep.dutyHrs );
 
 					reps.push( 
 						<Report 
 							key={ uniqid() } 
-							{...rep}
+							{...currRep}
 						/> 
 					);
 				}
 
-				switch( semester?.replaceAll?.(' ', '') ){
-					case '1stsemester':
-						if( dateReport === year1 || dateReport === yearStarted ){
-							addToReps();
-						}
-						break;
-
-					case '2ndsemester':
-						if( dateReport === year1 || dateReport === year2 ){
-							addToReps();
-						}
-						break;
-
-					default:
-						return;
+				if( reportYear === year && rep.semester.replaceAll(' ', '') === semester ){
+					addToReps( rep );
 				}
 			});
 
 			if( !reps.length ){
-				setDuties( null );
+				setDutyHrs( [] );
+				setDuties( [] );
+			}
+			else{
+				setDuties([ ...dtys ]);
+				setDutyHrs([ ...dtyHrs ]);
 			}
 
 			setReportsView([ ...reps ]);
@@ -161,8 +150,23 @@ const Dashboard = props => {
 				<div className="col-md-3 my-2 d-flex justify-content-center align-items-center">
 					<SkeletonizedTextfield label="Year & Section" data={ studentData?.student?.yearSection } />
 				</div>
-				
-				{ duties }
+				<div className="col-md-3 my-2 d-flex justify-content-center align-items-center">
+					<SkeletonizedTextfield label="Semester" data={ studentData?.student?.semester } />
+				</div>
+				<div className="col-md-5 my-2 d-flex justify-content-center align-items-center">
+					<SkeletonizedTextfield 
+						width="100%"
+						label="Duty / Duties" 
+						data={ duties?.[ reportPage - 1 ] }
+					/>
+				</div>
+				<div className="col-md-5 my-2 d-flex justify-content-center align-items-center">
+					<SkeletonizedTextfield 
+						width="100%"
+						label="Duty Hours" 
+						data={ dutyHrs?.[ reportPage - 1 ] }
+					/>
+				</div>
 			</div>
 
 			<div className="col-12">
@@ -300,22 +304,41 @@ const SkeletonizedTextfield = props => {
 	}, [props]);
 
 	React.useEffect(() => {
+		// if( props.label === 'Duty / Duties') console.log( props.data );
+		let refresh = null;
+		
 		if( state === 'ok' ){
-			setContent(
-				<CustomizedTextField 
-					disabled={ props.disabled ?? true } 
-					label={props.label} 
-					variant="filled" 
-					defaultValue={props?.data} 
-					sx={{ width: props.width ?? '7cm', border: 'none' }}
-				/>
-			);	
+			if( props.refresh ){
+				refresh = setInterval(() => {
+					setContent(() => (
+						<CustomizedTextField 
+							disabled={ props.disabled ?? true } 
+							label={props.label} 
+							variant="filled" 
+							defaultValue={typeof props?.data === Array ? props?.data?.join?.(',') : props?.data} 
+							sx={{ width: props.width ?? '7cm', border: 'none' }}
+						/>
+					));
+				}, 500);
+			}
+			else{
+				setContent(() => (
+					<CustomizedTextField 
+						disabled={ props.disabled ?? true } 
+						label={props.label} 
+						variant="filled" 
+						defaultValue={typeof props?.data === Array ? props?.data?.join?.(',') : props?.data} 
+						sx={{ width: props.width ?? '7cm', border: 'none' }}
+					/>
+				));
+			}
+
 		}
 		else if( state === 'loading' ){
-			setContent( <Skeleton width={ props.width ?? '7cm' } height="100px" /> );
+			setContent(() => <Skeleton width={ props.width ?? '7cm' } height="100px" /> );
 		}
 		else{
-			setContent(
+			setContent(() => (
 				<CustomizedTextField 
 					disabled={ props.disabled ?? true } 
 					label={props.label} 
@@ -323,9 +346,11 @@ const SkeletonizedTextfield = props => {
 					defaultValue="N/A" 
 					sx={{ width: props.width ?? '7cm', border: 'none' }}
 				/>
-			);
+			));
 		}
-	}, [state]);
+
+		return () => refresh ? clearInterval( refresh ) : null
+	}, [state, props]);
 
 	return (
 		<>

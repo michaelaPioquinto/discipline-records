@@ -62,7 +62,7 @@ const Item = props => {
 			sx={{ backgroundColor: bgColor, transition: '.1s ease-in-out' }} 
 			onPointerEnter={() => setBgColor('rgba(0, 0, 0, 0.2)')}
 			onPointerLeave={() => setBgColor('white')}
-			onDoubleClick ={() => props.onDoubleClick ({ editingMode: true, ...props })}
+			onDoubleClick={() => props.onDoubleClick(() => ({ editingMode: true, ...props }))}
 		>
 			<TableCell> { props.schoolYear } </TableCell>
 			<TableCell> { props.semester } </TableCell>
@@ -113,7 +113,7 @@ const Accounts = props => {
 			}
 		});
 
-		setItems([...renderedItem]);
+		setItems([ ...renderedItem ]);
 	}, [accounts, search]);
 
 	const handleAddForm = async () => {
@@ -129,6 +129,10 @@ const Accounts = props => {
 		if( !addForm ) setSelectedItem( null );
 	}, [addForm]);
 
+	React.useEffect(() => {
+		console.log( selectedItem );	
+	}, [selectedItem]);
+
 	return(
 		<div style={{ width: '100%', height: '80vh' }} className="p-3 text-center">
 			<Table
@@ -137,13 +141,22 @@ const Accounts = props => {
 				head={['School Year', 'Semester', 'Status']}
 				content={ items }
 			/>
-			<AddUser 
-				open={addForm} 
-				setOpen={handleAddForm}
-				setEdit={handleEditForm} 
-				fetchSchoolYears={fetchSchoolYears} 
-				{ ...selectedItem }
-			/> 
+			{
+				selectedItem
+					? <EditUser
+							open={addForm} 
+							setOpen={handleAddForm}
+							setEdit={handleEditForm} 
+							fetchSchoolYears={fetchSchoolYears}
+							{ ...selectedItem }
+						/> 
+					: <AddUser 
+						open={addForm} 
+						setOpen={handleAddForm}
+						setEdit={handleEditForm} 
+						fetchSchoolYears={fetchSchoolYears} 
+					/>
+			}
 			<div style={{ position: 'absolute', bottom: '15px', right: '15px' }}>
 				<IconButton style={{ backgroundColor: 'rgba(25, 25, 21, 0.9)' }} onClick={handleAddForm}>
 					<AddIcon style={{ color: 'white' }}/>
@@ -162,7 +175,157 @@ const AddUser = props => {
 	const yearToday = new Date().getFullYear();
 
 	const initState = {
-		_id: props?._id ?? '',
+		_id: '',
+		schoolYear: '',
+		semester: ''
+	}
+
+	const reducer = (state, action) => {
+		switch( action.type ){
+			case 'schoolYear':
+				state.schoolYear = action.data;
+				return state;
+
+			case 'semester':
+				state.semester = action.data;
+				return state;
+
+			default:
+				return state;
+		}
+	}
+
+	const [item, dispatch] = React.useReducer( reducer, initState );
+
+	const verifySchoolYear = value => {
+		if( !value ) return 'School Year is empty';
+
+		try{
+			const currentYear = new Date().getFullYear();
+			const years = value.split('-');
+
+			if( years[0].length > currentYear.length || ( years.length > 2 || years.length < 2 ) ||
+				( isNaN( years[0] ) || isNaN( years[1] ) ) ||
+				years[ 0 ] === years[ 1 ]
+				) return 'Incorrect School Year Format';
+
+			return null;
+		}
+		catch( err ){
+			console.error( err );
+			return '';
+		}
+	}
+
+	const verifySemester = value => {
+		if( !value ) return 'Semester is empty';
+
+		try{
+			if( value !== '1st' && value !== '2nd' ) {
+				return 'Incorrect Semester Format';
+			}
+
+			return null;
+		}
+		catch( err ){
+			console.error( err );
+			return null;
+		}
+	}
+
+	return(
+		<Dialog
+			fullScreen={fullScreen}
+			open={props.open}
+			onClose={ props.setOpen }
+			maxWidth="md"
+			aria-labelledby="responsive-dialog-title"
+		>
+			<DialogTitle id="responsive-dialog-title">
+				{ "Add new school year and semester" }
+			</DialogTitle>
+			<DialogContent>
+				<DialogContentText>
+					Please fill up this form.
+				</DialogContentText>
+				<Box
+					component="form"
+					sx={{
+						'& > :not(style)': { m: 1, width: '500px' },
+					}}
+					noValidate
+					autoComplete="off"
+			    >	
+			    	<Stack spacing={3}>
+			    		<GenerateInputFields
+				    		data={[
+								{
+									label: 'School Year',
+									value: () => item.schoolYear,
+									onChange: e => dispatch({ type: 'schoolYear', data: e.target.value }),
+									placeHolder: 'Ex: 2018-2019'
+								},
+								{
+									label: 'Semester',
+									value: () => item.semester,
+									onChange: e => dispatch({ type: 'semester', data: (e.target.value).replaceAll(' ', '') }),
+									placeHolder: 'Ex: 1st'
+								}	
+			    			]}
+						/>
+			    	</Stack>
+			    </Box>
+			</DialogContent>
+			<DialogActions>
+				<Button autoFocus onClick={ props.setOpen }>
+					Discard
+				</Button>
+				<Button 
+					autoFocus
+					onClick={() => {
+						const syError = verifySchoolYear( item.schoolYear );
+						const semError = verifySemester( item.semester );
+
+						if( !syError && !semError ){
+							if( item.schoolYear.length && item.semester.length ){
+								axios.post('http://localhost:3000/create-school-year', { ...item })
+								.then(() => {
+									props.fetchSchoolYears();
+									props.setOpen();
+									enqueueSnackbar('Successfully added a school year', { variant: 'success' });
+								})
+								.catch( err => {
+									enqueueSnackbar( err.response.data.message ?? 'Please try again', { variant: 'error' });
+								});
+							}
+							else{
+								enqueueSnackbar('All fields must be filled up', { variant: 'error' });
+							}
+						}
+						else{
+							[ syError, semError ].forEach( error => {
+								if( error?.length ) enqueueSnackbar( error, { variant: 'error' });
+							});
+						}
+					}}
+				>
+					Add
+				</Button>
+			</DialogActions>
+		</Dialog>
+	);
+}
+
+const EditUser = props => {
+	const theme = useTheme();
+	const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+
+	const { enqueueSnackbar } = useSnackbar();
+	
+	const yearToday = new Date().getFullYear();
+
+	const initState = {
+		_id: props?._id,
 		schoolYear: props?.schoolYear,
 		semester: props?.semester
 	}
@@ -229,11 +392,7 @@ const AddUser = props => {
 			aria-labelledby="responsive-dialog-title"
 		>
 			<DialogTitle id="responsive-dialog-title">
-				{
-					!props.editingMode
-						? "Add new school year and semester"
-						: "Edit this school year and semester?"
-				}
+				{ "Edit this school year and semester?" }
 			</DialogTitle>
 			<DialogContent>
 				<DialogContentText>
@@ -252,13 +411,13 @@ const AddUser = props => {
 				    		data={[
 								{
 									label: 'School Year',
-									value: item.schoolYear,
+									value: () => item.schoolYear,
 									onChange: e => dispatch({ type: 'schoolYear', data: e.target.value }),
 									placeHolder: 'Ex: 2018-2019'
 								},
 								{
 									label: 'Semester',
-									value: item.semester,
+									value: () => item.semester,
 									onChange: e => dispatch({ type: 'semester', data: (e.target.value).replaceAll(' ', '') }),
 									placeHolder: 'Ex: 1st'
 								}	
@@ -271,83 +430,41 @@ const AddUser = props => {
 				<Button autoFocus onClick={ props.setOpen }>
 					Discard
 				</Button>
-				{
-					!props.editingMode
-						? (
-							<Button 
-								autoFocus
-								onClick={() => {
-									console.log( item );
-									const syError = verifySchoolYear( item.schoolYear );
-									const semError = verifySemester( item.semester );
+				<Button 
+					autoFocus
+					onClick={() => {
+						const syError = verifySchoolYear( item.schoolYear );
+						const semError = verifySemester( item.semester );
 
-									if( !syError && !semError ){
-										if( item.schoolYear.length && item.semester.length ){
-											axios.post('http://localhost:3000/create-school-year', { ...item })
-											.then(() => {
-												props.fetchSchoolYears();
-												props.setOpen();
-												enqueueSnackbar('Successfully added a school year', { variant: 'success' });
-											})
-											.catch( err => {
-												enqueueSnackbar( err.response.data.message ?? 'Please try again', { variant: 'error' });
-											});
-										}
-										else{
-											enqueueSnackbar('All fields must be filled up', { variant: 'error' });
-										}
-									}
-									else{
-										[ syError, semError ].forEach( error => {
-											if( error?.length ) enqueueSnackbar( error, { variant: 'error' });
-										});
-									}
-								}}
-							>
-								Add
-							</Button>
-						)
-						: (
-							<>
-								<Button 
-									autoFocus
-									onClick={() => {
-										const syError = verifySchoolYear( item.schoolYear );
-										const semError = verifySemester( item.semester );
-
-										if( !syError && !semError ){
-											if( item.schoolYear.length && item.semester.length ){
-												axios.put('http://localhost:3000/edit-school-year', { ...item })
-												.then(() => {
-													props.fetchSchoolYears();
-													props.setOpen();
-													enqueueSnackbar('Successfully edited a user', { variant: 'success' });
-												})
-												.catch( err => {
-													enqueueSnackbar( err.response.data.message ?? 'Please try again', { variant: 'error' });
-												});
-											}
-											else{
-												enqueueSnackbar('All fields must be filled up', { variant: 'error' });
-											}
-										}
-										else{
-											[ syError, semError ].forEach( error => {
-												if( error?.length ) enqueueSnackbar( error, { variant: 'error' });
-											});
-										}
-									}}
-								>
-									Save
-								</Button>		
-							</>
-						)
-				}
+						if( !syError && !semError ){
+							if( item.schoolYear.length && item.semester.length ){
+								axios.put('http://localhost:3000/edit-school-year', { ...item })
+								.then(() => {
+									props.fetchSchoolYears();
+									props.setOpen();
+									enqueueSnackbar('Successfully edited a user', { variant: 'success' });
+								})
+								.catch( err => {
+									enqueueSnackbar( err.response.data.message ?? 'Please try again', { variant: 'error' });
+								});
+							}
+							else{
+								enqueueSnackbar('All fields must be filled up', { variant: 'error' });
+							}
+						}
+						else{
+							[ syError, semError ].forEach( error => {
+								if( error?.length ) enqueueSnackbar( error, { variant: 'error' });
+							});
+						}
+					}}
+				>
+					Save
+				</Button>		
 			</DialogActions>
 		</Dialog>
 	);
 }
-
 
 const GenerateInputFields = props => {
 	const [fields, setFields] = React.useState( [] );
@@ -357,12 +474,13 @@ const GenerateInputFields = props => {
 			const list = [];
 
 			props?.data?.forEach( datum => {
+				console.log( datum?.value?.() );
 				list.push(
 					<TextField
 						key={uniqid()}
 						label={ datum.label ?? 'TextField' }
 						variant={ props.variant ?? 'outlined' }
-						defaultValue={ datum.value ?? '' }
+						defaultValue={ datum?.value?.() ?? '' }
 						onChange={ datum.onChange ?? null }
 						placeholder={ datum.placeHolder ?? '' }
 					/>

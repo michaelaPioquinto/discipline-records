@@ -35,7 +35,8 @@ const reportsSchema = new Schema({
 	firstOffenses: [ String ],
 	secondOffenses: [ String ],
 	thirdOffenses: [ String ],
-	status: { type: String, default: 'activated' }
+	status: { type: String, default: 'activated' },
+	schoolYear: String
 });
 
 

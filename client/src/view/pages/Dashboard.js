@@ -130,7 +130,7 @@ const Dashboard = props => {
     let renderedItem = [];
 
     accounts.forEach( acc => {
-      if( acc.studentID.searchContain( search ) ){
+      if( acc.status === 'activated' && acc.studentID.searchContain( search ) ){
         renderedItem.push( 
           <Item
             key={uniqid()}

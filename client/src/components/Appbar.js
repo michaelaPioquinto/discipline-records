@@ -34,6 +34,8 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import TreeView from '@mui/lab/TreeView';
 import TreeItem from '@mui/lab/TreeItem';
 import ListAltIcon from '@mui/icons-material/ListAlt';
+import { useSnackbar } from 'notistack';
+
 import Chip from '@mui/material/Chip';
 
 
@@ -90,6 +92,8 @@ const Appbar = props => {
 	const [anchorEl, setAnchorEl] = React.useState(null);
 	const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 	const [allowSearch, setSearchAllow] = React.useState( props?.openSearchOn?.includes?.( props?.listItems?.[0]?.title ) ?? false );
+
+	const { enqueueSnackbar } = useSnackbar();
 
 	const toggleDrawer = open => event => {
 	    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -305,7 +309,38 @@ const Appbar = props => {
           					<Divider/>
 					          <br/>
 					          <div className="d-flex justify-content-center align-items-center">
-						          <Button variant="filled" sx={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', color: 'white'}}>back up</Button>
+						          <Button 
+						          	onClick={() => {
+						          		axios.get('http://localhost:3000/back-up')
+						          		.then( res => {
+						          			enqueueSnackbar( 'Downloading...', { variant: 'success' });
+
+						          			const { student, user, sanction, statistic, report, archived, schoolYear } = res.data;
+						          			const objList = [ student, user, sanction, statistic, report, archived, schoolYear ];
+						          			const names = [ 'student', 'user', 'sanction', 'statistic', 'report', 'archived', 'schoolYear' ];
+
+						          			objList.forEach((obj, index) => {
+						          				var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify( obj ));
+
+						          				const link = document.createElement('a');
+						          				link.href = `data:${data}`;
+						          				link.setAttribute('download', `${names[ index ]}.json`);
+
+						          				document.body.appendChild( link );
+															link.click();
+						          				// $('<a href="data:' + data + '" download="data.json">download JSON</a>').appendTo('#container');
+						          			});	
+						          		})
+						          		.catch( err => {
+						          			console.log( err );
+						          			enqueueSnackbar( 'Please try again later.', { variant: 'error' });
+						          		});
+						          	}}
+						          	variant="filled" 
+						          	sx={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', color: 'white'}}
+						          >
+						          	back up
+						          </Button>
 					          </div>
           				</>
           			)
@@ -322,7 +357,7 @@ const StudentTreeView = props => {
 	const [schoolYear, setSchoolYear] = React.useState( [] );
 
 	const [selected, setSelected] = React.useState( Number(Cookies.get('slctd')) ?? 2 );
-	const [expanded, setExpanded] = React.useState( [Cookies.get('xpndd')] ?? ['1'] );
+	const [expanded, setExpanded] = React.useState( Cookies.get('xpndd')?.length ? JSON.parse( Cookies.get('xpndd') ) : ['1'] );
 	const [label, setLabel] = React.useState( '' );
 
 	React.useEffect(() => {
@@ -379,7 +414,7 @@ const StudentTreeView = props => {
 	}, [selected, schoolYear]);
 
 	React.useEffect(() => {
-		Cookies.set('xpndd', [expanded?.[ 0 ]]);
+		Cookies.set('xpndd', JSON.stringify([expanded?.[ 0 ]]));
 	}, [expanded]);
 
 	React.useEffect(() => {
