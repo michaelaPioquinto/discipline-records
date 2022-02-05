@@ -209,14 +209,14 @@ const MakeReport = props => {
 
 		setTimeout(() => {
 			if( state.studentID.length ){
-				axios.post('http://localhost:3000/save-report', state)
+				axios.post(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/save-report`, state)
 				.then( async res => {
 					if( image ){
 						const formData = new FormData();
 						formData.append('reportImage', image );
 
 						try{
-							await axios.post(`http://localhost:3000/save-report-image`, formData)
+							await axios.post(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/save-report-image`, formData)
 						}
 						catch( err ){
 							throw err;

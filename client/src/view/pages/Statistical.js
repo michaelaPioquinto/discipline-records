@@ -51,7 +51,7 @@ const Statistical = props => {
 	const [statisticalHistory, setStatisticalHistory] = React.useState( [] );
 
 	const fetchData = async () => {
-		axios.get('http://localhost:3000/statistical-data')
+		axios.get(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/statistical-data`)
 		.then( res => {
 			setData( res.data );
 		})
@@ -92,13 +92,13 @@ const Statistical = props => {
 			setDatasets([
 				{
 					label: '1st Semester',
-					data: semester1List,
+					data: semester1List.reverse(),
 					backgroundColor: '#636e72',
 					borderColor: '#d63031'
 				},
 				{
 					label: '2nd Semester',
-					data: semester2List,
+					data: semester2List.reverse(),
 					backgroundColor: '#636e72',
 					borderColor: '#0984e3'
 				}

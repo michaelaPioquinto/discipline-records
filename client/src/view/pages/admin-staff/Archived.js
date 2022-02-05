@@ -47,7 +47,7 @@ const Archived = props => {
 	const search = React.useContext( SearchContext );
 
 	const getArchived = async() => {
-		axios.get('http://localhost:3000/archived-students')
+		axios.get(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/archived-students`)
 		.then( res => {
 			setArchivedStudents([ ...res.data ]);
 		})
@@ -57,7 +57,7 @@ const Archived = props => {
 	}
 
 	const handleUnarchive = studentID => {
-		axios.put(`http://localhost:3000/change-student-status`, { studentID })
+		axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/change-student-status`, { studentID })
 		.then( res => {
 			getArchived();
 		})

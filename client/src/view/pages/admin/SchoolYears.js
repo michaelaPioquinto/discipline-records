@@ -46,7 +46,7 @@ const Item = props => {
 	}
 
 	const changeStatus = async e => {
-		axios.put(`http://localhost:3000/change-school-year-semester-status/${ props?._id }`, { status: e.target.checked ? 'activated' : 'deactivated' })
+		axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/change-school-year-semester-status/${ props?._id }`, { status: e.target.checked ? 'activated' : 'deactivated' })
 		.then(() => props.fetchSchoolYears())
 		.catch( err => {
 			throw err;
@@ -86,7 +86,7 @@ const Accounts = props => {
 	const search = React.useContext( SearchContext );
 
 	const fetchSchoolYears = async () => {
-		axios.get('http://localhost:3000/school-year-and-semester')
+		axios.get(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/school-year-and-semester`)
 		.then( res => {
 			setAccounts( res.data );
 		})
@@ -288,7 +288,7 @@ const AddUser = props => {
 
 						if( !syError && !semError ){
 							if( item.schoolYear.length && item.semester.length ){
-								axios.post('http://localhost:3000/create-school-year', { ...item })
+								axios.post(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/create-school-year`, { ...item })
 								.then(() => {
 									props.fetchSchoolYears();
 									props.setOpen();
@@ -438,7 +438,7 @@ const EditUser = props => {
 
 						if( !syError && !semError ){
 							if( item.schoolYear.length && item.semester.length ){
-								axios.put('http://localhost:3000/edit-school-year', { ...item })
+								axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/edit-school-year`, { ...item })
 								.then(() => {
 									props.fetchSchoolYears();
 									props.setOpen();

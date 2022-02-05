@@ -73,7 +73,7 @@ const Archived = props => {
 	const { enqueueSnackbar } = useSnackbar();
 
 	const getReports = async() => {
-		axios.get('http://localhost:3000/report')
+		axios.get(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/report`)
 		.then( res => {
 			setReports([ ...res.data ]);
 		})
@@ -83,7 +83,7 @@ const Archived = props => {
 	}
 
 	const handleArchive = async ({ _id }) => {
-	    axios.put(`http://localhost:3000/archive-report/${ _id }`)
+	    axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/archive-report/${ _id }`)
 	    .then(() => {
 	      getReports();
 	    })
@@ -99,7 +99,7 @@ const Archived = props => {
 	React.useEffect(() => {
 		let filtered = [];
 		let chunkSet = [];
-		const chunksLimit = 7;
+		const chunksLimit = 5;
 
 		const addToFilteredItems = item => filtered.push( <Report key={uniqid()} {...item} handleArchive={handleArchive}/> );
 
@@ -154,7 +154,7 @@ const Archived = props => {
 				</div>
 				<div style={{ width: '100%', height: '10%' }} className="row py-2 px-1">
 					<div className="col-8">
-						<Pagination count={ renderedReports.length } page={ page } onChange={(_, value) => setPage( value )}/>
+						<Pagination count={ renderedReports.length - 1 } page={ page } onChange={(_, value) => setPage( value )}/>
 					</div>
 					<div className="col-4">
 						<Button onClick={() => setCurrentView( currentView => currentView === 'activated' ? 'deactivated' : 'activated' )}>{ currentView === 'activated' ? 'Non-archived' : 'Archived' }</Button>

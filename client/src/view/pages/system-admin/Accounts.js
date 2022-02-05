@@ -44,7 +44,7 @@ const Item = props => {
 	}
 
 	const changeStatus = async e => {
-		axios.put('http://localhost:3000/change-user-status', { 
+		axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/change-user-status`, { 
 			username: props.username, 
 			status: e.target.checked ? 'activated' : 'deactivated' 
 		})
@@ -85,7 +85,7 @@ const Accounts = props => {
 	const search = React.useContext( SearchContext );
 
 	const fetchAccounts = async () => {
-		axios.get('http://localhost:3000/accounts/system-admin')
+		axios.get(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/accounts/system-admin`)
 		.then( res => {
 			setAccounts( res.data );
 		})
@@ -271,7 +271,7 @@ const AddUser = props => {
 										autoFocus
 										onClick={() => {
 											if( username && firstname && lastname && middlename && password && status ){
-												axios.post('http://localhost:3000/create-user/admin', { 
+												axios.post(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/create-user/admin`, { 
 													firstname,
 													lastname,
 													middlename,
@@ -303,7 +303,7 @@ const AddUser = props => {
 									<Button 
 										autoFocus
 										onClick={() => {
-											axios.delete(`http://localhost:3000/delete-user/id/${ id }`)
+											axios.delete(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/delete-user/id/${ id }`)
 											.then(() => {
 												props.fetchAccounts();
 												props.setOpen();
@@ -320,7 +320,7 @@ const AddUser = props => {
 										autoFocus
 										onClick={() => {
 											if( id && firstname && lastname && middlename && username && password && status ){
-												axios.post('http://localhost:3000/edit-user/admin', {
+												axios.post(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/edit-user/admin`, {
 													id, 
 													firstname,
 													lastname,

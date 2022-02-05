@@ -11,6 +11,8 @@ const ChipList = props => {
 	const [word, setWord] = React.useState('');
 	const [wordList, setWordList] = React.useState([]);
 
+	const textField = React.useRef( null );
+
 	const handleWord = e => {
 		setWord( e.target.value );
 	}
@@ -29,6 +31,13 @@ const ChipList = props => {
 		setWordList([ ...newWordList ]);
 	}
 
+	const handleInsertWord = e => {
+		if( e.key === 'Enter' && e.target.value.length ){
+			setWordList( wordList => [...wordList, e.target.value]);
+			setWord('');
+		}
+	}
+
 	React.useEffect(() => {
 		props?.getValues?.( wordList.length ? wordList : null );
 	}, [wordList]);
@@ -38,6 +47,18 @@ const ChipList = props => {
 			setWordList([ ...props.value ]);
 		}
 	}, [props]);
+
+	React.useEffect(() => {
+		if( textField.current ){
+			textField.current.addEventListener('keydown', e => handleInsertWord( e ));
+		}
+
+		return () => {
+			if( textField.current ){
+				return textField.current.removeEventListener('keydown', e => handleInsertWord( e ));
+			}
+		}
+	}, [textField]);
 
 	return(
 		<div
@@ -74,6 +95,7 @@ const ChipList = props => {
 			<div className="row container-fluid p-0 d-flex justify-content-between">
 				<div className="col-10 p-0 m-0">
 					<TextField 
+						ref={textField}
 						sx={{
 							width: '100%',
 							padding: '0px'

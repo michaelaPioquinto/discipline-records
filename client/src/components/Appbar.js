@@ -104,7 +104,7 @@ const Appbar = props => {
 	};
 
 	const isMenuOpen = Boolean(anchorEl);
-	const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+	// const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
 	const handleProfileMenuOpen = (event) => {
 		setAnchorEl(event.currentTarget);
@@ -124,7 +124,7 @@ const Appbar = props => {
 	};
 
 	const handleSignout = async () => {
-		axios.delete('http://localhost:3000/sign-out')
+		axios.delete(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/sign-out`)
 		.then(() => {
 			Cookies.remove('token');
 			Cookies.remove('rtoken');
@@ -137,38 +137,38 @@ const Appbar = props => {
 	}
 
 	const mobileMenuId = 'primary-search-account-menu-mobile';
-	const renderMobileMenu = (
-		<Menu
-		  anchorEl={mobileMoreAnchorEl}
-		  anchorOrigin={{
-		    vertical: 'top',
-		    horizontal: 'right',
-		  }}
-		  id={mobileMenuId}
-		  keepMounted
-		  transformOrigin={{
-		    vertical: 'top',
-		    horizontal: 'right',
-		  }}
-		  open={isMobileMenuOpen}
-		  onClose={handleMobileMenuClose}
-		>
-			<MenuItem onClick={handleProfileMenuOpen}>
-				<Stack>
-					<IconButton
-						size="small"
-						aria-label="log out account of current user"
-						aria-controls="primary-search-account-menu"
-						aria-haspopup="true"
-						color="inherit"
-						onClick={handleSignout}
-					>
-						<MeetingRoomIcon/>
-					</IconButton>
-				</Stack>
-			</MenuItem>
-		</Menu>
-	);
+	// const renderMobileMenu = (
+	// 	<Menu
+	// 	  anchorEl={mobileMoreAnchorEl}
+	// 	  anchorOrigin={{
+	// 	    vertical: 'top',
+	// 	    horizontal: 'right',
+	// 	  }}
+	// 	  id={mobileMenuId}
+	// 	  keepMounted
+	// 	  transformOrigin={{
+	// 	    vertical: 'top',
+	// 	    horizontal: 'right',
+	// 	  }}
+	// 	  open={isMenuOpen}
+	// 	  onClose={handleProfileMenuOpen}
+	// 	>
+	// 		<MenuItem onClick={handleProfileMenuOpen}>
+	// 			<Stack>
+	// 				<IconButton
+	// 					size="small"
+	// 					aria-label="log out account of current user"
+	// 					aria-controls="primary-search-account-menu"
+	// 					aria-haspopup="true"
+	// 					color="inherit"
+	// 					onClick={handleSignout}
+	// 				>
+	// 					<MeetingRoomIcon/>
+	// 				</IconButton>
+	// 			</Stack>
+	// 		</MenuItem>
+	// 	</Menu>
+	// );
 
 	const menuId = 'primary-search-account-menu';
 	const renderMenu = (
@@ -280,9 +280,9 @@ const Appbar = props => {
 						<IconButton
 							size="large"
 							aria-label="show more"
-							aria-controls={mobileMenuId}
+							aria-controls={menuId}
 							aria-haspopup="true"
-							onClick={handleMobileMenuOpen}
+							onClick={handleProfileMenuOpen}
 							color="inherit"
 						>
 							<MoreIcon />
@@ -290,7 +290,7 @@ const Appbar = props => {
 					</Box>
 	        </Toolbar>
 		    </AppBar>
-		    {renderMobileMenu}
+		    {/*{renderMobileMenu}*/}
 		    {renderMenu}
 		    <Drawer
           anchor="left"
@@ -311,7 +311,7 @@ const Appbar = props => {
 					          <div className="d-flex justify-content-center align-items-center">
 						          <Button 
 						          	onClick={() => {
-						          		axios.get('http://localhost:3000/back-up')
+						          		axios.get(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/back-up`)
 						          		.then( res => {
 						          			enqueueSnackbar( 'Downloading...', { variant: 'success' });
 
@@ -375,7 +375,7 @@ const StudentTreeView = props => {
 
 				For example: 2022
 
-				The "20" in "2022" means the current year is in the range of 2000, so when we get into 3000 we can still get the exact year
+				The "20" in "2022" means the current year is in the range of 2000, so when we get into ${process.env.REACT_APP_PORT} we can still get the exact year
 				the student enrolled.
 			*/
 			const yearStarted = Number(new Date().getFullYear().toString().slice( 0, 2 ) + props.studentID.slice( 0, 2 ));

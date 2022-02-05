@@ -1022,36 +1022,59 @@ router.post('/save-report-image', async( req, res ) => {
 
   const image = req.files['reportImage[]'];
 
-  const destination = image.map( img => createPath( img ));
+  if( image instanceof Array ){
+    const destination = image.map( img => createPath( img ));
+    try{
+      const accumulatedImages = fs.readdirSync( imagesPath );
 
-  try{
-    const accumulatedImages = fs.readdirSync( imagesPath );
+      image.forEach( async (img, index) => {
+        try{
+          if( accumulatedImages && accumulatedImages.length && accumulatedImages.includes( img.name )){
+            if( index === image.length - 1 ){
+              return res.sendStatus( 200 );
+            }
+            else{
+              return;
+            }
+          };
+      
+          await img.mv( destination[ index ] );
 
-    image.forEach( async (img, index) => {
-      try{
-        if( accumulatedImages && accumulatedImages.length && accumulatedImages.includes( img.name )){
           if( index === image.length - 1 ){
             return res.sendStatus( 200 );
           }
-          else{
-            return;
-          }
+        }
+        catch( err ){
+          console.log( err );
+        }
+      });
+    }
+    catch( err ){
+      console.log( err );
+      return res.sendStatus( 503 );
+    }
+  }
+  else{
+    try{
+      const accumulatedImages = fs.readdirSync( imagesPath );
+
+      try{
+        if( accumulatedImages && accumulatedImages.length && accumulatedImages.includes( image.name )){
+          return res.sendStatus( 200 );
         };
     
-        await img.mv( destination[ index ] );
+        await image.mv( createPath( image ) );
 
-        if( index === image.length - 1 ){
-          return res.sendStatus( 200 );
-        }
+        return res.sendStatus( 200 );
       }
       catch( err ){
         console.log( err );
       }
-    });
-  }
-  catch( err ){
-    console.log( err );
-    return res.sendStatus( 503 );
+    }
+    catch( err ){
+      console.log( err );
+      return res.sendStatus( 503 );
+    }
   }
 
   // image.mv( destination, err => {

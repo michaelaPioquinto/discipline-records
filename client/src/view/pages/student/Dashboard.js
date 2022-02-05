@@ -45,7 +45,7 @@ const Dashboard = props => {
 	}
 
 	const fetchStudentData = async () => {
-		axios.get(`http://localhost:3000/student-report/${ props.name }`)
+		axios.get(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/student-report/${ props.name }`)
 		.then( res => setStudentData( res.data ))
 		.catch( err => {
 			throw err;

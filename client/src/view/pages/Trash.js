@@ -65,7 +65,7 @@ const Item = props => {
       <TableCell>
 				<Tooltip title="Restore" arrow placement="bottom">
 					<IconButton onClick={() => {
-							axios.put(`http://localhost:3000/restore-trash/id/${ props._id }`)
+							axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/restore-trash/id/${ props._id }`)
 							.then(() => {
 								props.refresh();
 								enqueueSnackbar('Successfully restored a trash', { variant: 'success' });		
@@ -81,7 +81,7 @@ const Item = props => {
 
 				<Tooltip title="Delete permanently" arrow placement="bottom">
 					<IconButton onClick={() => {
-							axios.put(`http://localhost:3000/delete-trash-permanently/id/${ props._id }`)
+							axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/delete-trash-permanently/id/${ props._id }`)
 							.then(() => {
 								props.refresh();
 								enqueueSnackbar('Successfully removed a trash', { variant: 'success' });		
@@ -109,7 +109,7 @@ const Trash = props => {
   const search = React.useContext( SearchContext );
   
 	const fetchStudentData = async() => {
-    axios.get(`http://localhost:3000/trash/role/${ props.role }`)
+    axios.get(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/trash/role/${ props.role }`)
     .then( res => {
       if( res.data ){
         const modifiedData = res.data.map( datum => ({ id: datum._id, ...datum}));

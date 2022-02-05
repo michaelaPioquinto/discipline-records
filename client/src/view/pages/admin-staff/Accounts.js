@@ -50,7 +50,7 @@ const Item = props => {
 	}
 
 	const changeStatus = async () => {
-		axios.put(`http://localhost:3000/change-student-status`, { studentID : props.studentID })
+		axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/change-student-status`, { studentID : props.studentID })
 		.then(res => {
 			setStatus( res.data );
 			props.fetchAccounts();
@@ -97,7 +97,7 @@ const Accounts = props => {
 	const search = React.useContext( SearchContext );
 
 	const fetchAccounts = async () => {
-		axios.get('http://localhost:3000/student-data')
+		axios.get(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/student-data`)
 		.then( res => {
 			setAccounts([ ...res.data ]);
 		})
@@ -296,7 +296,7 @@ const AddUser = props => {
 									<Button 
 										autoFocus
 										onClick={() => {
-											axios.post('http://localhost:3000/create-student', { 
+											axios.post(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/create-student`, { 
 												studentID, 
 												firstName, 
 												lastname: lastName, 
@@ -323,7 +323,7 @@ const AddUser = props => {
 									<Button 
 										autoFocus
 										onClick={() => {
-											axios.put(`http://localhost:3000/edit-student/${ props._id }`, { 
+											axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/edit-student/${ props._id }`, { 
 												studentID, 
 												firstName, 
 												lastname: lastName, 

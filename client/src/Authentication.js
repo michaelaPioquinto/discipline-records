@@ -66,7 +66,7 @@ const Authentication = props => {
 	    const token = Cookies.get('token');
 	    const rtoken = Cookies.get('rtoken');
 
-	    axios.get('http://localhost:3000/verify-me', {
+	    axios.get(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/verify-me`, {
 	      headers: {
 	        'authorization': `Bearer ${ token }`
 	      }
@@ -78,7 +78,7 @@ const Authentication = props => {
 	      setAllow(() => true);
 	    })
 	    .catch( err => {
-	      axios.post('http://localhost:3500/auth/refresh-token', { rtoken })
+	      axios.post(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/auth/refresh-token`, { rtoken })
 	      .then( res => {
 	        Cookies.set('token', res.data.accessToken);
 	        runAuth();
@@ -212,6 +212,9 @@ const SignIn = props => {
 	const [btnMsg, setBtnMsg] = React.useState('sign me in');
 	const [errMsg, setErrMsg] = React.useState( null );
 
+	const unameField = React.useRef( null );
+	const passField = React.useRef( null );
+
 	const handleClickShowPassword = () => {
 		setUser({
 		  ...user,
@@ -246,7 +249,7 @@ const SignIn = props => {
 
 	React.useEffect(() => {
 		if( signingIn ){
-			axios.post('http://localhost:3000/sign-in', { username: user.username, password: user.password })
+			axios.post(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/sign-in`, { username: user.username, password: user.password })
 			.then( res => {
 				Cookies.set('token', res.data.accessToken);
 				Cookies.set('rtoken', res.data.refreshToken);
@@ -264,6 +267,19 @@ const SignIn = props => {
 			})
 		}
 	}, [signingIn, user]);
+
+	React.useEffect(() => {
+		if( unameField.current && passField.current ){
+			const handleEnter = e => {
+				if( e.key === 'Enter' ){
+					handleSignin();
+				}
+			}
+
+			unameField.current.addEventListener('keydown', handleEnter);
+			passField.current.addEventListener('keydown', handleEnter);
+		}
+	}, [unameField, passField]);
 
 	return(
 		<div 
@@ -298,11 +314,12 @@ const SignIn = props => {
 						<div className="mb-3 d-flex justify-content-center">
 							<p style={{ letterSpacing: '3px', color: 'rgba(0, 0, 0, 0.7)', fontSize: '14px'}}>Sign in to start your session</p>
 						</div>
-						<TextField sx={{width: '6cm' }} onChange={setUsername} id="sign-in-uname" label="username" variant="outlined" />
+						<TextField ref={unameField} sx={{width: '6cm' }} onChange={setUsername} id="sign-in-uname" label="username" variant="outlined" />
 						<Divider/>
 						<FormControl sx={{ m: 3, width: '6cm' }} variant="outlined">
 							<InputLabel htmlFor="sign-in-pass">Password</InputLabel>
 							<OutlinedInput 
+								ref={passField}
 								id="outlined-adornment-password" 
 								type={ user.showPassword ? "text" : "password" }
 								value={ user.password } 

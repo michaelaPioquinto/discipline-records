@@ -87,7 +87,7 @@ const Violation = props => {
 	}, [violationList, search]);
 
 	const fetchViolationList = async() => {
-		axios.get('http://localhost:3000/violation-list')
+		axios.get(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/violation-list`)
 		.then( res => {
 			if( res.data ){ // here
 				setViolationList( res.data.map( (viol, index) => ({ 
@@ -247,7 +247,7 @@ const ValidationForm = props => {
 					<Button 
 						onClick={async () => {
 							if( violationName.length && firstOffense.length && secondOffense.length && thirdOffense.length ){
-								await axios.post('http://localhost:3000/save-violation', { violationName, firstOffense, secondOffense, thirdOffense })
+								await axios.post(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/save-violation`, { violationName, firstOffense, secondOffense, thirdOffense })
 								.then(() => {
 									props.fetchViolationList();
 									enqueueSnackbar('Successfully added a violation', { variant: 'success' });
@@ -373,7 +373,7 @@ const ValidationEditForm = props => {
 							props.setOpen();
 
 							const handleDelete = async () => {
-								axios.delete(`http://localhost:3000/delete-violation/${props.editForm.item._id}`)
+								axios.delete(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/delete-violation/${props.editForm.item._id}`)
 								.then( res => {
 									props.fetchViolationList();
 									enqueueSnackbar('Successfully deleted violation', { variant: 'success' });
@@ -395,7 +395,7 @@ const ValidationEditForm = props => {
 						onClick={() => {
 							if( violationName.length && firstOffense.length && secondOffense.length && thirdOffense.length ){
 								const handleEdit = async () => {
-									axios.put(`http://localhost:3000/edit-violation/${ props.editForm.item._id }`, { 
+									axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/edit-violation/${ props.editForm.item._id }`, { 
 										item: {
 											violationName,
 											firstOffense,

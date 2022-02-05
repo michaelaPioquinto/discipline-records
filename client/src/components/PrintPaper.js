@@ -75,7 +75,7 @@ const PrintPaper = props => {
 	]
 
 	const getStudentData = async () => {
-		axios.get(`http://localhost:3000/student-report/${ studentID }`)
+		axios.get(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/student-report/${ studentID }`)
 		.then( res => {
       setStudentData( res.data );
 

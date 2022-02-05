@@ -147,7 +147,7 @@ const Dashboard = props => {
   }, [accounts, search]);
 
   const fetchIncidentNumber = async() => {
-    axios.get('http://localhost:3000/incident-number')
+    axios.get(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/incident-number`)
     .then( res => {
       setIncidentNumber( res.data );
     })
@@ -157,7 +157,7 @@ const Dashboard = props => {
   }
 
 	const fetchStudentData = async() => {
-    axios.get('http://localhost:3000/student-data')
+    axios.get(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/student-data`)
     .then( res => {
       if( res.data ){
         const modifiedData = res.data.map( datum => ({ id: datum._id, ...datum}));
@@ -174,7 +174,7 @@ const Dashboard = props => {
   }
 
   const getSchoolYearAndSemester = async() => {
-    axios.get(`http://localhost:3000/get-current-school-year-semester`)
+    axios.get(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/get-current-school-year-semester`)
     .then( res => {
       setSemester( res?.data?.semester + ' semester' );
     })
@@ -235,7 +235,7 @@ const StudentForm = props => {
   const fetchStudentReport = async () => {
     if( !props.item ) return;
 
-    axios.get(`http://localhost:3000/student-report/${ props.item.studentID }`)
+    axios.get(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/student-report/${ props.item.studentID }`)
     .then( res => {
       setReportData( res.data );
     })
@@ -256,7 +256,7 @@ const StudentForm = props => {
       throw err;
     });
 
-    axios.get(`http://localhost:3000/get-current-school-year-semester`)
+    axios.get(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/get-current-school-year-semester`)
     .then( res => {
       setYearSemester( res.data );
     })
@@ -267,7 +267,7 @@ const StudentForm = props => {
   } 
 
   const handleDutyUpdate = async ({ _id }, val) => {
-    axios.put(`http://localhost:3000/duty-update/${ _id }`, { dutyHrs: val })
+    axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/duty-update/${ _id }`, { dutyHrs: val })
     .catch( err => {
       enqueueSnackbar( 'Please try again later', { variant: 'error' });       
     });
@@ -276,7 +276,7 @@ const StudentForm = props => {
   const debouncedDutyUpdate = debounce( handleDutyUpdate, 1000 );
 
   const handleArchive = async ({ _id }) => {
-    axios.put(`http://localhost:3000/archive-report/${ _id }`)
+    axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/archive-report/${ _id }`)
     .then(() => {
       fetchStudentReport();
     })
@@ -850,8 +850,14 @@ const MakeReportForm = props => {
     }
 
     setTimeout(() => {
-      if( state.studentID.length ){
-        axios.post('http://localhost:3000/save-report', state)
+      if( state.studentID.length && state.reportedBy.length && 
+        state.role.length && state.duty.length &&
+        state.dateOfReport.length && state.timeOfIncident.length &&
+        state.location.length && state.dutyHrs.length && 
+        state.specificAreaLocation.length && state.administrativeDecision.length &&
+        state.incidentDescription && ( state.minorProblemBehavior.length || state.majorProblemBehavior.length )
+        ){
+        axios.post(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/save-report`, state)
         .then( async res => {
           if( image ){
             const formData = new FormData();
@@ -861,7 +867,7 @@ const MakeReportForm = props => {
             });
 
             try{
-              await axios.post(`http://localhost:3000/save-report-image`, formData)
+              await axios.post(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/save-report-image`, formData)
             }
             catch( err ){
               throw err;
@@ -870,16 +876,16 @@ const MakeReportForm = props => {
 
           props?.incrementIncidentNumber?.();
           enqueueSnackbar( res.data.message, { variant: 'success' });
+          props.setOpen();
         })
         .catch( err => {
           enqueueSnackbar( err?.response?.data?.message ?? 'Please try again', { variant: 'error' });
         });
       }
       else{
-        enqueueSnackbar( 'Student ID is required', { variant: 'error' });
+        enqueueSnackbar( 'A required field is empty!', { variant: 'error' });
       }
 
-      props.setOpen();
       setButton({ msg: 'Submit', isDisabled: false });
     }, 1000);
   }
@@ -975,13 +981,13 @@ const MakeReportForm = props => {
             <div className="row container-fluid d-flex justify-content-around align-items-center">
               <div className="col-md-6 d-flex justify-content-center align-items-center my-5">
                 <Stack spacing={2}>
-                  <TextField sx={{ width: '300px' }} label="Reported By" onChange={e => dispatch({ type: 'reportedBy', data: e.target.value })} variant="standard"/>
-                  <TextField sx={{ width: '300px' }} label="Title/Role" onChange={e => dispatch({ type: 'role', data: e.target.value })} variant="standard"/>
+                  <TextField required sx={{ width: '300px' }} label="Reported By" onChange={e => dispatch({ type: 'reportedBy', data: e.target.value })} variant="standard"/>
+                  <TextField required sx={{ width: '300px' }} label="Title/Role" onChange={e => dispatch({ type: 'role', data: e.target.value })} variant="standard"/>
                 </Stack>
               </div>
               <div className="col-md-6 d-flex justify-content-center align-items-center my-5">
                 <Stack spacing={2}>
-                  <TextField sx={{ width: '300px' }} defaultValue={today} disabled helperText="Date of Report" onChange={e => dispatch({ type: 'dateOfReport', data: e.target.value })} type="date" variant="standard"/>
+                  <TextField required sx={{ width: '300px' }} defaultValue={today} disabled helperText="Date of Report" onChange={e => dispatch({ type: 'dateOfReport', data: e.target.value })} type="date" variant="standard"/>
                   <TextField disabled sx={{ width: '300px' }} defaultValue={state.incidentNo} label="Incident no." onChange={e => dispatch({ type: 'incidentNo', data: e.target.value })} type="number" variant="standard"/>
                 </Stack>
               </div>
@@ -997,13 +1003,13 @@ const MakeReportForm = props => {
               <div className="col-md-6 d-flex justify-content-center align-items-center my-5">
                 <Stack spacing={2}>
                   <TextField disabled sx={{ width: '300px' }} defaultValue={state.studentName} onChange={e => dispatch({ type: 'studentName', data: e.target.value })} label="Student Name" variant="standard"/>
-                  <TextField sx={{ width: '300px' }} onChange={e => dispatch({ type: 'dateOfIncident', data: e.target.value })} helperText="Date of Incident" type="date" variant="standard"/>
+                  <TextField required sx={{ width: '300px' }} onChange={e => dispatch({ type: 'dateOfIncident', data: e.target.value })} helperText="Date of Incident" type="date" variant="standard"/>
                 </Stack>
               </div>
               <div className="col-md-6 d-flex justify-content-center align-items-center my-5">
                 <Stack spacing={2}>
-                  <TextField disabled sx={{ width: '300px' }} defaultValue={state.courseYrSection} onChange={e => dispatch({ type: 'courseYrSection', data: e.target.value })} label="Course / Yr / Section" variant="standard"/>
-                  <TextField sx={{ width: '300px' }} onChange={e => dispatch({ type: 'timeOfIncident', data: e.target.value })} label="Time of Incident" variant="standard"/>
+                  <TextField required disabled sx={{ width: '300px' }} defaultValue={state.courseYrSection} onChange={e => dispatch({ type: 'courseYrSection', data: e.target.value })} label="Course / Yr / Section" variant="standard"/>
+                  <TextField required sx={{ width: '300px' }} onChange={e => dispatch({ type: 'timeOfIncident', data: e.target.value })} label="Time of Incident" variant="standard"/>
                 </Stack>
               </div>
             </div>
@@ -1019,7 +1025,7 @@ const MakeReportForm = props => {
 
               <div className="col-md-12">
                 <ChipList 
-                  label="Add Duty"
+                  label="Add Duty (Required)"
                   getValues={ data => dispatch({ type: 'duty', data: data ? data : [] })}
                 />
               </div>
@@ -1029,11 +1035,11 @@ const MakeReportForm = props => {
               </div>
 
               <div className="col-md-12 d-flex justify-content-center align-items-center">
-                <TextField sx={{ width: '80vw', margin: '10px' }} onChange={e => dispatch({ type: 'location', data: e.target.value })} label="Location" variant="standard"/>
+                <TextField required sx={{ width: '80vw', margin: '10px' }} onChange={e => dispatch({ type: 'location', data: e.target.value })} label="Location" variant="standard"/>
               </div>
 
               <div className="col-md-12 d-flex justify-content-center align-items-center">
-                <TextField sx={{ width: '80vw', margin: '10px' }} onChange={e => dispatch({ type: 'specificAreaLocation', data: e.target.value })} label="Specific Area of Location" variant="standard"/>
+                <TextField required sx={{ width: '80vw', margin: '10px' }} onChange={e => dispatch({ type: 'specificAreaLocation', data: e.target.value })} label="Specific Area of Location" variant="standard"/>
               </div>
 
               <div className="col-md-12 d-flex justify-content-center align-items-center">
@@ -1051,6 +1057,7 @@ const MakeReportForm = props => {
                 id="standard-multiline-flexible"
                 label="Incident Description"
                 multiline
+                required 
                 rows={10}
                 onChange={e => dispatch({ type: 'incidentDescription', data: e.target.value })}
                 variant="filled"
@@ -1095,11 +1102,11 @@ const MakeReportForm = props => {
 
             <div className="row container-fluid">
               <div className="col-md-3 d-flex flex-row justify-content-around align-items-center m-3">
-                <TextField sx={{ width: '7cm', margin: '5px' }} onChange={e => dispatch({ type: 'employeeName', data: e.target.value })} label="Faculty / Employee Name" variant="standard"/>
+                <TextField required sx={{ width: '7cm', margin: '5px' }} onChange={e => dispatch({ type: 'employeeName', data: e.target.value })} label="Faculty / Employee Name" variant="standard"/>
               </div>
 
               <div className="col-md-3 d-flex flex-row justify-content-around align-items-center m-3">
-                <TextField sx={{ width: '7cm', margin: '5px' }} onChange={e => dispatch({ type: 'chairpersonName', data: e.target.value })} label="Head / Chairperson Name" variant="standard"/>
+                <TextField required sx={{ width: '7cm', margin: '5px' }} onChange={e => dispatch({ type: 'chairpersonName', data: e.target.value })} label="Head / Chairperson Name" variant="standard"/>
               </div>
             </div>
 
@@ -1113,7 +1120,7 @@ const MakeReportForm = props => {
 
             <div className="mt-5 row d-flex flex-row justify-content-center align-items-center mb-5">
               <div className="col-md-12 px-5 d-flex justify-content-start align-items-start">
-                <h5 className="text-uppercase"><b>problem behavior:</b></h5>
+                <h5 className="text-uppercase"><b>problem behavior ( Required ):</b></h5>
               </div>
 
 
@@ -1248,7 +1255,7 @@ const MakeReportForm = props => {
             </div>
             <div className="row container-fluid d-flex flex-column justify-content-center align-items-center">
               <div className="col-md-12 px-5 d-flex justify-content-start align-items-start">
-                <h5 className="text-uppercase"><b>administrative decision:</b></h5>
+                <h5 className="text-uppercase"><b>administrative decision ( Required ):</b></h5>
               </div>
               <div className="row col-md-12">
                 <div className="col-md-4">

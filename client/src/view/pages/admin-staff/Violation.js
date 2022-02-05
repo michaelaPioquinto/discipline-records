@@ -78,7 +78,7 @@ const Violation = props => {
 	}, [violationList, search]);
 
 	const fetchViolationList = async() => {
-		axios.get('http://localhost:3000/violation-list')
+		axios.get(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/violation-list`)
 		.then( res => {
 			if( res.data?.length ){
 				setViolationList( res.data.map( (viol, index) => ({ 
