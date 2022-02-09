@@ -35,7 +35,7 @@ const AdminStaff = props => {
 					{ title: 'Dashboard', onClick: () => content.name === 'Dashboard' ? null : setContent({ name: 'Dashboard', cont: <Dashboard role="adminstaff" search={searchContent}/> }) },
 					{ title: 'Violation', onClick: () =>  content.name === 'Validation' ? null : setContent({ name: 'Violation', cont: <Violation search={searchContent}/> })},
 					{ title: 'Account', onClick: () => content.name === 'Account' ? null : setContent({ name: 'Account', cont: <Accounts search={searchContent}/> }) },
-					{ title: 'Archived', onClick: () => content.name === 'Archived' ? null : setContent({ name: 'Archvied', cont: <Archived search={searchContent}/> }) },
+					{ title: 'Deactivated Students', onClick: () => content.name === 'Archived' ? null : setContent({ name: 'Archvied', cont: <Archived search={searchContent}/> }) },
 					// { title: 'Make Report / Referral', onClick: () => content.name === 'Make Report' ? null : setContent({ name: 'Make Report / Referral', cont: <MakeReport /> }) },
 					{ title: 'Reports', onClick: () => content.name === 'Reports' ? null : setContent({ name: 'Reports', cont: <Reports search={searchContent}/> }) },
 					{ title: 'Statistical', onClick: () => content.name === 'Statistical' ? null : setContent({ name: 'Statistical', cont: <Statistical/> }) },

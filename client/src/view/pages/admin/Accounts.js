@@ -296,7 +296,7 @@ const AddUser = props => {
 												.then(() => {
 													props.fetchAccounts();
 													props.setOpen();
-													enqueueSnackbar('Successfully edited a user', { variant: 'success' });
+													enqueueSnackbar('Successfully added a user', { variant: 'success' });
 												})
 												.catch( err => {
 													enqueueSnackbar( err.response.data.message ?? 'Please try again', { variant: 'error' });

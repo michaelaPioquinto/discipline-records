@@ -13,6 +13,7 @@ import TableCell from '@mui/material/TableCell';
 
 import IconButton from '@mui/material/IconButton';
 import UnarchiveIcon from '@mui/icons-material/Unarchive';
+import Tooltip from '@mui/material/Tooltip';
 
 import SearchContext from '../../../context/SearchContext';
 
@@ -28,9 +29,11 @@ const Student = props => {
 			<TableCell> { props.middleName } </TableCell>
 			<TableCell> { props.course } </TableCell>
 			<TableCell> 
-				<IconButton onClick={() => handleUnarchive( props.studentID )}>
-					<UnarchiveIcon/>
-				</IconButton>
+				<Tooltip arrow placement="bottom" title="Activate">
+					<IconButton onClick={() => handleUnarchive( props.studentID )}>
+						<UnarchiveIcon/>
+					</IconButton>
+				</Tooltip>
 			</TableCell>
 		</TableRow>
 	);
@@ -137,7 +140,7 @@ const Archived = props => {
 						<Table
 							maxHeight={330}
 							style={{ width: '100%' }}
-							head={['Student ID', 'First Name', 'Last Name', 'Middle Name', 'Course', 'Unarchive']}
+							head={['Student ID', 'First Name', 'Last Name', 'Middle Name', 'Course', 'Action']}
 							content={[...renderedStudents]}
 						/>
 					</div>

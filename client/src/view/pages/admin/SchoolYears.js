@@ -100,6 +100,7 @@ const Accounts = props => {
 	React.useEffect(() => {
 		let renderedItem = [];
 
+		accounts?.sort?.(( ac1, ac2 ) => Number(ac1?.schoolYear?.split?.('-')?.[ 0 ]) - Number(ac2?.schoolYear?.split?.('-')?.[ 0 ]))
 		accounts.forEach( acc => {
 			if( acc.schoolYear.searchContain( search ) ){
 				renderedItem.push( 
@@ -128,10 +129,6 @@ const Accounts = props => {
 	React.useEffect(() => {
 		if( !addForm ) setSelectedItem( null );
 	}, [addForm]);
-
-	React.useEffect(() => {
-		console.log( selectedItem );	
-	}, [selectedItem]);
 
 	return(
 		<div style={{ width: '100%', height: '80vh' }} className="p-3 text-center">
@@ -204,9 +201,10 @@ const AddUser = props => {
 			const currentYear = new Date().getFullYear();
 			const years = value.split('-');
 
+			console.log( Number( years[ 0 ] ) + 1 === Number( years[ 1 ] ) );
 			if( years[0].length > currentYear.length || ( years.length > 2 || years.length < 2 ) ||
 				( isNaN( years[0] ) || isNaN( years[1] ) ) ||
-				years[ 0 ] === years[ 1 ]
+				years[ 0 ] === years[ 1 ] || Number( years[ 0 ] ) + 1 !== Number( years[ 1 ] )
 				) return 'Incorrect School Year Format';
 
 			return null;
@@ -356,7 +354,7 @@ const EditUser = props => {
 
 			if( years[0].length > currentYear.length || ( years.length > 2 || years.length < 2 ) ||
 				( isNaN( years[0] ) || isNaN( years[1] ) ) ||
-				years[ 0 ] === years[ 1 ]
+				years[ 0 ] === years[ 1 ] || Number( years[ 0 ] ) + 1 !== Number( years[ 1 ] )
 				) return 'Incorrect School Year Format';
 
 			return null;

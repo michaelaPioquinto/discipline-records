@@ -23,6 +23,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
 
+import Tooltip from '@mui/material/Tooltip';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import InputLabel from '@mui/material/InputLabel';
@@ -80,9 +81,13 @@ const Item = props => {
 					control={<Switch checked={status === 'activated' ? true : false} onDoubleClick={e => e.stopPropagation()} onChange={() => debouncedChangeStatus()}/>} 
 					label={ status === 'activated' ? 'Activated' : 'Deactivated' }
 				/>*/}
-				<IconButton onDoubleClick={e => e.stopPropagation()} onClick={() => debouncedChangeStatus()}>
-					<ArchiveIcon/>
-				</IconButton>
+				<Tooltip arrow placement="bottom" title="Deactivate">
+					<span>
+						<IconButton onDoubleClick={e => e.stopPropagation()} onClick={() => debouncedChangeStatus()}>
+							<ArchiveIcon/>
+						</IconButton>
+					</span>
+				</Tooltip>
 			</TableCell>
 		</TableRow>
 	);
@@ -153,7 +158,7 @@ const Accounts = props => {
 			<Table
 				maxHeight={ 500 }
 				style={{ width: '100%' }}
-				head={['ID', 'Full Name', 'Course', 'Year & Section', 'Archive']}
+				head={['ID', 'Full Name', 'Course', 'Year & Section', 'Action']}
 				content={ items }
 			/>
 			<AddUser
@@ -250,7 +255,7 @@ const AddUser = props => {
 				<DialogTitle id="responsive-dialog-title">
 					{
 						!props.editingMode
-							? "Want to add a system administrator or an administrator staff?"
+							? null
 							: "Edit this account?"
 					}
 				</DialogTitle>

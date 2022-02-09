@@ -33,9 +33,9 @@ const Report = props => {
 		}
 	}, [props]);
 
-	React.useEffect(() => {
-		console.log( behaviors );
-	}, [behaviors]);
+	// React.useEffect(() => {
+	// 	console.log( behaviors );
+	// }, [behaviors]);
 
 	return(
 		<TableRow>
@@ -104,7 +104,7 @@ const Archived = props => {
 		const addToFilteredItems = item => filtered.push( <Report key={uniqid()} {...item} handleArchive={handleArchive}/> );
 
 		reports?.forEach?.( item => {
-			if( item?.studentName?.searchContain?.( search ) && item?.status === currentView ){
+			if( item?.studentID?.searchContain?.( search ) && item?.status === currentView ){
 				addToFilteredItems( item );
 			}
 		});
@@ -121,6 +121,7 @@ const Archived = props => {
 			while( chunkSet.length < Math.floor( filtered.length / chunksLimit ) + (filtered % chunksLimit === 0 ? 0 : 1 ));
 		}
 
+		console.log( chunkSet );
 		setRenderedReports([ ...chunkSet ]);
 	}, [reports, search, currentView]);	
 
@@ -154,7 +155,7 @@ const Archived = props => {
 				</div>
 				<div style={{ width: '100%', height: '10%' }} className="row py-2 px-1">
 					<div className="col-8">
-						<Pagination count={ renderedReports.length - 1 } page={ page } onChange={(_, value) => setPage( value )}/>
+						<Pagination count={ !renderedReports?.[ renderedReports?.length - 1 ]?.length ? renderedReports?.length - 1 : renderedReports?.length } page={ page } onChange={(_, value) => setPage( value )}/>
 					</div>
 					<div className="col-4">
 						<Button onClick={() => setCurrentView( currentView => currentView === 'activated' ? 'deactivated' : 'activated' )}>{ currentView === 'activated' ? 'Non-archived' : 'Archived' }</Button>
