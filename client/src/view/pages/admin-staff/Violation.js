@@ -25,6 +25,7 @@ import { useSnackbar } from 'notistack';
 import Table from '../../../components/Table';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
+import Pagination from '@mui/material/Pagination';
 
 import SearchContext from '../../../context/SearchContext';
 
@@ -39,11 +40,13 @@ const Item = props => (
 
 const Violation = props => {
 	const [violationList, setViolationList] = React.useState( [] );
+	const [renderedViolations, setRenderedViolations] = React.useState( [] );
 	const [list, setList] = React.useState( [] );
 	const [openForm, setOpenForm] = React.useState( false );
 	const [editForm, setEditForm] = React.useState({ isOpen: false, item: null });
 	const [violation, setViolation] = React.useState( null );
 	const [deleteViol, setDeleteViol] = React.useState( null );
+	const [page, setPage] = React.useState( 1 );
 
 	const search = React.useContext( SearchContext );
 
@@ -101,6 +104,36 @@ const Violation = props => {
 	}, [violationList]);
 
 
+	React.useEffect(() => {
+		let filtered = [];
+		let chunkSet = [];
+		const chunksLimit = 7;
+
+		const addToFilteredItems = item => filtered.push( <Item key={uniqid()} {...item}/> );
+
+		violationList?.forEach?.( item => {
+			if( item?.violationName?.searchContain?.( search ) ){
+				addToFilteredItems( item );
+			}
+		});
+
+		if( violationList.length ){
+			let index = 0;
+			do{
+				const chunk = filtered.slice(index, index + chunksLimit);
+
+				chunkSet.push( chunk );	
+
+				index += chunksLimit;
+			}
+			while( chunkSet.length < Math.floor( filtered.length / chunksLimit ) + (filtered % chunksLimit === 0 ? 0 : 1 ));
+		}
+
+		console.log( chunkSet );
+		setList([ ...chunkSet ]);
+	}, [violationList, search]);
+
+
 	// React.useEffect(() => {
 	// 	if( deleteViol ){
 	// 		let modifiedViolations = violationList.filter( viol => viol.id !== deleteViol.id );
@@ -113,21 +146,18 @@ const Violation = props => {
 	// }, [deleteViol]);
 
 	return(
-		<div style={{ width: '100%', height: '80vh' }} className="p-3 d-flex flex-column">
-      <Table
-        style={{ width: '100%' }}
-      	maxHeight={ 500 }
-        head={['Violation Name', 'First Offense', 'Second Offense', 'Third Offense']}
-        content={
-          list.map( item => (
-            <Item
-              key={uniqid()}
-              onClick={setEditForm}
-              {...item}
-            />
-          ))
-        }
-      />
+		<div style={{ width: '100%', height: '80vh', backgroundColor: 'white' }} className="d-flex flex-column">
+			<div style={{ height: '90%', width: '100%'}}>
+	      <Table
+	        style={{ width: '100%' }}
+	      	maxHeight={ 500 }
+	        head={['Violation Name', 'First Offense', 'Second Offense', 'Third Offense']}
+	        content={list[ page - 1 ]}
+	      />
+			</div>
+      <div stly={{ width: '100%', height: '10%' }} className="d-flex justify-content-center align-items-center">
+    		<Pagination count={!list?.[ list?.length - 1 ]?.length ? list?.length - 1 : list?.length} onChange={(_, value) => setPage( value )} page={page}/>
+      </div>
 		</div>
 	)
 }

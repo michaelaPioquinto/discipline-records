@@ -81,6 +81,7 @@ const Accounts = props => {
 	const [accounts, setAccounts] = React.useState( [] );
 	const [items, setItems] = React.useState( [] );
 	const [addForm, setAddForm] = React.useState( false );
+	const [editForm, setEditForm] = React.useState( false );
 	const [selectedItem, setSelectedItem] = React.useState( null );
 	const { enqueueSnackbar } = useSnackbar();
 	const search = React.useContext( SearchContext );
@@ -119,16 +120,17 @@ const Accounts = props => {
 
 	const handleAddForm = async () => {
 		setAddForm( addForm => !addForm );
+		// if( addForm === true ) setSelectedItem( null );
 	}
 
 	const handleEditForm = async item => {
-		setAddForm( addForm => !addForm );
+		setEditForm( editForm => !editForm );
 		setSelectedItem( item );
 	}
 
 	React.useEffect(() => {
-		if( !addForm ) setSelectedItem( null );
-	}, [addForm]);
+		if( !editForm ) setSelectedItem( null );
+	}, [editForm]);
 
 	return(
 		<div style={{ width: '100%', height: '80vh' }} className="p-3 text-center">
@@ -141,19 +143,20 @@ const Accounts = props => {
 			{
 				selectedItem
 					? <EditUser
-							open={addForm} 
-							setOpen={handleAddForm}
-							setEdit={handleEditForm} 
-							fetchSchoolYears={fetchSchoolYears}
-							{ ...selectedItem }
-						/> 
-					: <AddUser 
-						open={addForm} 
-						setOpen={handleAddForm}
+						open={editForm} 
+						setOpen={() => setEditForm( false )}
 						setEdit={handleEditForm} 
-						fetchSchoolYears={fetchSchoolYears} 
+						fetchSchoolYears={fetchSchoolYears}
+						{ ...selectedItem }
 					/>
+					: null
 			}
+			<AddUser 
+				open={addForm} 
+				setOpen={handleAddForm}
+				setEdit={handleEditForm} 
+				fetchSchoolYears={fetchSchoolYears}
+			/>
 			<div style={{ position: 'absolute', bottom: '15px', right: '15px' }}>
 				<IconButton style={{ backgroundColor: 'rgba(25, 25, 21, 0.9)' }} onClick={handleAddForm}>
 					<AddIcon style={{ color: 'white' }}/>
@@ -201,7 +204,6 @@ const AddUser = props => {
 			const currentYear = new Date().getFullYear();
 			const years = value.split('-');
 
-			console.log( Number( years[ 0 ] ) + 1 === Number( years[ 1 ] ) );
 			if( years[0].length > currentYear.length || ( years.length > 2 || years.length < 2 ) ||
 				( isNaN( years[0] ) || isNaN( years[1] ) ) ||
 				years[ 0 ] === years[ 1 ] || Number( years[ 0 ] ) + 1 !== Number( years[ 1 ] )
@@ -291,9 +293,13 @@ const AddUser = props => {
 									props.fetchSchoolYears();
 									props.setOpen();
 									enqueueSnackbar('Successfully added a school year', { variant: 'success' });
+
+									dispatch({ type: 'schoolYear', data: '' });
+									dispatch({ type: 'semester', data: '' });
 								})
 								.catch( err => {
-									enqueueSnackbar( err.response.data.message ?? 'Please try again', { variant: 'error' });
+									console.log( err );
+									enqueueSnackbar( err?.response?.data?.message ?? 'Please try again', { variant: 'error' });
 								});
 							}
 							else{
@@ -304,6 +310,9 @@ const AddUser = props => {
 							[ syError, semError ].forEach( error => {
 								if( error?.length ) enqueueSnackbar( error, { variant: 'error' });
 							});
+
+							dispatch({ type: 'schoolYear', data: '' });
+							dispatch({ type: 'semester', data: '' });
 						}
 					}}
 				>

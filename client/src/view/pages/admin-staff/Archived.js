@@ -128,15 +128,7 @@ const Archived = props => {
 		<div style={{ width: '100%', height: '100%' }} className="d-flex justify-content-center align-items-start">
 			<Paper sx={{ width: '95%', height: '80%', marginTop: '10px' }} elevation={5}>
 				<Stack direction="column" justifyContent="center" alignItems="center">
-					<div className="col-11 my-5">
-						<Autocomplete
-							options={yearOptions}
-							onChange={handleYearSelection}
-							onInputChange={handleYearSelection}
-							renderInput={ params => <TextField { ...params} label="Year" variant="filled"/> }
-						/>
-					</div>
-					<div className="col-11">
+					<div className="col-12">
 						<Table
 							maxHeight={330}
 							style={{ width: '100%' }}

@@ -10,7 +10,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 
 const Statistical = React.lazy(() => import('./pages/Statistical'));
 const SchoolYears = React.lazy(() => import('./pages/admin/SchoolYears'));
-const Violation = React.lazy(() => import('./pages/admin/Violation'));
+const Violation = React.lazy(() => import('./pages/Violation'));
 const Handbook = React.lazy(() => import('./pages/Handbook'));
 const Accounts = React.lazy(() => import('./pages/admin/Accounts'));
 const Dashboard = React.lazy(() => import('./pages/Dashboard'));
@@ -33,7 +33,7 @@ const Admin = props => {
 				getSearchContent={e => handleSearch( e )}
 				listItems={[
 					{ title: 'Dashboard', onClick: () => content.name === 'Dashboard' ? null : setContent({ name: 'Dashboard', cont: <Dashboard search={searchContent}/> }) },
-					{ title: 'Violation', onClick: () =>  content.name === 'Validation' ? null : setContent({ name: 'Violation', cont: <Violation search={searchContent}/> })},
+					{ title: 'Violation', onClick: () =>  content.name === 'Validation' ? null : setContent({ name: 'Violation', cont: <Violation role="admin" search={searchContent}/> })},
 					{ title: 'Account', onClick: () => content.name === 'Account' ? null : setContent({ name: 'Account', cont: <Accounts search={searchContent}/> }) },
 					{ title: 'School Year & Semester', onClick: () => content.name === 'School Year & Semester' ? null : setContent({ name: 'School Year & Semester', cont: <SchoolYears search={searchContent}/> }) },
 					{ title: 'Statistical', onClick: () => content.name === 'Statistical' ? null : setContent({ name: 'Statistical', cont: <Statistical/> }) },

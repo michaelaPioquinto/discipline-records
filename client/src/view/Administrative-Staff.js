@@ -10,7 +10,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 const Statistical = React.lazy(() => import('./pages/Statistical'));
 // const MakeReport = React.lazy(() => import('./pages/admin-staff/MakeReport'));
 const Dashboard = React.lazy(() => import('./pages/Dashboard'));
-const Violation = React.lazy(() => import('./pages/admin-staff/Violation'));
+const Violation = React.lazy(() => import('./pages/Violation'));
 const Handbook = React.lazy(() => import('./pages/Handbook'));
 const Accounts = React.lazy(() => import('./pages/admin-staff/Accounts'));
 const Reports = React.lazy(() => import('./pages/admin-staff/Reports'));
@@ -29,13 +29,13 @@ const AdminStaff = props => {
 			<Appbar 
 				tools={props.tools}
 				title="Administrative Staff"
-				openSearchOn={['Dashboard', 'Violation', 'Account', 'Reports']}
+				openSearchOn={['Dashboard', 'Violation', 'Account', 'Reports', 'Deactivated Students']}
 				getSearchContent={e => handleSearch( e )}
 				listItems={[
 					{ title: 'Dashboard', onClick: () => content.name === 'Dashboard' ? null : setContent({ name: 'Dashboard', cont: <Dashboard role="adminstaff" search={searchContent}/> }) },
-					{ title: 'Violation', onClick: () =>  content.name === 'Validation' ? null : setContent({ name: 'Violation', cont: <Violation search={searchContent}/> })},
+					{ title: 'Violation', onClick: () =>  content.name === 'Validation' ? null : setContent({ name: 'Violation', cont: <Violation role="adminstaff" search={searchContent}/> })},
 					{ title: 'Account', onClick: () => content.name === 'Account' ? null : setContent({ name: 'Account', cont: <Accounts search={searchContent}/> }) },
-					{ title: 'Deactivated Students', onClick: () => content.name === 'Archived' ? null : setContent({ name: 'Archvied', cont: <Archived search={searchContent}/> }) },
+					{ title: 'Deactivated Students', onClick: () => content.name === 'Deactivated Students' ? null : setContent({ name: 'Deactivated Students', cont: <Archived search={searchContent}/> }) },
 					// { title: 'Make Report / Referral', onClick: () => content.name === 'Make Report' ? null : setContent({ name: 'Make Report / Referral', cont: <MakeReport /> }) },
 					{ title: 'Reports', onClick: () => content.name === 'Reports' ? null : setContent({ name: 'Reports', cont: <Reports search={searchContent}/> }) },
 					{ title: 'Statistical', onClick: () => content.name === 'Statistical' ? null : setContent({ name: 'Statistical', cont: <Statistical/> }) },

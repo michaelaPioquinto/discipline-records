@@ -14,6 +14,7 @@ import Button from '@mui/material/Button';
 
 import IconButton from '@mui/material/IconButton';
 import ArchiveIcon from '@mui/icons-material/Archive';
+import UnarchiveIcon from '@mui/icons-material/Unarchive';
 
 import { useSnackbar } from 'notistack';
 import SearchContext from '../../../context/SearchContext';
@@ -21,7 +22,7 @@ import Pagination from '@mui/material/Pagination';
 
 
 const Report = props => {
-	const { handleArchive } = props;
+	const { handleArchive, handleUnarchive } = props;
 	const [behaviors, setBehaviors] = React.useState( [] );
 
 	React.useEffect(() => {
@@ -52,7 +53,11 @@ const Report = props => {
 							<ArchiveIcon/>
 						</IconButton>
 					</TableCell>
-					: null
+					: <TableCell> 
+						<IconButton onClick={() => handleUnarchive( props )}>
+							<UnarchiveIcon/>
+						</IconButton>
+					</TableCell>
 			}
 		</TableRow>
 	);
@@ -92,6 +97,16 @@ const Archived = props => {
 	    });
   	}
 
+  	const handleUnarchive = async ({ _id }) => {
+	    axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/unarchive-report/${ _id }`)
+	    .then(() => {
+	      getReports();
+	    })
+	    .catch( err => {
+	      enqueueSnackbar( 'Please try again later', { variant: 'error' });       
+	    });
+  	}
+
 	// const handleYearSelection = ( e, data ) => {
 	// 	setYearSelected( data );
 	// }
@@ -101,7 +116,7 @@ const Archived = props => {
 		let chunkSet = [];
 		const chunksLimit = 5;
 
-		const addToFilteredItems = item => filtered.push( <Report key={uniqid()} {...item} handleArchive={handleArchive}/> );
+		const addToFilteredItems = item => filtered.push( <Report key={uniqid()} {...item} handleArchive={handleArchive} handleUnarchive={handleUnarchive}/> );
 
 		reports?.forEach?.( item => {
 			if( item?.studentID?.searchContain?.( search ) && item?.status === currentView ){
@@ -121,7 +136,6 @@ const Archived = props => {
 			while( chunkSet.length < Math.floor( filtered.length / chunksLimit ) + (filtered % chunksLimit === 0 ? 0 : 1 ));
 		}
 
-		console.log( chunkSet );
 		setRenderedReports([ ...chunkSet ]);
 	}, [reports, search, currentView]);	
 
@@ -133,8 +147,11 @@ const Archived = props => {
 					setPage( page => page - 1 );
 				}
 			}
+			else if( page > renderedReports.length ){
+				setPage( page => page - 1 );	
+			}
 		}
-	}, [renderedReports, page]);
+	}, [renderedReports, page, currentView]);
 
 	React.useEffect(() => getReports(), []);
 
@@ -145,11 +162,15 @@ const Archived = props => {
 					<Table
 						maxHeight="100%"
 						style={{ width: '100%' }}
-						head={
-							currentView === 'activated'
-								? ['Student ID', 'Student Name', 'Incident Description', ' Reported By', 'Date Of Report', 'Problem Behavior', 'Action']
-								: ['Student ID', 'Student Name', 'Incident Description', ' Reported By', 'Date Of Report', 'Problem Behavior']
-						}
+						head={[
+							'Student ID', 
+							'Student Name', 
+							'Incident Description', 
+							'Reported By', 
+							'Date Of Report', 
+							'Problem Behavior', 
+							'Action'
+						]}
 						content={renderedReports[ page - 1 ]}
 					/>
 				</div>

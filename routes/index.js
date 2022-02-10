@@ -335,6 +335,15 @@ router.put('/archive-report/:reportId', async( req, res ) => {
   });
 });
 
+router.put('/unarchive-report/:reportId', async( req, res ) => {
+  // archive report
+  Report.findOneAndUpdate({ _id: req.params.reportId }, { status: 'activated' }, err => {
+    if( err ) return res.sendStatus( 503 );
+
+    return res.sendStatus( 200 );
+  });
+});
+
 router.put('/duty-update/:reportId', async( req, res ) => {
   Report.findOne({ _id: req.params.reportId }, (err, doc) => {
     if( err ) return res.sendStatus( 503 );
@@ -412,22 +421,38 @@ router.post('/create-school-year', async( req, res ) => {
 
   delete sy._id;
 
-  SchoolYear.create({ ...sy, status: 'deactivated' }, err => {
+  SchoolYear.findOne({ schoolYear: sy.schoolYear }, (err, doc) => {
     if( err ) return res.sendStatus( 503 );
 
-    return res.sendStatus( 200 );
+    if( doc ){
+      return res.status( 403 ).json({ message: 'School year already exists' });
+    }
+    else{
+      SchoolYear.create({ ...sy, status: 'deactivated' }, err => {
+        if( err ) return res.sendStatus( 503 );
+
+        return res.sendStatus( 200 );
+      });
+    }
   });
 });
 
 router.put('/edit-school-year', async( req, res ) => {
   const sy = req.body;
 
-  SchoolYear.findOneAndUpdate({ _id: sy._id }, { ...sy }, err => {
-    if( err ) {
-      return res.sendStatus( 503 );
-    }
+  SchoolYear.findOne({ schoolYear: sy.schoolYear }, (err, doc) => {
+    if( err ) return res.sendStatus( 503 );
 
-    return res.sendStatus( 200 );
+    if( doc && doc._id.toString() !== sy._id ){
+      return res.status( 403 ).json({ message: 'School year already exists' });
+    } 
+    else{
+      SchoolYear.findOneAndUpdate({ _id: sy._id }, { ...sy }, err => {
+        if( err ) return res.sendStatus( 503 );
+
+        return res.sendStatus( 200 );
+      });
+    } 
   });
 });
 
