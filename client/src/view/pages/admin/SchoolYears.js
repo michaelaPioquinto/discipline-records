@@ -30,6 +30,7 @@ import FormControl from '@mui/material/FormControl';
 
 import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import Table from '../../../components/Table';
 import SearchContext from '../../../context/SearchContext';
@@ -73,6 +74,11 @@ const Item = props => {
 					label={ status }
 				/>
 			</TableCell>
+			<TableCell> 
+				<IconButton onClick={() => props.handleDelete( props._id )}>
+					<DeleteIcon/>
+				</IconButton>
+			</TableCell>
 		</TableRow>
 	);
 }
@@ -96,6 +102,17 @@ const Accounts = props => {
 		});
 	}
 
+	const handleDelete = id => {
+		axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/delete-school-year-and-semester/${id}`)
+		.then( res => {
+			fetchSchoolYears();
+		})
+		.catch( err => {
+			console.error( err );
+			throw err;
+		});	
+	}
+
 	React.useEffect(() => fetchSchoolYears(), []);
 
 	React.useEffect(() => {
@@ -109,6 +126,7 @@ const Accounts = props => {
 						key={uniqid()} 
 						onDoubleClick ={handleEditForm} 
 						fetchSchoolYears={fetchSchoolYears}
+						handleDelete={handleDelete}
 						{...acc}
 					/> 
 				);
@@ -137,7 +155,7 @@ const Accounts = props => {
 			<Table
 				maxHeight={ 500 }
 				style={{ width: '100%' }}
-				head={['School Year', 'Semester', 'Status']}
+				head={['School Year', 'Semester', 'Status', 'Action']}
 				content={ items }
 			/>
 			{
