@@ -326,11 +326,10 @@ const AddUser = props => {
 						}
 						else{
 							[ syError, semError ].forEach( error => {
-								if( error?.length ) enqueueSnackbar( error, { variant: 'error' });
+								if( error?.length ){ 
+									enqueueSnackbar( error, { variant: 'error' });
+								}
 							});
-
-							dispatch({ type: 'schoolYear', data: '' });
-							dispatch({ type: 'semester', data: '' });
 						}
 					}}
 				>

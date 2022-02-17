@@ -301,6 +301,11 @@ const AddUser = props => {
 									<Button 
 										autoFocus
 										onClick={() => {
+											if( !studentID.length || !firstName.length ||
+											!lastName.length || !middleName.length ||
+											!password.length || !course.length ||
+											!yearSection.length ) return enqueueSnackbar('A field must be empty', { variant: 'error' });
+
 											axios.post(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/create-student`, { 
 												studentID, 
 												firstName, 
@@ -328,6 +333,11 @@ const AddUser = props => {
 									<Button 
 										autoFocus
 										onClick={() => {
+											if( !studentID.length || !firstName.length ||
+											!lastName.length || !middleName.length ||
+											!password.length || !course.length ||
+											!yearSection.length ) return enqueueSnackbar('A field must be empty', { variant: 'error' });
+
 											axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/edit-student/${ props._id }`, { 
 												studentID, 
 												firstName, 
