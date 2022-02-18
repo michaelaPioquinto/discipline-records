@@ -4,6 +4,8 @@ import uniqid from 'uniqid';
 
 import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
@@ -35,6 +37,20 @@ const Item = props => (
       <TableCell> { props.firstOffense } </TableCell>
       <TableCell> { props.secondOffense } </TableCell>
       <TableCell> { props.thirdOffense } </TableCell>
+  		<TableCell> 
+	      {
+	      	props?.role === 'admin'
+	      		? <>
+		      			<IconButton onClick={() => props?.handleEdit({ ...props })}>
+		      				<EditIcon/>
+				      	</IconButton>
+				      	<IconButton onClick={() => props?.handleDelete( props?._id )}>
+				      		<DeleteIcon/>
+				      	</IconButton>
+				      </>
+				    : null
+	      }
+  		</TableCell>
   </TableRow>
 );
 
@@ -62,10 +78,14 @@ const Violation = props => {
 
 	const handleAddButton = () => { 
 		setOpenForm( openForm => !openForm );
-	}	
+	}
 
 	const handleEditButton = () => { 
 		setEditForm({ isOpen: false, item: null });
+	}
+
+	const handleEdit = val => { 
+		setEditForm({ isOpen: true, item: val });
 	}
 
 	React.useEffect(() => {
@@ -84,7 +104,7 @@ const Violation = props => {
 		axios.get(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/violation-list`)
 		.then( res => {
 			if( res.data?.length ){
-				setViolationList( res.data.map( (viol, index) => ({ 
+				setViolationList( res.data.map((viol, index) => ({ 
 					id: index,
 					...viol
 				})));
@@ -92,6 +112,31 @@ const Violation = props => {
 		})
 		.catch( err => {
 			setTimeout(() => fetchViolationList(), 5000);
+		});
+	}
+
+	// const handleEditSave = ({ _id, violationName, firstOffense, secondOffense, thirdOffense }) => {
+	// 	axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/edit-violation/id/${_id}`, { 
+	// 		violationName, 
+	// 		firstOffense, 
+	// 		secondOffense, 
+	// 		thirdOffense
+	// 	})
+	// 	.then(() => {
+	// 		fetchViolationList();
+	// 	})
+	// 	.catch( err => {
+	// 		throw err;
+	// 	});
+	// }
+
+	const handleDelete = id => {
+		axios.delete(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/delete-violation/${id}`)
+		.then(() => {
+			fetchViolationList();
+		})
+		.catch( err => {
+			throw err;
 		});
 	}
 	
@@ -109,7 +154,15 @@ const Violation = props => {
 		let chunkSet = [];
 		const chunksLimit = 7;
 
-		const addToFilteredItems = item => filtered.push( <Item key={uniqid()} {...item}/> );
+		const addToFilteredItems = item => filtered.push(
+			<Item
+				handleDelete={handleDelete}
+				handleEdit={handleEdit}
+				role={props?.role} 
+				key={uniqid()} 
+				{...item}
+			/> 
+		);
 
 		violationList?.forEach?.( item => {
 			if( item?.violationName?.searchContain?.( search ) ){
@@ -151,7 +204,7 @@ const Violation = props => {
 	      <Table
 	        style={{ width: '100%' }}
 	      	maxHeight={ 500 }
-	        head={['Violation Name', 'First Offense', 'Second Offense', 'Third Offense']}
+	        head={['Violation Name', 'First Offense', 'Second Offense', 'Third Offense', 'Action']}
 	        content={list[ page - 1 ]}
 	      />
 			</div>
@@ -163,6 +216,7 @@ const Violation = props => {
 				editForm={editForm} 
 				setViolationList={setViolationList} 
 				setOpen={handleEditButton}
+				// save={val => handleEditSave( val )}
 				fetchViolationList={fetchViolationList}
 			/>
       { 

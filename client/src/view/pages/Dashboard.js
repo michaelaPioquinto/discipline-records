@@ -203,7 +203,13 @@ const Dashboard = props => {
           head={head}
           content={ items }
         />
-        <StudentForm restorePage={restorePage} setOpen={setOpen} item={editForm.item} isOpen={editForm.isOpen}/>
+        <StudentForm 
+          setOpen={setOpen} 
+          role={props?.role}
+          item={editForm.item} 
+          isOpen={editForm.isOpen}
+          restorePage={restorePage} 
+        />
         { 
           selected 
             ? <MakeReportForm 
@@ -212,6 +218,7 @@ const Dashboard = props => {
                 setOpen={() => setSelected( null )} 
                 isOpen={ selected ? true : false }
                 incidentNumber={ incidentNumber }
+
                 incrementIncidentNumber={incrementIncidentNumber}
               /> 
             : null 
@@ -497,12 +504,16 @@ const StudentForm = props => {
                       >
                         print
                       </Button>
-                      <Button 
-                        variant="outlined" 
-                        onClick={() => rep ? handleArchive?.( rep ) : null}
-                      >
-                        Archive
-                      </Button>
+                      {
+                        props?.role === 'adminstaff'
+                          ? <Button 
+                              variant="outlined" 
+                              onClick={() => rep ? handleArchive?.( rep ) : null}
+                            >
+                              Archive
+                            </Button>
+                          : null
+                      }
                     </div>
                     <Divider/>
                 </Stack>
