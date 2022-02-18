@@ -149,7 +149,7 @@ const Dashboard = props => {
   const fetchIncidentNumber = async() => {
     axios.get(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/incident-number`)
     .then( res => {
-      setIncidentNumber( res.data );
+      setIncidentNumber( res.data + 1 );
     })
     .catch( err => {
       throw err;
