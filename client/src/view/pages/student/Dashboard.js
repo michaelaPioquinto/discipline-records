@@ -237,7 +237,11 @@ const Report = props => {
 			</div>
 			<Divider sx={{ margin: '5px 0px 5px 0px', width: '100%' }}/>
 			<div className="col-12 p-3 d-flex justify-content-center align-items-center" style={{ height: 'fit-content' }}>
-				<SkeletonizedImage images={ props.images } width="500px" height="500px"/>
+				{
+					props?.images?.length
+						? <SkeletonizedImage images={ props.images } width="500px" height="500px"/>
+						: <h1>NO EVIDENCE</h1>
+				}
 			</div>
 		</div>	
 	);

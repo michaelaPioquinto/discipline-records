@@ -865,8 +865,8 @@ const MakeReportForm = props => {
         state.role.length && state.duty.length &&
         state.dateOfReport.length && state.timeOfIncident.length &&
         state.location.length && state.dutyHrs.length && 
-        state.specificAreaLocation.length && state.administrativeDecision.length &&
-        state.incidentDescription && ( state.minorProblemBehavior.length || state.majorProblemBehavior.length )
+        state.specificAreaLocation.length &&
+        state.incidentDescription
         ){
         axios.post(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/save-report`, state)
         .then( async res => {
@@ -898,6 +898,44 @@ const MakeReportForm = props => {
       }
 
       setButton({ msg: 'Submit', isDisabled: false });
+
+      // if( state.studentID.length && state.reportedBy.length && 
+      //   state.role.length && state.duty.length &&
+      //   state.dateOfReport.length && state.timeOfIncident.length &&
+      //   state.location.length && state.dutyHrs.length && 
+      //   state.specificAreaLocation.length && state.administrativeDecision.length &&
+      //   state.incidentDescription && ( state.minorProblemBehavior.length || state.majorProblemBehavior.length )
+      //   ){
+      //   axios.post(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/save-report`, state)
+      //   .then( async res => {
+      //     if( image ){
+      //       const formData = new FormData();
+
+      //       image.forEach( img => {
+      //         formData.append('reportImage[]', img );
+      //       });
+
+      //       try{
+      //         await axios.post(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/save-report-image`, formData)
+      //       }
+      //       catch( err ){
+      //         throw err;
+      //       }       
+      //     }
+
+      //     props?.incrementIncidentNumber?.();
+      //     enqueueSnackbar( res.data.message, { variant: 'success' });
+      //     props.setOpen();
+      //   })
+      //   .catch( err => {
+      //     enqueueSnackbar( err?.response?.data?.message ?? 'Please try again', { variant: 'error' });
+      //   });
+      // }
+      // else{
+      //   enqueueSnackbar( 'A required field is empty!', { variant: 'error' });
+      // }
+
+      // setButton({ msg: 'Submit', isDisabled: false });
     }, 1000);
   }
 
@@ -1131,7 +1169,7 @@ const MakeReportForm = props => {
 
             <div className="mt-5 row d-flex flex-row justify-content-center align-items-center mb-5">
               <div className="col-md-12 px-5 d-flex justify-content-start align-items-start">
-                <h5 className="text-uppercase"><b>problem behavior ( Required ):</b></h5>
+                <h5 className="text-uppercase"><b>problem behavior:</b></h5>
               </div>
 
 
@@ -1266,7 +1304,7 @@ const MakeReportForm = props => {
             </div>
             <div className="row container-fluid d-flex flex-column justify-content-center align-items-center">
               <div className="col-md-12 px-5 d-flex justify-content-start align-items-start">
-                <h5 className="text-uppercase"><b>administrative decision ( Required ):</b></h5>
+                <h5 className="text-uppercase"><b>administrative decision:</b></h5>
               </div>
               <div className="row col-md-12">
                 <div className="col-md-4">
