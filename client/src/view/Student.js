@@ -38,12 +38,13 @@ const Student = props => {
 						{ title: 'Dashboard', onClick: () => content.name === 'Dashboard' ? null : setContent({ name: 'Dashboard', cont: <Dashboard name={ props.tools.name } selectedYearAndSem={selectedYearAndSem}/> }) },
 						{ title: 'Handbook', onClick: () => content.name === 'Handbook' ? null : setContent({ name: 'Handbook', cont: <Handbook/> }) },
 					]}
-				/>
-				<React.Suspense 
-					fallback={<LinearProgress color="success"/>}
 				>
-					{ content.cont }
-				</React.Suspense>
+					<React.Suspense 
+						fallback={<LinearProgress color="success"/>}
+					>
+						{ content.cont }
+					</React.Suspense>
+				</Appbar>
 			</div>
 		</SchoolYearAndSemester.Provider>
 	)

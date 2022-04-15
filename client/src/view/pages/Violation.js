@@ -21,6 +21,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
+import TableV2 from '../../components/Table-v2';
 
 import { useSnackbar } from 'notistack';
 
@@ -103,12 +104,10 @@ const Violation = props => {
 	const fetchViolationList = async() => {
 		axios.get(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/violation-list`)
 		.then( res => {
-			if( res.data?.length ){
 				setViolationList( res.data.map((viol, index) => ({ 
 					id: index,
 					...viol
 				})));
-			}
 		})
 		.catch( err => {
 			setTimeout(() => fetchViolationList(), 5000);
@@ -149,42 +148,33 @@ const Violation = props => {
 	}, [violationList]);
 
 
-	React.useEffect(() => {
-		let filtered = [];
-		let chunkSet = [];
-		const chunksLimit = 7;
+	// React.useEffect(() => {
+	// 	let filtered = [];
+	// 	let chunkSet = [];
+	// 	const chunksLimit = 7;
 
-		const addToFilteredItems = item => filtered.push(
-			<Item
-				handleDelete={handleDelete}
-				handleEdit={handleEdit}
-				role={props?.role} 
-				key={uniqid()} 
-				{...item}
-			/> 
-		);
+	// 	const addToFilteredItems = item => filtered.push( item );
 
-		violationList?.forEach?.( item => {
-			if( item?.violationName?.searchContain?.( search ) ){
-				addToFilteredItems( item );
-			}
-		});
+	// 	violationList?.forEach?.( item => {
+	// 		if( item?.violationName?.searchContain?.( search ) ){
+	// 			addToFilteredItems( item );
+	// 		}
+	// 	});
 
-		if( violationList.length ){
-			let index = 0;
-			do{
-				const chunk = filtered.slice(index, index + chunksLimit);
+	// 	if( violationList.length ){
+	// 		let index = 0;
+	// 		do{
+	// 			const chunk = filtered.slice(index, index + chunksLimit);
 
-				chunkSet.push( chunk );	
+	// 			chunkSet.push( chunk );	
 
-				index += chunksLimit;
-			}
-			while( chunkSet.length < Math.floor( filtered.length / chunksLimit ) + (filtered % chunksLimit === 0 ? 0 : 1 ));
-		}
+	// 			index += chunksLimit;
+	// 		}
+	// 		while( chunkSet.length < Math.floor( filtered.length / chunksLimit ) + (filtered % chunksLimit === 0 ? 0 : 1 ));
+	// 	}
 
-		console.log( chunkSet );
-		setList([ ...chunkSet ]);
-	}, [violationList, search]);
+	// 	setList([ ...chunkSet ]);
+	// }, [violationList, search]);
 
 
 	React.useEffect(() => {
@@ -199,8 +189,8 @@ const Violation = props => {
 	}, [deleteViol]);
 
 	return(
-		<div style={{ width: '100%', height: '80vh', backgroundColor: 'white' }} className="d-flex flex-column">
-			<div style={{ height: '90%', width: '100%'}}>
+		<>
+			{/*<div style={{ height: '90%', width: '100%'}}>
 	      <Table
 	        style={{ width: '100%' }}
 	      	maxHeight={ 500 }
@@ -210,7 +200,87 @@ const Violation = props => {
 			</div>
       <div stly={{ width: '100%', height: '10%' }} className="d-flex justify-content-center align-items-center">
     		<Pagination count={!list?.[ list?.length - 1 ]?.length ? list?.length - 1 : list?.length} onChange={(_, value) => setPage( value )} page={page}/>
-      </div>
+      </div>*/}
+      <TableV2 
+      	items={list} 
+      	userType={props?.role} 
+      	setSearch={e => props?.getSearchContent?.( e )}
+      	handleEdit={handleEdit}
+      	handleDelete={handleDelete}
+      	generateRows={( index, style, props ) => {
+      		return (
+      			<div 
+	            id={uniqid()} 
+	            style={{ ...style }} 
+	            className="table-v2-row col-12 d-flex"
+	          > 
+	            <div 
+	              style={{
+	                borderRight: '1px solid rgba(0, 0, 0, 0.1)'
+	              }} 
+	              className={`${props?.userType === 'admin' ? 'col-3' : 'col-3'} d-flex align-items-center justify-content-center text-center"`}
+	            >
+	              { props?.items?.[ index ]?.violationName }
+	            </div>
+	            <div className={`${props?.userType === 'admin' ? 'col-2' : 'col-3'} d-flex align-items-center justify-content-center text-center"`}>
+	              { props?.items?.[ index ]?.firstOffense }
+	            </div>
+	            <div 
+	              style={{
+	                borderLeft: '1px solid rgba(0, 0, 0, 0.1)'
+	              }} 
+	              className={`${props?.userType === 'admin' ? 'col-2' : 'col-3'} d-flex align-items-center justify-content-center text-center"`}
+	            >
+	              { props?.items?.[ index ]?.secondOffense }
+	            </div>
+	            <div 
+	              style={{
+	                borderLeft: '1px solid rgba(0, 0, 0, 0.1)'
+	              }} 
+	              className={`${props?.userType === 'admin' ? 'col-3' : 'col-3'} d-flex align-items-center justify-content-center text-center"`}
+	            >
+	              { props?.items?.[ index ]?.thirdOffense }
+	            </div>
+	            {
+				      	props?.userType === 'admin'
+				      		? <div style={{ borderLeft: '1px solid rgba(0, 0, 0, 0.1)' }} className="col-2 d-flex align-items-center justify-content-center text-center">
+					      			<IconButton onClick={() => props?.handleEdit({ ...props.items[ index ] })}>
+					      				<EditIcon/>
+							      	</IconButton>
+							      	<IconButton onClick={() => props?.handleDelete( props?.items[ index ]['_id'] )}>
+							      		<DeleteIcon/>
+							      	</IconButton>
+							      </div>
+							    : null
+				      }
+	          </div>
+	        )
+      	}}
+
+      	generateHeader={props => (
+      		<>
+            <div className={`${props?.userType === 'admin' ? 'col-3' : 'col-3'} d-flex align-items-center justify-content-center text-center"`}>
+              <b>Violation Name</b>
+            </div>
+            <div className={`${props?.userType === 'admin' ? 'col-2' : 'col-3'} d-flex align-items-center justify-content-center text-center"`}>
+              <b>First Offense</b>
+            </div>
+            <div className={`${props?.userType === 'admin' ? 'col-2' : 'col-3'} d-flex align-items-center justify-content-center text-center"`}>
+              <b>Second Offense</b>
+            </div>
+            <div className={`${props?.userType === 'admin' ? 'col-3' : 'col-3'} d-flex align-items-center justify-content-center text-center"`}>
+              <b>Third Offense</b>
+            </div>
+            {
+              props?.userType === 'admin'
+                ? <div className="col-2 d-flex align-items-center justify-content-center">
+	                  <b>Action</b>
+	                </div>
+                : null
+            }
+          </>
+      	)}
+      />
       <ValidationEditForm 
 				setDelete={setDeleteViol} 
 				editForm={editForm} 
@@ -238,7 +308,7 @@ const Violation = props => {
 						</div>
 					: null
 			}
-		</div>
+		</>
 	)
 }
 

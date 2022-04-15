@@ -27,10 +27,11 @@ import TableCell from '@mui/material/TableCell';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
-
 import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
 
+import TableV2 from '../../../components/Table-v2';
+import InputAdornment from '../../../components/InputAdornment';
 import Table from '../../../components/Table';
 import SearchContext from '../../../context/SearchContext';
 
@@ -57,7 +58,7 @@ const Item = props => {
 	}
 
 	const debouncedChangeStatus = debounce(changeStatus, 500);
-	const displayRole = userRole => userRole === 'sysadmin' ? 'SYSTEM ADMINISTRATOR' : 'ADMINISTRATOR STAFF';
+	const displayRole = userRole => userRole === 'adminstaff' ? 'ADMINISTRATOR STAFF' : userRole;
 
 	return(
 		<TableRow 
@@ -102,16 +103,16 @@ const Accounts = props => {
 	React.useEffect(() => {
 		let renderedItem = [];
 
+		// <Item 
+		// 	key={uniqid()} 
+		// 	onDoubleClick ={handleEditForm} 
+		// 	fetchAccounts={fetchAccounts}
+		// 	{...acc}
+		// />
+
 		accounts.forEach( acc => {
 			if( acc.username.searchContain( search ) ){
-				renderedItem.push( 
-					<Item 
-						key={uniqid()} 
-						onDoubleClick ={handleEditForm} 
-						fetchAccounts={fetchAccounts}
-						{...acc}
-					/> 
-				);
+				renderedItem.push( acc );
 			}
 		});
 
@@ -132,12 +133,91 @@ const Accounts = props => {
 	}, [addForm]);
 
 	return(
-		<div style={{ width: '100%', height: '80vh' }} className="p-3 text-center">
-			<Table
+		<>
+			{/*<Table
 				maxHeight={ 500 }
 				style={{ width: '100%' }}
 				head={['Username', 'Role', 'Status']}
 				content={ items }
+			/>*/}
+			<TableV2
+				items={items}
+				// onDoubleClick={() => props.onDoubleClick({ editingMode: true, ...props })}
+				onDoubleClick={handleEditForm} 
+				fetchAccounts={fetchAccounts}
+				generateRows={( index, style, props ) => {
+
+					const handleStatus = e => {
+						e.stopPropagation();
+						debouncedChangeStatus( e );
+					}
+
+					const changeStatus = async e => {
+						axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/change-user-status`, { 
+							username: props?.items?.[ index ]?.username, 
+							status: props?.items?.[ index ]?.status === 'deactivated' ? 'activated' : 'deactivated' 
+						})
+						.then(() => props.fetchAccounts())
+						.catch( err => {
+							setTimeout(() => changeStatus(), 5000);
+						});
+					}
+
+					const debouncedChangeStatus = debounce(changeStatus, 100);
+
+					return(
+						<div 
+				            id={uniqid()} 
+				            style={{ ...style }} 
+				            className="table-v2-row col-12 d-flex"
+							onDoubleClick={() => props.onDoubleClick({ editingMode: true, ...props.items[ index ] })}
+						> 
+				            <div 
+				              style={{
+				                borderRight: '1px solid rgba(0, 0, 0, 0.1)'
+				              }} 
+				              className={`col-4 d-flex align-items-center justify-content-center text-center"`}
+				            >
+				              { props?.items?.[ index ]?.username }
+				            </div>
+				            <div className={`col-4 d-flex align-items-center justify-content-center text-center"`}>
+				              { props?.items?.[ index ]?.role }
+				            </div>
+				            <div 
+				              style={{
+				                borderLeft: '1px solid rgba(0, 0, 0, 0.1)'
+				              }} 
+				              className={`col-4 text-capitalize d-flex align-items-center justify-content-center text-center"`}
+				            >
+								<FormControlLabel
+									onDoubleClick={e => e.stopPropagation()} 
+									control={
+										<Switch 
+											checked={props?.items?.[ index ]?.status === 'activated'} 
+											onDoubleClick={e => e.stopPropagation()} 
+											onChange={handleStatus}
+										/>
+									} 
+									label={ props?.items?.[ index ]?.status }
+								/>
+				            </div>
+			          </div>
+			         )
+				}}
+
+				generateHeader={props => (
+					<>
+			            <div className={`col-4 d-flex align-items-center justify-content-center text-center"`}>
+			              <b>Username</b>
+			            </div>
+			            <div className={`col-4 d-flex align-items-center justify-content-center text-center"`}>
+			              <b>Role</b>
+			            </div>
+			            <div className={`col-4 d-flex align-items-center justify-content-center text-center"`}>
+			              <b>Status</b>
+			            </div>
+			          </>
+				)}
 			/>
 			<AddUser 
 				open={addForm} 
@@ -146,12 +226,12 @@ const Accounts = props => {
 				fetchAccounts={fetchAccounts} 
 				{ ...selectedItem }
 			/>
-			<div style={{ position: 'absolute', bottom: '15px', right: '15px' }}>
+			<div style={{ position: 'fixed', bottom: '15px', right: '15px' }}>
 				<IconButton style={{ backgroundColor: 'rgba(25, 25, 21, 0.9)' }} onClick={handleAddForm}>
 					<AddIcon style={{ color: 'white' }}/>
 				</IconButton>
 			</div>
-		</div>
+		</>
 	);
 }
 
@@ -166,7 +246,7 @@ const AddUser = props => {
 	const [username, setUsername] = React.useState( props.username ?? '' );
 	const [email, setEmail] = React.useState( props.email ?? '' );
 	const [password, setPassword] = React.useState( props.password ?? '' );
-	const [role, setRole] = React.useState( props.role ?? 'sysadmin' );
+	const [role, setRole] = React.useState( props.role ?? 'adminstaff' );
 	const [status, setStatus] = React.useState( props.status ?? 'activated' );
 
 	const { enqueueSnackbar } = useSnackbar();
@@ -219,7 +299,7 @@ const AddUser = props => {
 			setUsername( '' );
 			setPassword( '' );
 			setEmail( '' );
-			setRole( 'sysadmin' );
+			setRole( 'adminstaff' );
 			setStatus( 'activated' );	
 		}
 	}, [props]);
@@ -260,7 +340,7 @@ const AddUser = props => {
 		    					username={username ?? ''}
 		    					password={password ?? ''}
 		    					email={email ?? ''}
-		    					role={role ?? 'sysadmin'}
+		    					role={role ?? 'adminstaff'}
 		    					handleFirstName={handleFirstName}
 	    						handleLastName={handleLastName}
 	    						handleMiddleName={handleMiddleName}
@@ -406,23 +486,24 @@ const GenerateInputFields = props => (
 			value={props.email}
 			onChange={props.handleEmail}
 		/>
-		<TextField 
-			id="outlined-basic" 
-			label="password" 
+		<InputAdornment 
+			label="Password" 
+			type="password"
 			variant="outlined"
 			value={props.password}
+			for="password"
 			onChange={props.handlePassword}
 		/>
 		<FormControl fullWidth>
 		  <InputLabel id="demo-simple-select-label">ROLE</InputLabel>
 		  <Select
+			disabled
 		    labelId="demo-simple-select-label"
 		    id="demo-simple-select"
-		    value={props.role}
+		    value={props.role ?? 'adminstaff'}
 		    label="ROLE"
 		    onChange={props.handleRole}
 		  >
-		    <MenuItem sx={{ display: 'block !important' }} value={"sysadmin"}>System Administrator</MenuItem>
 		    <MenuItem sx={{ display: 'block !important' }} value={"adminstaff"}>Administrator Staff</MenuItem>
 		  </Select>
 		</FormControl>

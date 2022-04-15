@@ -33,6 +33,7 @@ import AddIcon from '@mui/icons-material/Add';
 
 import Table from '../../../components/Table';
 import SearchContext from '../../../context/SearchContext';
+import TableV2 from '../../../components/Table-v2';
 
 const Item = props => {
 	const [status, setStatus] = React.useState( props.status === 'activated' ? true : false );
@@ -102,12 +103,13 @@ const Accounts = props => {
 		accounts.forEach( acc => {
 			if( acc.username.searchContain( search ) ){
 				renderedItem.push( 
-					<Item 
-						key={uniqid()} 
-						onDoubleClick ={handleEditForm} 
-						fetchAccounts={fetchAccounts}
-						{...acc}
-					/> 
+					acc
+					// <Item 
+					// 	key={uniqid()} 
+					// 	onDoubleClick ={handleEditForm} 
+					// 	fetchAccounts={fetchAccounts}
+					// 	{...acc}
+					// /> 
 				);
 			}
 		});
@@ -129,12 +131,90 @@ const Accounts = props => {
 	}, [addForm]);
 
 	return(
-		<div style={{ width: '100%', height: '80vh' }} className="p-3 text-center">
-			<Table
+		<>
+			{/*<Table
 				maxHeight={ 500 }
 				style={{ width: '100%' }}
 				head={['Username', 'Role', 'Status']}
 				content={ items }
+			/>*/}
+			<TableV2
+				items={items}
+				onDoubleClick={handleEditForm} 
+				fetchAccounts={fetchAccounts}
+				generateRows={( index, style, props ) => {
+
+					const handleStatus = e => {
+						e.stopPropagation();
+						debouncedChangeStatus( e );
+					}
+
+					const changeStatus = async e => {
+						axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/change-user-status`, { 
+							username: props?.items?.[ index ]?.username, 
+							status: props?.items?.[ index ]?.status === 'deactivated' ? 'activated' : 'deactivated' 
+						})
+						.then(() => props.fetchAccounts())
+						.catch( err => {
+							setTimeout(() => changeStatus(), 5000);
+						});
+					}
+
+					const debouncedChangeStatus = debounce(changeStatus, 100);
+
+					return(
+						<div 
+				            id={uniqid()} 
+				            style={{ ...style }} 
+				            className="table-v2-row col-12 d-flex"
+							onDoubleClick={() => props.onDoubleClick({ editingMode: true, ...props.items[ index ] })}
+						> 
+				            <div 
+				              style={{
+				                borderRight: '1px solid rgba(0, 0, 0, 0.1)'
+				              }} 
+				              className={`col-4 d-flex align-items-center justify-content-center text-center"`}
+				            >
+				              { props?.items?.[ index ]?.username }
+				            </div>
+				            <div className={`col-4 d-flex align-items-center justify-content-center text-center"`}>
+				              { props?.items?.[ index ]?.role }
+				            </div>
+				            <div 
+				              style={{
+				                borderLeft: '1px solid rgba(0, 0, 0, 0.1)'
+				              }} 
+				              className={`col-4 text-capitalize d-flex align-items-center justify-content-center text-center"`}
+				            >
+								<FormControlLabel
+									onDoubleClick={e => e.stopPropagation()} 
+									control={
+										<Switch 
+											checked={props?.items?.[ index ]?.status === 'activated'} 
+											onDoubleClick={e => e.stopPropagation()} 
+											onChange={handleStatus}
+										/>
+									} 
+									label={ props?.items?.[ index ]?.status }
+								/>
+				            </div>
+			          </div>
+			         )
+				}}
+
+				generateHeader={props => (
+					<>
+			            <div className={`col-4 d-flex align-items-center justify-content-center text-center"`}>
+			              <b>Username</b>
+			            </div>
+			            <div className={`col-4 d-flex align-items-center justify-content-center text-center"`}>
+			              <b>Role</b>
+			            </div>
+			            <div className={`col-4 d-flex align-items-center justify-content-center text-center"`}>
+			              <b>Status</b>
+			            </div>
+			          </>
+				)}
 			/>
 			<AddUser 
 				open={addForm} 
@@ -148,7 +228,7 @@ const Accounts = props => {
 					<AddIcon style={{ color: 'white' }}/>
 				</IconButton>
 			</div>
-		</div>
+		</>
 	);
 }
 

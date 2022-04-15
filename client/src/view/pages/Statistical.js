@@ -120,8 +120,8 @@ const Statistical = props => {
 	}, [data]);
 
 	return(
-		<div style={{ width: '100%', height: '100%' }} className="p-0 m-0 d-flex flex-row justify-content-center align-items-start">
-			<div className="p-0 m-0 col-md-5 d-flex justify-content-center align-items-center">
+		<div style={{ width: '100%', height: '100%' }} className="p-2 m-0 d-flex flex-row justify-content-center align-items-start">
+			<div className="p-0 m-0 col-md-6 d-flex justify-content-center align-items-center">
 				<TableContainer component={Paper}>
 			      <Table aria-label="simple table">
 			        <TableHead>
@@ -138,11 +138,11 @@ const Statistical = props => {
 			      </Table>
 			    </TableContainer>
 			</div>
-			<div style={{ height: '100%' }} className="p-0 m-0 col-md-7 d-flex justify-content-center align-items-center">
+			<div style={{ height: '100%' }} className="p-0 m-0 col-md-6 d-flex justify-content-center align-items-center">
 				{
 					data && datasets && labels && 
 					(
-						<Paper elevation={10} sx={{ width: '80vw', height: '100%', padding: '10px' }}>
+						<Paper elevation={10} sx={{ width: '80%', height: '100%', padding: '10px' }}>
 							<Line
 								options={options}
 								data={{

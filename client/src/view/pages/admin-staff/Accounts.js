@@ -40,6 +40,8 @@ import ArchiveIcon from '@mui/icons-material/Archive';
 import SearchContext from '../../../context/SearchContext';
 
 import Table from '../../../components/Table';
+import TableV2 from '../../../components/Table-v2';
+import InputAdornment from '../../../components/InputAdornment';
 
 
 const Item = props => {
@@ -116,6 +118,12 @@ const Accounts = props => {
 	React.useEffect(() => {
 		let renderedItem = [];
 
+		// <Item 
+		// 	key={uniqid()} 
+		// 	onDoubleClick ={handleEditForm} 
+		// 	fetchAccounts={fetchAccounts}
+		// 	{...acc}
+		// /> 
 		accounts.forEach( acc => {
 			if( acc?.status === 'activated' ){
 				if( acc?.studentID?.searchContain?.( search ) ||
@@ -125,14 +133,7 @@ const Accounts = props => {
 					acc?.yearSection?.toLowerCase?.()?.includes?.( search?.toLowerCase?.() ) ||
 					acc?.course?.toLowerCase?.()?.includes?.( search?.toLowerCase?.() )
 				 ){
-					renderedItem.push( 
-						<Item 
-							key={uniqid()} 
-							onDoubleClick ={handleEditForm} 
-							fetchAccounts={fetchAccounts}
-							{...acc}
-						/> 
-					);
+					renderedItem.push( acc );
 				}
 			}
 		});
@@ -154,13 +155,96 @@ const Accounts = props => {
 	}, [addForm]);
 
 	return(
-		<div style={{ width: '100%', height: '80vh', overflow: 'hidden'}} className="p-3 text-center">
-			<Table
+		<>
+			<TableV2
+				items={items}
+				onDoubleClick={handleEditForm} 
+				fetchAccounts={fetchAccounts}
+				generateRows={( index, style, props ) => {
+					const handleStatus = () => {
+						changeStatus();
+					}
+
+					const changeStatus = async () => {
+						axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/change-student-status`, { studentID : props.items[ index ].studentID })
+						.then(res => {
+							props.fetchAccounts();
+						})
+						.catch( err => {
+							throw err;
+							// setTimeout(() => changeStatus(), 5000);
+						});
+					}
+
+					const debouncedChangeStatus = debounce(changeStatus, 100);
+
+					return(
+						<div 
+				            id={uniqid()} 
+				            style={{ ...style }} 
+				            className="table-v2-row col-12 d-flex"
+							onDoubleClick={() => props.onDoubleClick({ editingMode: true, ...props.items[ index ] })}
+						> 
+				            <div 
+				              style={{
+				                borderRight: '1px solid rgba(0, 0, 0, 0.1)'
+				              }} 
+				              className={`col-3 d-flex align-items-center justify-content-center text-center"`}
+				            >
+				              { props?.items?.[ index ]?.studentID }
+				            </div>
+				            <div 
+				            	style={{
+					                borderRight: '1px solid rgba(0, 0, 0, 0.1)'
+					              }} 
+					            className={`col-3 d-flex align-items-center justify-content-center text-capitalize text-center"`}
+					        >
+				              { `${props.items[ index ].lastname}, ${props.items[ index ].firstName} ${props.items[ index ].middleName}` }
+				            </div>
+				            <div className={`col-3 d-flex align-items-center justify-content-center text-center"`}>
+				              { `${props.items[ index ].course} ${props.items[ index ].yearSection}` }
+				            </div>
+				            <div 
+				              style={{
+				                borderLeft: '1px solid rgba(0, 0, 0, 0.1)'
+				              }} 
+				              className={`col-3 text-capitalize d-flex align-items-center justify-content-center text-center"`}
+				            >
+								<Tooltip arrow placement="bottom" title="Deactivate">
+									<span>
+										<IconButton onDoubleClick={e => e.stopPropagation()} onClick={() => debouncedChangeStatus()}>
+											<ArchiveIcon/>
+										</IconButton>
+									</span>
+								</Tooltip>
+				            </div>
+			          </div>
+			         )
+				}}
+
+				generateHeader={props => (
+					<>
+			            <div className={`col-3 d-flex align-items-center justify-content-center text-center"`}>
+			              <b>Student ID</b>
+			            </div>
+			            <div className={`col-3 d-flex align-items-center justify-content-center text-center"`}>
+			              <b>Full name</b>
+			            </div>
+			            <div className={`col-3 d-flex align-items-center justify-content-center text-center"`}>
+			              <b>Course / Year & Section</b>
+			            </div>
+			            <div className={`col-3 d-flex align-items-center justify-content-center text-center"`}>
+			              <b>Status</b>
+			            </div>
+			          </>
+				)}
+			/>
+			{/*<Table
 				maxHeight={ 500 }
 				style={{ width: '100%' }}
 				head={['ID', 'Full Name', 'Course', 'Year & Section', 'Action']}
 				content={ items }
-			/>
+			/>*/}
 			<AddUser
 				open={addForm} 
 				setOpen={handleAddForm}
@@ -173,7 +257,7 @@ const Accounts = props => {
 					<AddIcon style={{ color: 'white' }}/>
 				</IconButton>
 			</div>
-		</div>
+		</>
 	);
 }
 
@@ -400,10 +484,11 @@ const GenerateInputFields = props => (
 			value={props.middleName}
 			onChange={props.handleMiddleName}
 		/>
-		<TextField 
-			id="outlined-basic" 
-			label="password" 
+		<InputAdornment
+			type="password"
+			label="Password" 
 			variant="outlined"
+			for="password"
 			value={props.password}
 			onChange={props.handlePassword}
 		/>

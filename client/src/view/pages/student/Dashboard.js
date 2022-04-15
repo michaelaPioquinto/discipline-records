@@ -30,6 +30,20 @@ const CustomizedTextField = styled( TextField )({
 	backgroundColor: 'rgba(255, 255, 255, 0.9)',
 	border: 'none',
 	borderRadius: '5px',
+	color: 'black',
+	".css-10botns-MuiInputBase-input-MuiFilledInput-input.Mui-disabled": {
+		"-webkit-text-fill-color": 'rgba(0, 0, 0, 0.8)'
+	},
+
+	".Mui-disabled": {
+		color: 'rgba(0, 0, 0, 0.7) !important'
+	},
+	// "input:disabled": {
+	// 	color: 'rgba(0, 0, 0, 0.8) !important'
+	// },
+	// ".MuiFilledInput-input": {
+	// 	color: 'red !important'
+	// }
 });
 
 const Dashboard = props => {
@@ -102,6 +116,7 @@ const Dashboard = props => {
 		}
 	}, [studentData, selectedYearAndSem]);
 
+	React.useEffect(() => console.log( dutyHrs[ reportPage - 1 ] ), [dutyHrs, reportPage]);
 	const renderFullName = () => {
 		if( (!studentData?.student?.firstName && !studentData?.student?.lastname ) || !studentData?.student?.middleName )
 			return 'N/A';
@@ -117,7 +132,7 @@ const Dashboard = props => {
 
 	return(
 		<div style={{ width: '100%', height: '100%', overflow: 'auto' }} className="m-0 py-5 px-2 d-flex flex-column justify-content-start align-items-center">
-			<div className="col-12 pl-2">
+			<div className="col-12 pl-2 text-capitalize">
 				<h1 style={{ letterSpacing: '5px' }}><b>Hello! {  (studentData?.student?.lastname ?? '') +', '+  (studentData?.student?.firstName ?? '') }</b></h1>
 			</div>
 			<div className="col-12">
@@ -129,9 +144,15 @@ const Dashboard = props => {
 			</div>
 
 			<div className="row col-12 d-flex flex-row justify-content-between">
-				<div className="col-md-12 my-2 d-flex justify-content-center align-items-center">
-					<SkeletonizedTextfield width="100%" label="Student Name" data={studentData ? renderFullName() : null} />
-				</div>
+				{/*<div className="col-md-12 my-2 d-flex justify-content-center align-items-center text-capitalize">
+					<CustomizedTextField 
+						disabled 
+						label="Student Name" 
+						variant="filled"
+						value={studentData ? renderFullName() : null}
+						sx={{ width: '100%' }}
+					/>
+				</div>*/}
 				{/*<div className="col-md-3 my-2 d-flex justify-content-center align-items-center">
 					<SkeletonizedTextfield label="Middle Name" data={studentData?.student?.middleName}/>
 				</div>
@@ -141,30 +162,58 @@ const Dashboard = props => {
 			</div>
 
 			<div className="row col-12 d-flex flex-row justify-content-between">
-				<div className="col-md-3 my-2 d-flex justify-content-center align-items-center">
-					<SkeletonizedTextfield label="Student ID" data={studentData?.student?.studentID} />
+				<div className="col-lg-3 my-2 d-flex justify-content-center align-items-center">
+					<CustomizedTextField 
+						disabled 
+						label="Student Name" 
+						variant="filled"
+						value={studentData ? renderFullName() : ''}
+						sx={{ width: '100%' }}
+					/>
 				</div>
-				<div className="col-md-3 my-2 d-flex justify-content-center align-items-center">
-					<SkeletonizedTextfield label="Course" data={ studentData?.student?.course } />
+				<div className="col-lg-3 my-2 d-flex justify-content-center align-items-center">
+					<CustomizedTextField 
+						disabled 
+						label="Course" 
+						variant="filled"
+						value={studentData?.student?.course ?? ''}
+						sx={{ width: '100%' }}
+					/>
 				</div>
-				<div className="col-md-3 my-2 d-flex justify-content-center align-items-center">
-					<SkeletonizedTextfield label="Year & Section" data={ studentData?.student?.yearSection } />
+				<div className="col-lg-3 my-2 d-flex justify-content-center align-items-center">
+					<CustomizedTextField 
+						disabled 
+						label="Year & Section"
+						variant="filled"
+						value={studentData?.student?.yearSection ?? ''}
+						sx={{ width: '100%' }}
+					/>
 				</div>
-				<div className="col-md-3 my-2 d-flex justify-content-center align-items-center">
-					<SkeletonizedTextfield label="Semester" data={ studentData?.student?.semester } />
-				</div>
-				<div className="col-md-5 my-2 d-flex justify-content-center align-items-center">
-					<SkeletonizedTextfield 
-						width="100%"
-						label="Duty / Duties" 
-						data={ duties?.[ reportPage - 1 ] }
+				<div className="col-lg-3 my-2 d-flex justify-content-center align-items-center">
+					<CustomizedTextField 
+						disabled 
+						label="Semester" 
+						variant="filled"
+						value={studentData?.student?.semester ?? ''}
+						sx={{ width: '100%' }}
 					/>
 				</div>
 				<div className="col-md-5 my-2 d-flex justify-content-center align-items-center">
-					<SkeletonizedTextfield 
-						width="100%"
-						label="Duty Hours" 
-						data={ dutyHrs?.[ reportPage - 1 ] }
+					<CustomizedTextField 
+						disabled 
+						label="Duty / Duties"
+						variant="filled"
+						value={duties?.[ reportPage - 1 ] ?? ''}
+						sx={{ width: '100%' }}
+					/>
+				</div>
+				<div className="col-md-5 my-2 d-flex justify-content-center align-items-center">
+					<CustomizedTextField 
+						disabled 
+						label="Duty Hours"
+						variant="filled"
+						value={dutyHrs?.[ reportPage - 1 ] ?? ''}
+						sx={{ width: '100%' }}
 					/>
 				</div>
 			</div>
@@ -177,7 +226,7 @@ const Dashboard = props => {
 				</Root>
 			</div>
 			<div className="col-12 d-flex justify-content-center align-items-center">
-				<div style={{ position: 'relative', width: '60%', minWidth: '350px' }} className="py-5 m-0">
+				<div style={{ position: 'relative', width: '100%', minWidth: '200px' }} className="pt-5 m-0">
 					{
 						studentData && studentData?.report?.length
 							? (
@@ -294,7 +343,7 @@ const findSemester = data => {
 
 const SkeletonizedTextfield = props => {
 	const [state, setState] = React.useState('loading');
-	const [content, setContent] = React.useState( <Skeleton width={ props.width ?? '7cm' } height="100px" /> );
+	const [content, setContent] = React.useState( <Skeleton width={ props.width ?? '100%' } height="100px" /> );
 
 	React.useEffect(() => {
 		if( props.data ){
@@ -318,9 +367,10 @@ const SkeletonizedTextfield = props => {
 						<CustomizedTextField 
 							disabled={ props.disabled ?? true } 
 							label={props.label} 
-							variant="filled" 
-							defaultValue={typeof props?.data === Array ? props?.data?.join?.(',') : props?.data} 
-							sx={{ width: props.width ?? '7cm', border: 'none' }}
+							variant="filled"
+							value={props?.data}
+							// defaultValue={typeof props?.data === Array ? props?.data?.join?.(',') : props?.data} 
+							sx={{ width: props.width ?? '100%', border: 'none' }}
 						/>
 					));
 				}, 500);
@@ -331,15 +381,16 @@ const SkeletonizedTextfield = props => {
 						disabled={ props.disabled ?? true } 
 						label={props.label} 
 						variant="filled" 
-						defaultValue={typeof props?.data === Array ? props?.data?.join?.(',') : props?.data} 
-						sx={{ width: props.width ?? '7cm', border: 'none' }}
+						value={props?.data}
+						// defaultValue={typeof props?.data === Array ? props?.data?.join?.(',') : props?.data} 
+						sx={{ width: props.width ?? '100%', border: 'none' }}
 					/>
 				));
 			}
 
 		}
 		else if( state === 'loading' ){
-			setContent(() => <Skeleton width={ props.width ?? '7cm' } height="100px" /> );
+			setContent(() => <Skeleton width={ props.width ?? '100%' } height="100px" /> );
 		}
 		else{
 			setContent(() => (
@@ -347,8 +398,8 @@ const SkeletonizedTextfield = props => {
 					disabled={ props.disabled ?? true } 
 					label={props.label} 
 					variant="filled" 
-					defaultValue="N/A" 
-					sx={{ width: props.width ?? '7cm', border: 'none' }}
+					// defaultValue="N/A" 
+					sx={{ width: props.width ?? '100%', border: 'none' }}
 				/>
 			));
 		}
@@ -373,6 +424,7 @@ const SkeletonizedImage = props => {
               props?.images?.map( image => (
                   <ImageListItem key={uniqid()}>
                       <img
+                      	className="image-list-item-img"
                         src={image}
                         // srcSet={`${item.img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
                         alt=""

@@ -32,6 +32,7 @@ import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 
+import TableV2 from '../../../components/Table-v2';
 import Table from '../../../components/Table';
 import SearchContext from '../../../context/SearchContext';
 
@@ -118,18 +119,17 @@ const Accounts = props => {
 	React.useEffect(() => {
 		let renderedItem = [];
 
+		// <Item 
+		// 	key={uniqid()} 
+		// 	onDoubleClick ={handleEditForm} 
+		// 	fetchSchoolYears={fetchSchoolYears}
+		// 	handleDelete={handleDelete}
+		// 	{...acc}
+		// /> 
 		accounts?.sort?.(( ac1, ac2 ) => Number(ac1?.schoolYear?.split?.('-')?.[ 0 ]) - Number(ac2?.schoolYear?.split?.('-')?.[ 0 ]))
 		accounts.forEach( acc => {
 			if( acc.schoolYear.searchContain( search ) ){
-				renderedItem.push( 
-					<Item 
-						key={uniqid()} 
-						onDoubleClick ={handleEditForm} 
-						fetchSchoolYears={fetchSchoolYears}
-						handleDelete={handleDelete}
-						{...acc}
-					/> 
-				);
+				renderedItem.push( acc );
 			}
 		});
 
@@ -151,12 +151,87 @@ const Accounts = props => {
 	}, [editForm]);
 
 	return(
-		<div style={{ width: '100%', height: '80vh' }} className="p-3 text-center">
-			<Table
-				maxHeight={ 500 }
-				style={{ width: '100%' }}
-				head={['School Year', 'Semester', 'Status', 'Action']}
-				content={ items }
+		<>
+			<TableV2
+				items={items}
+				onDoubleClick ={handleEditForm} 
+				fetchSchoolYears={fetchSchoolYears}
+				handleDelete={handleDelete}
+				generateRows={( index, style, props ) => {
+
+					const handleStatus = e => {
+						e.stopPropagation();
+						debouncedChangeStatus( e );
+					}
+
+					const changeStatus = async e => {
+						axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/change-school-year-semester-status/${ props?.items?.[ index ]['_id'] }`, 
+							{ 
+								status:  props?.items?.[ index ]?.status === 'deactivated' ? 'activated' : 'deactivated' 
+							}
+						)
+						.then(() => props.fetchSchoolYears())
+						.catch( err => {
+							throw err;
+							// setTimeout(() => changeStatus(), 5000);
+						});
+					}
+
+					const debouncedChangeStatus = debounce(changeStatus, 100);
+
+					return(
+						<div 
+				            id={uniqid()} 
+				            style={{ ...style }} 
+				            className="table-v2-row col-12 d-flex"
+							onDoubleClick={() => props.onDoubleClick({ editingMode: true, ...props.items[ index ] })}
+						> 
+				            <div 
+				              style={{
+				                borderRight: '1px solid rgba(0, 0, 0, 0.1)'
+				              }} 
+				              className={`col-4 d-flex align-items-center justify-content-center text-center"`}
+				            >
+				              { props?.items?.[ index ]?.schoolYear }
+				            </div>
+				            <div className={`col-4 d-flex align-items-center justify-content-center text-center"`}>
+				              { props?.items?.[ index ]?.semester }
+				            </div>
+				            <div 
+				              style={{
+				                borderLeft: '1px solid rgba(0, 0, 0, 0.1)'
+				              }} 
+				              className={`col-4 text-capitalize d-flex align-items-center justify-content-center text-center"`}
+				            >
+								<FormControlLabel
+									onDoubleClick={e => e.stopPropagation()} 
+									control={
+										<Switch 
+											checked={props?.items?.[ index ]?.status === 'activated'} 
+											onDoubleClick={e => e.stopPropagation()} 
+											onChange={handleStatus}
+										/>
+									} 
+									label={ props?.items?.[ index ]?.status }
+								/>
+				            </div>
+			          </div>
+			         )
+				}}
+
+				generateHeader={props => (
+					<>
+			            <div className={`col-4 d-flex align-items-center justify-content-center text-center"`}>
+			              <b>School Year</b>
+			            </div>
+			            <div className={`col-4 d-flex align-items-center justify-content-center text-center"`}>
+			              <b>Semester</b>
+			            </div>
+			            <div className={`col-4 d-flex align-items-center justify-content-center text-center"`}>
+			              <b>Status</b>
+			            </div>
+			          </>
+				)}
 			/>
 			{
 				selectedItem
@@ -180,7 +255,7 @@ const Accounts = props => {
 					<AddIcon style={{ color: 'white' }}/>
 				</IconButton>
 			</div>
-		</div>
+		</>
 	);
 }
 

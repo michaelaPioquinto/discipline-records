@@ -1,16 +1,42 @@
+@font-face{
+  font-family: Poppins-Black;
+  src: url('../fonts/Poppins/Poppins-Black.ttf');
+}
+
+@font-face{
+  font-family: Poppins-Light;
+  src: url('../fonts/Poppins/Poppins-Light.ttf');
+}
+
+@font-face{
+  font-family: Poppins-Medium;
+  src: url('../fonts/Poppins/Poppins-Medium.ttf');
+}
+
+@font-face{
+  font-family: Poppins;
+  src: url('../fonts/Poppins/Poppins-Regular.ttf');
+}
+
+@font-face{
+  font-family: Poppins-SemiBold;
+  src: url('../fonts/Poppins/Poppins-SemiBold.ttf');
+}
+
+
 body {
-  background-image: url("../images/cct-picture.jpg");
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
   image-rendering: optimizeSpeed;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+:root{
+  --text-color: #656565;
+  --bg-color: white;
+  font-size: 15px;
+}
+
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
@@ -34,20 +60,145 @@ code {
 }
 
 .App{
-  background-color: rgba(255, 255, 255, 0.5);
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
+
   width:  100vw;
   height:  100vh;
   overflow: hidden;
+
+  font-family: Poppins;
 }
 
+.image-list-item-img{
+  width: calc( 100% / 3 );
+  max-width: 450px;
+  min-width: 250px;
+}
+
+/*
+       App bar
+*/
+.app-bar{
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+  background-color: #D0C8C8;
+  transition: .2s ease-in-out;
+}
+
+.app-bar img{
+  width: 150px;
+  height: 150px;
+}
+
+.app-bar-left{
+  width: 250px;
+  min-width: 250px;
+
+  transition: width 5s ease-in-out;
+}
+
+.app-bar-right{
+  flex-grow: 1;
+  min-width: 250px;
+}
+
+.app-bar-title{
+  height: 50px;
+  text-transform: capitalize;
+  font-family: Poppins-Black;
+  color: white;
+
+  letter-spacing: 1px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.app-bar-title::before{
+  content: "CCT";
+  font-size: 1.8em;
+  color: #717171;
+}
+
+.app-bar-content-box{
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+
+  overflow: hidden;
+  border-radius: 15px;
+  box-shadow: -5px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.app-bar-menu-label{
+  color: var( --text-color );
+}
+
+.app-bar-menu-button{
+  display: none;
+}
+
+.app-bar-menu-bar{
+  width: 95%;
+  min-width: 300px;
+  height: 40px;
+
+  background-color: #E5E5E5;
+  border-radius: 50px;
+  margin: auto;
+}
+
+.app-bar-search-bar{
+  position: relative;
+  border-radius: 50px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+
+  width: 150px;
+  height: 30px;
+}
+
+.app-bar-search-bar-input{
+  width: 100%;
+  min-width: 100px;
+  outline: none;
+  border: none;
+  background-color: transparent;
+}
+
+.app-bar-search-bar-input-2{
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100%;
+
+
+  border-radius: 50px;
+  border: 1px solid transparent;
+
+  user-select: none;
+  pointer-events: none;
+  transition: border .4s ease-in-out;
+}
+
+.app-bar-search-bar-input:focus + .app-bar-search-bar-input-2{
+  border: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+/*_______________________________________*/
+
 #discipline-logo, #cct-logo{
-  image-rendering: optimizeSpeed;
+  image-rendering: optimizeQuality;
 }
 
 #cct-logo{
-  image-rendering: optimizeSpeed;
-  width: 130px;
-  height: 130px;
+  width: 100%;
+  min-width: 250px;
+  max-width: 350px;
 }
 
 #discipline-logo{
@@ -56,8 +207,31 @@ code {
 }
 
 .sign-in{
-  background-color: #ffeaa7;
+  font-family: Poppins-SemiBold;
   color: black !important;
+  width: 100%;
+  height: 100%;
+}
+
+.sign-in-box{
+  letter-spacing: 1px;
+  width: 100%;
+  min-width: 200px;
+  max-width: 1000px;
+
+  height: 100%;
+
+  font-size: 1rem;
+  color: var( --text-color );
+}
+
+.sign-in-box b{
+  color: black;
+  font-family: Poppins-Black;
+}
+
+.sign-in-fields{
+  align-items: flex-start;
 }
 
 .item{
@@ -88,3 +262,117 @@ code {
 
 
 
+/*=======================
+
+        Table-v2
+
+========================*/
+.table-v2{
+  width: 100%;
+  height: 100%;
+}
+
+.table-v2-row{
+  transition: .2s ease-in-out;
+}
+
+.table-v2-row:nth-child( odd ){
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.table-v2-row:hover{
+  background-color: rgba(0, 0, 0, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  user-select: none;
+}
+
+.table-v2-header{
+  height: fit-content;
+}
+
+/*
+.v1-row{
+  font-size: 13px;
+}
+
+.account-view{
+  width: 80%;
+  min-width: 1000px;
+  
+  height: 80%;
+  min-height: 500px;
+
+  background-color: white;
+}
+
+.account-view-top-bar, .account-view-bot-bar{
+  color: var( --text-color );
+  height:  10%;
+}
+
+.account-view-button {
+  width: fit-content;
+  transition: .8s ease-in-out;
+}
+
+
+.account-view-button:hover{
+  cursor: pointer;
+
+  width: 150px;
+  border-radius: 25px;
+  background-color: var( --bg-color );
+}
+
+.account-view-item{
+  color: #8e8e8e;
+}
+
+.account-view-item:hover{
+  background-color: #e8e8e8 !important;
+  display: flex;
+  align-content: center;
+}
+*/
+
+@media screen and (max-width: 1000px){
+  .sign-in-box{
+    justify-content: start;
+    flex-direction: row-reverse !important;
+    text-align: center;
+  }
+
+  .app-bar-menu-button{
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .sign-in-fields{
+    justify-content: center;
+    align-items: center;
+  }
+
+  .app-bar-left{
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 999999;
+
+    height: 100%;
+    background-color: #D0C8C8;
+    box-shadow: 5px 0 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .app-bar-title{
+    display: none !important;
+  }
+
+  .app-bar{
+    background-color: white;
+  }
+
+  .app-bar-content-box{
+    border-radius: 0;
+  }
+}

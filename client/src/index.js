@@ -11,9 +11,9 @@ import { Switch } from 'react-router-dom'
 ReactDOM.render(
   <React.StrictMode>
     <Router basename="/">
-		<Route path="/">
-	      <Authentication/>
-		</Route>
+  		<Route path="/">
+  	      <Authentication/>
+  		</Route>
     </Router>
   </React.StrictMode>,
   document.getElementById('root')

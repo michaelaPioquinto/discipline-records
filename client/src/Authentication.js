@@ -281,45 +281,63 @@ const SignIn = props => {
 		}
 	}, [unameField, passField]);
 
+	React.useEffect(() => {
+		if( errMsg ){
+			setTimeout(() => setErrMsg( null ), 2000);
+		}
+	}, [errMsg]);
+
 	return(
-		<div 
-			style={{ width: '100%', height: '100vh' }} 
-			className="sign-in d-flex flex-column justify-content-center align-items-center"
-		>
-			<img id="cct-logo" style={{ width: '200px', height: '200px' }} src={cctLogo} alt="cct-logo"/>
-			{
-				errMsg 
-					? <Alert variant="outlined" severity="error">
-						{ errMsg }
-					</Alert> 
-					: null
-			}
-			<div className="mb-3 d-flex justify-content-center">
-				<h2 className="text-uppercase text-center" style={{ letterSpacing: '3px', color: 'rgba(0, 0, 0, 0.4)'}}>
-					discpline records management
-				</h2>
-			</div>
-			<br/>
-			<div className="container-fluid d-flex justify-content-center align-items-center">
+		<div className="sign-in d-flex justify-content-center align-items-center">
+			<div className="sign-in-box row d-flex flex-row-reverse align-items-center">
+				{
+					errMsg 
+						? <div
+								style={{
+									position: 'absolute',
+									top: '5%',
+									left: '0%'
+								}}
+							>
+								<Alert variant="filled" severity="error">
+									{ errMsg }
+								</Alert> 
+							</div>
+						: null
+				}
+				<div 
+					style={{ height: 'fit-content', borderLeft: '1px solid #c8cac9' }}
+					className="col-lg-6 d-flex justify-content-center align-items-center"
+				>
+					<img 
+						id="cct-logo" 
+						src={cctLogo} 
+						alt="cct-logo"
+					/>
+				</div>
+				
+				<div style={{ height: '250px' }} className="col-lg-6 d-flex justify-content-center">
 					<div 
-						style={{
-							backgroundColor: 'white',
-							width: 'fit-content',
+						style={{ 
 							height: '100%',
-							border: '1px solid rgba(0, 0, 0, 0.3)',
-							borderRadius: '10px'
+							width: 'fit-content'
 						}} 
-						className="p-3 d-flex flex-column justify-content-around align-items-center"
+						className="sign-in-fields d-flex flex-column justify-content-around"
 					>
-						<div className="mb-3 d-flex justify-content-center">
-							<p style={{ letterSpacing: '3px', color: 'rgba(0, 0, 0, 0.7)', fontSize: '14px'}}>Sign in to start your session</p>
-						</div>
-						<TextField ref={unameField} sx={{width: '6cm' }} onChange={setUsername} id="sign-in-uname" label="username" variant="outlined" />
-						<Divider/>
-						<FormControl sx={{ m: 3, width: '6cm' }} variant="outlined">
+						<h5 className="text-capitalize"><b>CCT</b> discipline record management</h5>
+						<TextField 
+							ref={unameField}
+							sx={{ width: '6cm' }} 
+							size="small" 
+							label="Username" 
+							onChange={setUsername} 
+							id="sign-in-uname"
+						/>
+						<FormControl size="small" sx={{ width: '6cm' }} variant="outlined">
 							<InputLabel htmlFor="sign-in-pass">Password</InputLabel>
 							<OutlinedInput 
 								ref={passField}
+								label="Password"
 								id="outlined-adornment-password" 
 								type={ user.showPassword ? "text" : "password" }
 								value={ user.password } 
@@ -337,23 +355,93 @@ const SignIn = props => {
 		              </InputAdornment>
 		            }
 							/>
-						</FormControl>
-						<div className="d-flex flex-row justify-content-between align-items-center"> 
-							<Button 
-								onClick={handleSignin} 
-								disabled={ btnMsg === 'loading' ? true : false } 
-								sx={{borderColor: 'black', color: 'white', backgroundColor: '#dd4b39'}} 
-								variant="filled"
-								autoFocus
-							> 
-								{ btnMsg } 
-							</Button>
-						</div>
-					</div>			
+						</FormControl>				
+						<Button 
+							onClick={handleSignin} 
+							disabled={ btnMsg === 'loading' ? true : false } 
+							sx={{ width: '6cm' }}
+							variant="outlined"
+							color="error"
+						> 
+							{ btnMsg } 
+						</Button>		
+					</div>
+				</div>
 			</div>
 		</div>
 	);
 }
+
+
+// 		<div 
+// 			style={{ width: '100%', height: '100vh' }} 
+// 			className="sign-in d-flex flex-column justify-content-center align-items-center"
+// 		>
+// 			{
+// 				errMsg 
+// 					? <Alert variant="outlined" severity="error">
+// 						{ errMsg }
+// 					</Alert> 
+// 					: null
+// 			}
+// 			<div className="mb-3 d-flex justify-content-center">
+// 				<h2 className="text-uppercase text-center" style={{ letterSpacing: '3px', color: 'rgba(0, 0, 0, 0.4)'}}>
+// 					discpline records management
+// 				</h2>
+// 			</div>
+// 			<br/>
+// 			<div className="container-fluid d-flex justify-content-center align-items-center">
+// 					<div 
+// 						style={{
+// 							backgroundColor: 'white',
+// 							width: 'fit-content',
+// 							height: '100%',
+// 							border: '1px solid rgba(0, 0, 0, 0.3)',
+// 							borderRadius: '10px'
+// 						}} 
+// 						className="p-3 d-flex flex-column justify-content-around align-items-center"
+// 					>
+// 						<div className="mb-3 d-flex justify-content-center">
+// 							<p style={{ letterSpacing: '3px', color: 'rgba(0, 0, 0, 0.7)', fontSize: '14px'}}>Sign in to start your session</p>
+// 						</div>
+// 						<TextField ref={unameField} sx={{width: '6cm' }} onChange={setUsername} id="sign-in-uname" label="username" variant="outlined" />
+// 						<Divider/>
+// 						<FormControl sx={{ m: 3, width: '6cm' }} variant="outlined">
+// 							<InputLabel htmlFor="sign-in-pass">Password</InputLabel>
+// 							<OutlinedInput 
+// 								ref={passField}
+// 								id="outlined-adornment-password" 
+// 								type={ user.showPassword ? "text" : "password" }
+// 								value={ user.password } 
+// 								onChange={setPassword} 
+// 								endAdornment={
+// 		              <InputAdornment position="end">
+// 		                <IconButton
+// 		                  aria-label="toggle password visibility"
+// 		                  onClick={handleClickShowPassword}
+// 		                  onMouseDown={handleMouseDownPassword}
+// 		                  edge="end"
+// 		                >
+// 		                  { user.showPassword ? <VisibilityOff sx={{ color: 'black' }}/> : <Visibility sx={{ color: 'black' }}/> }
+// 		                </IconButton>
+// 		              </InputAdornment>
+// 		            }
+// 							/>
+// 						</FormControl>
+// 						<div className="d-flex flex-row justify-content-between align-items-center"> 
+// 							<Button 
+// 								onClick={handleSignin} 
+// 								disabled={ btnMsg === 'loading' ? true : false } 
+// 								sx={{borderColor: 'black', color: 'white', backgroundColor: '#dd4b39'}} 
+// 								variant="filled"
+// 								autoFocus
+// 							> 
+// 								{ btnMsg } 
+// 							</Button>
+// 						</div>
+// 					</div>			
+// 			</div>
+// 		</div>
 
 const PageNotFound = () => (
 	<div className="d-flex justify-content-center align-items-center">

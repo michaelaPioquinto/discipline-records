@@ -157,7 +157,7 @@ const Archived = props => {
 
 	return(
 		<div style={{ width: '100%', height: '100%' }} className="d-flex justify-content-center align-items-start">
-			<Paper sx={{ width: '95%', height: '80%', marginTop: '10px' }} elevation={5}>
+			<Paper sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }} elevation={5}>
 				<div style={{ height: '90%' }}>
 					<Table
 						maxHeight="100%"
@@ -174,7 +174,7 @@ const Archived = props => {
 						content={renderedReports[ page - 1 ]}
 					/>
 				</div>
-				<div style={{ width: '100%', height: '10%' }} className="row py-2 px-1">
+				<div style={{ width: '100%' }} className="row flex-grow-1 py-2 px-1 d-flex flex-row justify-content-center align-items-center">
 					<div className="col-8">
 						<Pagination count={ !renderedReports?.[ renderedReports?.length - 1 ]?.length ? renderedReports?.length - 1 : renderedReports?.length } page={ page } onChange={(_, value) => setPage( value )}/>
 					</div>

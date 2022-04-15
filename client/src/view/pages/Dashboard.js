@@ -5,7 +5,7 @@ import uniqid from 'uniqid';
 import debounce from 'lodash.debounce';
 
 import PrintPaper from '../../components/PrintPaper';
-
+import TimeField from 'react-simple-timefield';
 import Typography from '@mui/material/Typography';
 import Autocomplete from '@mui/material/Autocomplete';
 import Checkbox from '@mui/material/Checkbox';
@@ -51,6 +51,9 @@ import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
+
+import TableV2 from '../../components/Table-v2';
+import InputAdornment from '../../components/InputAdornment';
 
 const Root = styled('div')(({ theme }) => ({
   width: '100%',
@@ -128,22 +131,22 @@ const Dashboard = props => {
 
   React.useEffect(() => {
     let renderedItem = [];
+    
+    //          <Item
+    //             key={uniqid()}
+    //             openReport={props?.role === 'adminstaff'}
+    //             onClick={setEditForm}
+    //             onReport={data => setSelected( data )}
+    //             {...acc}
+    //           />
 
     accounts.forEach( acc => {
       if( acc.status === 'activated' && acc.studentID.searchContain( search ) ){
-        renderedItem.push( 
-          <Item
-            key={uniqid()}
-            openReport={props?.role === 'adminstaff'}
-            onClick={setEditForm}
-            onReport={data => setSelected( data )}
-            {...acc}
-          />
-        );
+        renderedItem.push( acc );
       }
     });
 
-    setItems([...renderedItem]);
+    setItems([...renderedItem ]);
   }, [accounts, search]);
 
   const fetchIncidentNumber = async() => {
@@ -193,38 +196,139 @@ const Dashboard = props => {
   React.useEffect(() => fetchIncidentNumber(), []);
   React.useEffect(() => getSchoolYearAndSemester(), []);
 
-
 	return(
-		<div style={{ width: '100%', height: 'fit-content' }}>
-      <div style={{ width: '100%', height: '100%' }} className="d-flex flex-column justify-content-center align-items-start p-1">
-        <Table
-          style={{ width: '100%' }}
-          maxHeight={ 500 }
-          head={head}
-          content={ items }
-        />
-        <StudentForm 
-          setOpen={setOpen} 
-          role={props?.role}
-          item={editForm.item} 
-          isOpen={editForm.isOpen}
-          restorePage={restorePage} 
-        />
-        { 
-          selected 
-            ? <MakeReportForm 
-                semester={semester}
-                data={selected} 
-                setOpen={() => setSelected( null )} 
-                isOpen={ selected ? true : false }
-                incidentNumber={ incidentNumber }
+    <>
+      <TableV2 
+        items={items} 
+        onClick={setEditForm} 
+        userType={props?.role} 
+        setSearch={e => props?.getSearchContent?.( e )}
+        generateRows={( index, style, props ) => {
+          const renderFullName = item => {
+              if( !item?.firstName && !item?.lastname )
+                return null;
 
-                incrementIncidentNumber={incrementIncidentNumber}
-              /> 
-            : null 
-        }
-      </div>
-		</div>
+              const middleName = item?.middleName ?? '';
+
+              return (
+              item?.firstName + ' ' +
+              middleName + ' ' +
+              item?.lastname 
+              );
+          }
+
+          const renderCourseYrSection = item => {
+            if( !item?.course || !item?.yearSection)
+              return null;
+
+            return item?.course + ' ' + item?.yearSection;
+          }
+          return (
+            <div 
+              id={uniqid()} 
+              style={{ ...style }} 
+              onClick={() => props.onClick({ isOpen: true, item: { ...props?.items?.[ index ] }})}
+              className="table-v2-row col-12 d-flex"
+            > 
+              <div 
+                style={{
+                  borderRight: '1px solid rgba(0, 0, 0, 0.1)'
+                }} 
+                className={`${props?.userType === 'adminstaff' ? 'col-3' : 'col-4'} d-flex align-items-center justify-content-center text-center"`}
+              >
+                { props?.items?.[ index ]?.studentID }
+              </div>
+              <div className={`${props?.userType === 'adminstaff' ? 'col-3' : 'col-4'} d-flex align-items-center justify-content-center text-center"`}>
+                { renderFullName( props?.items?.[ index ] ) }
+              </div>
+              <div 
+                style={{
+                  borderLeft: '1px solid rgba(0, 0, 0, 0.1)'
+                }} 
+                className={`${props?.userType === 'adminstaff' ? 'col-3' : 'col-4'} d-flex align-items-center justify-content-center text-center"`}
+              >
+                { renderCourseYrSection( props?.items?.[ index ] ) }
+              </div>
+              {
+                props?.userType === 'adminstaff'
+                  ? <div 
+                      style={{
+                        borderLeft: '1px solid rgba(0, 0, 0, 0.1)'
+                      }} 
+                      className="col-3 d-flex align-items-center justify-content-center"
+                    >
+                      <Button 
+                        onClick={e => {
+                          e.stopPropagation();
+                          setSelected({ ...props?.items?.[ index ] });
+                        }}
+                        onDoubleClick={e => e.stopPropagation()}
+                        variant="outlined" 
+                        size="small"
+                        color="error"
+                        startIcon={<ReportGmailerrorredIcon/>}
+                      >
+                        add incident
+                      </Button>             
+                  </div>
+                  : null
+              }
+            </div>
+          )
+        }}
+        generateHeader={props => (
+          <>
+            <div className={`${props?.userType === 'adminstaff' ? 'col-3' : 'col-4'} d-flex align-items-center justify-content-center text-center"`}>
+              <b>Student ID</b>
+            </div>
+            <div className={`${props?.userType === 'adminstaff' ? 'col-3' : 'col-4'} d-flex align-items-center justify-content-center text-center"`}>
+              <b>Full Name</b>
+            </div>
+            <div className={`${props?.userType === 'adminstaff' ? 'col-3' : 'col-4'} d-flex align-items-center justify-content-center text-center"`}>
+              <b>Year Section</b>
+            </div>
+            {
+              props?.userType === 'adminstaff'
+                ? <div className="col-3 d-flex align-items-center justify-content-center">
+                  <b>Action</b>
+                </div>
+                : null
+            }
+          </>
+        )}
+      />
+      <StudentForm 
+        setOpen={setOpen} 
+        role={props?.role}
+        item={editForm.item} 
+        isOpen={editForm.isOpen}
+        restorePage={restorePage} 
+      />
+      { 
+        selected 
+          ? <MakeReportForm 
+              semester={semester}
+              data={selected} 
+              setOpen={() => setSelected( null )} 
+              isOpen={ selected ? true : false }
+              incidentNumber={ incidentNumber }
+              incrementIncidentNumber={incrementIncidentNumber}
+            /> 
+          : null 
+      }
+  		{/*<div style={{ width: '100%', height: 'fit-content' }}>
+        <div style={{ width: '100%', height: '100%' }} className="d-flex flex-column justify-content-center align-items-start p-1">
+          <Table
+            style={{ width: '100%' }}
+            maxHeight={ 500 }
+            head={head}
+            content={ items }
+          />
+          
+        </div>
+  		</div>
+    */}
+    </>
 	);
 }
 
@@ -654,6 +758,7 @@ const MakeReportForm = props => {
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   const [button, setButton] = React.useState({ msg: 'Submit', isDisabled: false });
   
+  const [currentTime, setCurrentTime] = React.useState('AM');
   const [otherMinor, setOtherMinor] = React.useState( '' );
   const [otherMajor, setOtherMajor] = React.useState( '' );
   const [otherDecision, setOtherDecision] = React.useState( '' );
@@ -692,7 +797,7 @@ const MakeReportForm = props => {
     studentName: renderFullName() ?? '', 
     dateOfIncident: '', 
     courseYrSection: renderCourseYrSection() ?? '', 
-    timeOfIncident: '', 
+    timeOfIncident: `00:00 ${currentTime}`, 
     location: '',
     dutyHrs: '0', 
     specificAreaLocation: '', 
@@ -1058,7 +1163,12 @@ const MakeReportForm = props => {
               <div className="col-md-6 d-flex justify-content-center align-items-center my-5">
                 <Stack spacing={2}>
                   <TextField required disabled sx={{ width: '300px' }} defaultValue={state.courseYrSection} onChange={e => dispatch({ type: 'courseYrSection', data: e.target.value })} label="Course / Yr / Section" variant="standard"/>
-                  <TextField required sx={{ width: '300px' }} onChange={e => dispatch({ type: 'timeOfIncident', data: e.target.value })} label="Time of Incident" variant="standard"/>
+                  <TimeField 
+                    value="00:00" 
+                    input={<InputAdornment required getTime={time => setCurrentTime( time )} for="time" label="Time of Incident"/>} 
+                    onChange={(e, value) => dispatch({ type: 'timeOfIncident', data: `${value} ${currentTime}` })} 
+                  />
+                  {/*<InputAdornment required adornment="AM/PM" sx={{ width: '300px' }} onChange={e => dispatch({ type: 'timeOfIncident', data: e.target.value })} label="Time of Incident" variant="standard"/>*/}
                 </Stack>
               </div>
             </div>
@@ -1080,7 +1190,12 @@ const MakeReportForm = props => {
               </div>
 
               <div className="col-md-12">
-                <TextField sx={{ width: '300px', margin: '10px' }} defaultValue={state.dutyHrs} required onChange={e => dispatch({ type: 'dutyHrs', data: e.target.value })} label="Duty Time" variant="standard"/>
+                <br/>
+                <TimeField 
+                  value="00:00" 
+                  input={<InputAdornment width="80vw" required adornment="Hours / Minutes" placeholder="0" value={state.dutyHrs} label="Duty Time" variant="standard"/>} 
+                  onChange={(e, value) => dispatch({ type: 'dutyHrs', data: value })} 
+                />
               </div>
 
               <div className="col-md-12 d-flex justify-content-center align-items-center">

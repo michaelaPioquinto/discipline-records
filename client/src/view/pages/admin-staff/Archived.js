@@ -16,7 +16,7 @@ import UnarchiveIcon from '@mui/icons-material/Unarchive';
 import Tooltip from '@mui/material/Tooltip';
 
 import SearchContext from '../../../context/SearchContext';
-
+import TableV2 from '../../../components/Table-v2';
 
 const Student = props => {
 	const { handleUnarchive } = props;
@@ -76,9 +76,10 @@ const Archived = props => {
 	React.useEffect(() => {
 		let renderedItem = [];
 
+		// <Student key={uniqid()} {...student} handleUnarchive={handleUnarchive}/>
 		accounts.forEach( student => {
 			if( student.studentID.searchContain( search ) ){
-				renderedItem.push( <Student key={uniqid()} {...student} handleUnarchive={handleUnarchive}/> );
+				renderedItem.push( student );
 			}
 		});
 
@@ -125,20 +126,84 @@ const Archived = props => {
 	React.useEffect(() => getArchived(), []);
 
 	return(
-		<div style={{ width: '100%', height: '100%' }} className="d-flex justify-content-center align-items-start">
-			<Paper sx={{ width: '95%', height: '80%', marginTop: '10px' }} elevation={5}>
-				<Stack direction="column" justifyContent="center" alignItems="center">
-					<div className="col-12">
-						<Table
-							maxHeight={330}
-							style={{ width: '100%' }}
-							head={['Student ID', 'First Name', 'Last Name', 'Middle Name', 'Course', 'Action']}
-							content={[...renderedStudents]}
-						/>
-					</div>
-				</Stack>
-			</Paper>
-		</div>
+		<>
+			<TableV2
+				items={renderedStudents}
+				handleUnarchive={handleUnarchive}
+				generateRows={( index, style, props ) => {
+					return(
+						<div 
+				            id={uniqid()} 
+				            style={{ ...style }} 
+				            className="table-v2-row col-12 d-flex"
+						> 
+				            <div 
+				              style={{
+				                borderRight: '1px solid rgba(0, 0, 0, 0.1)'
+				              }} 
+				              className={`col-3 d-flex align-items-center justify-content-center text-center"`}
+				            >
+				              { props?.items?.[ index ]?.studentID }
+				            </div>
+				            <div 
+				            	style={{
+					                borderRight: '1px solid rgba(0, 0, 0, 0.1)'
+					              }} 
+				            	className={`col-3 d-flex align-items-center justify-content-center text-capitalize text-center"`}
+				            >
+				              { `${props.items[ index ].lastname}, ${props.items[ index ].firstName} ${props.items[ index ].middleName}` }
+				            </div>
+				            <div className={`col-3 d-flex align-items-center justify-content-center text-center"`}>
+				              { `${props.items[ index ].course} ${props.items[ index ].yearSection}` }
+				            </div>
+				            <div 
+				              style={{
+				                borderLeft: '1px solid rgba(0, 0, 0, 0.1)'
+				              }} 
+				              className={`col-3 text-capitalize d-flex align-items-center justify-content-center text-center"`}
+				            >
+								<Tooltip arrow placement="bottom" title="Activate">
+									<IconButton onClick={() => props.handleUnarchive( props.items[ index ].studentID )}>
+										<UnarchiveIcon/>
+									</IconButton>
+								</Tooltip>
+				            </div>
+			          </div>
+			         )
+				}}
+
+				generateHeader={props => (
+					<>
+			            <div className={`col-3 d-flex align-items-center justify-content-center text-center"`}>
+			              <b>Student ID</b>
+			            </div>
+			            <div className={`col-3 d-flex align-items-center justify-content-center text-center"`}>
+			              <b>Full name</b>
+			            </div>
+			            <div className={`col-3 d-flex align-items-center justify-content-center text-center"`}>
+			              <b>Course / Year & Section</b>
+			            </div>
+			            <div className={`col-3 d-flex align-items-center justify-content-center text-center"`}>
+			              <b>Status</b>
+			            </div>
+			          </>
+				)}
+			/>
+		</>
+		// <div style={{ width: '100%', height: '100%' }} className="d-flex justify-content-center align-items-start">
+		// 	<Paper sx={{ width: '95%', height: '80%', marginTop: '10px' }} elevation={5}>
+		// 		<Stack direction="column" justifyContent="center" alignItems="center">
+		// 			<div className="col-12">
+		// 				<Table
+		// 					maxHeight={330}
+		// 					style={{ width: '100%' }}
+		// 					head={['Student ID', 'First Name', 'Last Name', 'Middle Name', 'Course', 'Action']}
+		// 					content={[...renderedStudents]}
+		// 				/>
+		// 			</div>
+		// 		</Stack>
+		// 	</Paper>
+		// </div>
 	);
 }
 

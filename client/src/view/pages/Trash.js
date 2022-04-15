@@ -22,6 +22,7 @@ import Tooltip from '@mui/material/Tooltip';
 import Stack from '@mui/material/Stack';
 
 import SearchContext from '../../context/SearchContext';
+import TableV2 from '../../components/Table-v2';
 
 import { styled } from '@mui/material/styles';
 
@@ -34,71 +35,56 @@ const Root = styled('div')(({ theme }) => ({
 }));
 
 
-const Item = props => {
-  const [bgColor, setBgColor] = React.useState('white');
-	const { enqueueSnackbar } = useSnackbar();
+// const Item = props => {
+//   const [bgColor, setBgColor] = React.useState('white');
+// 	const { enqueueSnackbar } = useSnackbar();
 
-	const renderRole = role => {
-		switch( role ){
-			case 'admin':
-				return 'administrator'.toUpperCase();
 
-			case 'sysadmin':
-				return 'system administrator'.toUpperCase();
+//   return(
+//     <TableRow
+//       sx={{ backgroundColor: bgColor, transition: '.1s ease-in-out' }} 
+//       onPointerEnter={() => setBgColor('rgba(0, 0, 0, 0.2)')}
+//       onPointerLeave={() => setBgColor('white')}
+//     >
+//       <TableCell> { props.username } </TableCell>
+//       <TableCell> { renderRole(props.role) } </TableCell>
+//       <TableCell>
+// 				<Tooltip title="Restore" arrow placement="bottom">
+// 					<IconButton onClick={() => {
+// 							axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/restore-trash/id/${ props._id }`)
+// 							.then(() => {
+// 								props.refresh();
+// 								enqueueSnackbar('Successfully restored a trash', { variant: 'success' });		
+// 							})
+// 							.catch( err => {
+// 								enqueueSnackbar( err?.response?.data?.message ?? 'Please try again!', { variant: 'error' });
+// 							});
+// 						}}
+// 					>
+// 						<RestoreFromTrashIcon/>
+// 					</IconButton>
+// 				</Tooltip>
 
-			case 'adminstaff':
-				return 'administrator staff'.toUpperCase();
+// 				<Tooltip title="Delete permanently" arrow placement="bottom">
+// 					<IconButton onClick={() => {
+// 							axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/delete-trash-permanently/id/${ props._id }`)
+// 							.then(() => {
+// 								props.refresh();
+// 								enqueueSnackbar('Successfully removed a trash', { variant: 'success' });		
+// 							})
+// 							.catch( err => {
+// 								enqueueSnackbar( err?.response?.data?.message ?? 'Please try again!', { variant: 'error' });
+// 							});
+// 						}}
+// 					>
+// 						<DeleteIcon/>
+// 					</IconButton>
+// 				</Tooltip>
 
-			default:
-				return 'NO ROLE'.toUpperCase();				
-		}
-	}
-
-  return(
-    <TableRow
-      sx={{ backgroundColor: bgColor, transition: '.1s ease-in-out' }} 
-      onPointerEnter={() => setBgColor('rgba(0, 0, 0, 0.2)')}
-      onPointerLeave={() => setBgColor('white')}
-    >
-      <TableCell> { props.username } </TableCell>
-      <TableCell> { renderRole(props.role) } </TableCell>
-      <TableCell>
-				<Tooltip title="Restore" arrow placement="bottom">
-					<IconButton onClick={() => {
-							axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/restore-trash/id/${ props._id }`)
-							.then(() => {
-								props.refresh();
-								enqueueSnackbar('Successfully restored a trash', { variant: 'success' });		
-							})
-							.catch( err => {
-								enqueueSnackbar( err?.response?.data?.message ?? 'Please try again!', { variant: 'error' });
-							});
-						}}
-					>
-						<RestoreFromTrashIcon/>
-					</IconButton>
-				</Tooltip>
-
-				<Tooltip title="Delete permanently" arrow placement="bottom">
-					<IconButton onClick={() => {
-							axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/delete-trash-permanently/id/${ props._id }`)
-							.then(() => {
-								props.refresh();
-								enqueueSnackbar('Successfully removed a trash', { variant: 'success' });		
-							})
-							.catch( err => {
-								enqueueSnackbar( err?.response?.data?.message ?? 'Please try again!', { variant: 'error' });
-							});
-						}}
-					>
-						<DeleteIcon/>
-					</IconButton>
-				</Tooltip>
-
-      </TableCell>
-    </TableRow>
-  );
-}
+//       </TableCell>
+//     </TableRow>
+//   );
+// }
 
 
 const Trash = props => {
@@ -107,6 +93,7 @@ const Trash = props => {
   const [items, setItems] = React.useState( [] );
 
   const search = React.useContext( SearchContext );
+	const { enqueueSnackbar } = useSnackbar();
   
 	const fetchStudentData = async() => {
     axios.get(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/trash/role/${ props.role }`)
@@ -121,18 +108,33 @@ const Trash = props => {
     });
   }
 
+  const renderRole = role => {
+		switch( role ){
+			case 'admin':
+				return 'administrator'.toUpperCase();
+
+			case 'sysadmin':
+				return 'system administrator'.toUpperCase();
+
+			case 'adminstaff':
+				return 'administrator staff'.toUpperCase();
+
+			default:
+				return 'NO ROLE';				
+		}
+	}
+
   React.useEffect(() => {
     let renderedItem = [];
 
+    // <Item
+    //   key={uniqid()}
+    //   {...acc}
+    //   refresh={fetchStudentData}
+    // />
     accounts.forEach( acc => {
       if( acc.username.searchContain( search ) ){
-        renderedItem.push( 
-          <Item
-            key={uniqid()}
-            {...acc}
-            refresh={fetchStudentData}
-          />
-        );
+        renderedItem.push( acc );
       }
     });
 
@@ -146,16 +148,66 @@ const Trash = props => {
 
 
 	return(
-		<div style={{ width: '100%', height: 'fit-content' }}>
-      <div style={{ width: '100%', height: '100%' }} className="d-flex flex-column justify-content-center align-items-start p-1">
-        <Table
-          style={{ width: '100%' }}
-          maxHeight={ 500 }
-          head={['Username', 'Role', 'Action']}
-          content={ items }
-        />
-      </div>
-		</div>
+    	<TableV2
+    		items={items}
+    		refresh={fetchStudentData}
+    		generateRows={(index, style, props) => (
+    			<div 
+            id={uniqid()} 
+            style={{ ...style }} 
+            className="table-v2-row col-12 d-flex"
+          > 
+          	<div className="col-4 d-flex justify-content-center align-items-center"> { props?.items?.[ index ]?.username } </div>
+			      <div className="col-4 d-flex justify-content-center align-items-center"> { renderRole(props?.items?.[ index ]?.role) } </div>
+			      <div className="col-4 d-flex justify-content-center align-items-center">
+				      <Tooltip title="Restore" arrow placement="bottom">
+								<IconButton onClick={() => {
+										axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/restore-trash/id/${ props?.items?.[ index ]?.['_id'] }`)
+										.then(() => {
+											props.refresh();
+											enqueueSnackbar('Successfully restored a trash', { variant: 'success' });		
+										})
+										.catch( err => {
+											enqueueSnackbar( err?.response?.data?.message ?? 'Please try again!', { variant: 'error' });
+										});
+									}}
+								>
+									<RestoreFromTrashIcon/>
+								</IconButton>
+							</Tooltip>
+				      <Tooltip title="Restore" arrow placement="bottom">
+								<IconButton onClick={() => {
+										axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/delete-trash-permanently/id/${ props?.items?.[ index ]?.['_id'] }`)
+										.then(() => {
+											props.refresh();
+											enqueueSnackbar('Successfully removed a trash', { variant: 'success' });		
+										})
+										.catch( err => {
+											enqueueSnackbar( err?.response?.data?.message ?? 'Please try again!', { variant: 'error' });
+										});
+									}}
+								>
+									<DeleteIcon/>
+								</IconButton>
+							</Tooltip>
+						</div>
+    			</div>
+  			)}
+
+  			generateHeader={() => (
+  				<>
+            <div className="col-4 d-flex justify-content-center align-items-center">
+              <b>Username</b>
+            </div>
+            <div className="col-4 d-flex justify-content-center align-items-center">
+              <b>Role</b>
+            </div>
+            <div className="col-4 d-flex justify-content-center align-items-center">
+              <b>Actions</b>
+            </div>
+          </>
+  			)}
+    	/>
 	);
 }
 

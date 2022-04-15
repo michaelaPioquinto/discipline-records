@@ -18,7 +18,7 @@ const Trash = React.lazy(() => import('./pages/Trash'));
 
 const Admin = props => {
 	const [searchContent, setSearchContent] = React.useState('');
-	const [content, setContent] = React.useState({ name: 'Dashboard', cont: <Dashboard search={searchContent}/> });
+	const [content, setContent] = React.useState({ name: 'Dashboard', cont: <Dashboard search={searchContent} getSearchContent={e => handleSearch( e )}/> });
 
 	const handleSearch = e => {
 		debounce(() => setSearchContent( e.target.value ), 100)();
@@ -32,22 +32,23 @@ const Admin = props => {
 				openSearchOn={['Dashboard', 'Violation', 'Account', 'Trash']}
 				getSearchContent={e => handleSearch( e )}
 				listItems={[
-					{ title: 'Dashboard', onClick: () => content.name === 'Dashboard' ? null : setContent({ name: 'Dashboard', cont: <Dashboard search={searchContent}/> }) },
-					{ title: 'Violation', onClick: () =>  content.name === 'Validation' ? null : setContent({ name: 'Violation', cont: <Violation role="admin" search={searchContent}/> })},
-					{ title: 'Account', onClick: () => content.name === 'Account' ? null : setContent({ name: 'Account', cont: <Accounts search={searchContent}/> }) },
-					{ title: 'School Year & Semester', onClick: () => content.name === 'School Year & Semester' ? null : setContent({ name: 'School Year & Semester', cont: <SchoolYears search={searchContent}/> }) },
+					{ title: 'Dashboard', onClick: () => content.name === 'Dashboard' ? null : setContent({ name: 'Dashboard', cont: <Dashboard search={searchContent} getSearchContent={e => handleSearch( e )}/> }) },
+					{ title: 'Violation', onClick: () =>  content.name === 'Validation' ? null : setContent({ name: 'Violation', cont: <Violation role="admin" search={searchContent} getSearchContent={e => handleSearch( e )}/> })},
+					{ title: 'Account', onClick: () => content.name === 'Account' ? null : setContent({ name: 'Account', cont: <Accounts search={searchContent} getSearchContent={e => handleSearch( e )}/> }) },
+					{ title: 'S.Y & Semester', onClick: () => content.name === 'S.Y & Semester' ? null : setContent({ name: 'S.Y & Semester', cont: <SchoolYears/> }) },
 					{ title: 'Statistical', onClick: () => content.name === 'Statistical' ? null : setContent({ name: 'Statistical', cont: <Statistical/> }) },
 					{ title: 'Handbook', onClick: () => content.name === 'Handbook' ? null : setContent({ name: 'Handbook', cont: <Handbook/> }) },
-					{ title: 'Trash', onClick: () => content.name === 'Trash' ? null : setContent({ name: 'Trash', cont: <Trash role="admin"/> }) },
+					{ title: 'Trash', onClick: () => content.name === 'Trash' ? null : setContent({ name: 'Trash', cont: <Trash role="admin" search={searchContent} getSearchContent={e => handleSearch( e )}/> }) },
 				]}
-			/>
-			<SearchContext.Provider value={searchContent}>
-				<React.Suspense 
-					fallback={<LinearProgress color="success"/>}
-				>
-					{ content.cont }
-				</React.Suspense>
-			</SearchContext.Provider>
+			>
+				<SearchContext.Provider value={searchContent}>
+					<React.Suspense 
+						fallback={<LinearProgress color="success"/>}
+					>
+						{ content.cont }
+					</React.Suspense>
+				</SearchContext.Provider>
+			</Appbar>
 		</div>
 	)
 }

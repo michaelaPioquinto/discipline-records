@@ -711,7 +711,7 @@ router.delete('/delete-user/id/:id', async( req, res ) => {
 router.get('/accounts/admin', async( req, res ) => {
   try{
     const result = await User.find().$where(function() {
-      return this.role === 'sysadmin' || this.role === 'adminstaff';
+      return this.role === 'adminstaff';
     });
 
     return res.json( result );
