@@ -453,6 +453,13 @@ const GenerateInputFields = props => (
 	<>
 		<TextField 
 			id="outlined-basic" 
+			label="Last Name" 
+			variant="outlined"
+			value={props.lastname}
+			onChange={props.handleLastName}
+		/>
+		<TextField 
+			id="outlined-basic" 
 			label="First Name" 
 			variant="outlined"
 			value={props.firstname}
@@ -464,13 +471,6 @@ const GenerateInputFields = props => (
 			variant="outlined"
 			value={props.middlename}
 			onChange={props.handleMiddleName}
-		/>
-		<TextField 
-			id="outlined-basic" 
-			label="Last Name" 
-			variant="outlined"
-			value={props.lastname}
-			onChange={props.handleLastName}
 		/>
 		<TextField 
 			id="outlined-basic" 
