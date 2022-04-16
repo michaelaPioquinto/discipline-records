@@ -56,7 +56,7 @@ const MakeReport = props => {
 		semester: '1st semester',
 		reportedBy: '', 
 		role: '', 
-		duty: [],
+		duty: '',
 		dateOfReport: '', 
 		incidentNo: '', 
 		studentName: '', 
@@ -360,10 +360,7 @@ const MakeReport = props => {
 					</div>
 
 					<div className="col-md-12">
-						<ChipList 
-							label="Add Duty"
-							getValues={ data => dispatch({ type: 'duty', data: data ? data : [] })}
-						/>
+						<TextField sx={{ width: '80vw', margin: '10px' }} onChange={e => dispatch({ type: 'duty', data: e.target.value })} label="Duty" variant="standard"/>
 					</div>
 
 					<div className="col-md-12 d-flex justify-content-center align-items-center">

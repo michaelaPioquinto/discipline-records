@@ -791,7 +791,7 @@ const MakeReportForm = props => {
     semester: props?.semester,
     reportedBy: '', 
     role: '', 
-    duty: [],
+    duty: '',
     dateOfReport: `${dateNow().split('-')[1]}-${dateNow().split('-')[2]}-${dateNow().split('-')[0]}`, 
     incidentNo: props?.incidentNumber, 
     studentName: renderFullName() ?? '', 
@@ -1183,10 +1183,7 @@ const MakeReportForm = props => {
               </div>
 
               <div className="col-md-12">
-                <ChipList 
-                  label="Add Duty (Required)"
-                  getValues={ data => dispatch({ type: 'duty', data: data ? data : [] })}
-                />
+                <TextField required sx={{ width: '80vw', margin: '10px' }} onChange={e => dispatch({ type: 'duty', data: e.target.value })} label="Duty" variant="standard"/>
               </div>
 
               <div className="col-md-12">

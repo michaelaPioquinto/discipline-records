@@ -34,6 +34,7 @@ import AddIcon from '@mui/icons-material/Add';
 import Table from '../../../components/Table';
 import SearchContext from '../../../context/SearchContext';
 import TableV2 from '../../../components/Table-v2';
+import InputAdornment from '../../../components/InputAdornment';
 
 const Item = props => {
 	const [status, setStatus] = React.useState( props.status === 'activated' ? true : false );
@@ -178,7 +179,7 @@ const Accounts = props => {
 				              { props?.items?.[ index ]?.username }
 				            </div>
 				            <div className={`col-4 d-flex align-items-center justify-content-center text-center"`}>
-				              { props?.items?.[ index ]?.role }
+				            	Administrator
 				            </div>
 				            <div 
 				              style={{
@@ -473,9 +474,10 @@ const GenerateInputFields = props => (
 			value={props.email}
 			onChange={props.handleEmail}
 		/>
-		<TextField 
-			id="outlined-basic" 
-			label="password" 
+		<InputAdornment
+			type="password"
+			for="password" 
+			label="Password" 
 			variant="outlined"
 			value={props.password}
 			onChange={props.handlePassword}

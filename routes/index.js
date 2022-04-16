@@ -432,7 +432,7 @@ router.post('/create-school-year', async( req, res ) => {
 
   delete sy._id;
 
-  SchoolYear.findOne({ schoolYear: sy.schoolYear }, (err, doc) => {
+  SchoolYear.findOne({ schoolYear: sy.schoolYear, semester: sy.semester }, (err, doc) => {
     if( err ) return res.sendStatus( 503 );
 
     if( doc ){

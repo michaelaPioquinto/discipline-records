@@ -116,7 +116,6 @@ const Dashboard = props => {
 		}
 	}, [studentData, selectedYearAndSem]);
 
-	React.useEffect(() => console.log( dutyHrs[ reportPage - 1 ] ), [dutyHrs, reportPage]);
 	const renderFullName = () => {
 		if( (!studentData?.student?.firstName && !studentData?.student?.lastname ) || !studentData?.student?.middleName )
 			return 'N/A';

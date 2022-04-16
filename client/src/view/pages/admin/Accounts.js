@@ -181,7 +181,7 @@ const Accounts = props => {
 				              { props?.items?.[ index ]?.username }
 				            </div>
 				            <div className={`col-4 d-flex align-items-center justify-content-center text-center"`}>
-				              { props?.items?.[ index ]?.role }
+				              Administrative-staff
 				            </div>
 				            <div 
 				              style={{

@@ -3,6 +3,7 @@ import axios from 'axios';
 import uniqid from 'uniqid';
 import debounce from 'lodash.debounce';
 
+import Autocomplete from '@mui/material/Autocomplete';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
@@ -350,21 +351,19 @@ const AddUser = props => {
 					autoComplete="off"
 			    >	
 			    	<Stack spacing={3}>
-			    		<GenerateInputFields
-				    		data={[
-								{
-									label: 'School Year',
-									value: () => item.schoolYear,
-									onChange: e => dispatch({ type: 'schoolYear', data: e.target.value }),
-									placeHolder: 'Ex: 2018-2019'
-								},
-								{
-									label: 'Semester',
-									value: () => item.semester,
-									onChange: e => dispatch({ type: 'semester', data: (e.target.value).replaceAll(' ', '') }),
-									placeHolder: 'Ex: 1st'
-								}	
-			    			]}
+			    		<TextField
+							key={uniqid()}
+							label="School Year"
+							variant="outlined"
+							defaultValue={item.schoolYear}
+							onChange={e => dispatch({ type: 'schoolYear', data: e.target.value })}
+							placeholder="Ex: 2018-2019"
+						/>
+						<Autocomplete
+							defaultValue={item.semester}
+							options={['1st', '2nd']}
+							onChange={(_, val) => dispatch({ type: 'semester', data: val })}
+							renderInput={(params) => <TextField {...params} label="Semester"/>}
 						/>
 			    	</Stack>
 			    </Box>
@@ -506,21 +505,19 @@ const EditUser = props => {
 					autoComplete="off"
 			    >	
 			    	<Stack spacing={3}>
-			    		<GenerateInputFields
-				    		data={[
-								{
-									label: 'School Year',
-									value: () => item.schoolYear,
-									onChange: e => dispatch({ type: 'schoolYear', data: e.target.value }),
-									placeHolder: 'Ex: 2018-2019'
-								},
-								{
-									label: 'Semester',
-									value: () => item.semester,
-									onChange: e => dispatch({ type: 'semester', data: (e.target.value).replaceAll(' ', '') }),
-									placeHolder: 'Ex: 1st'
-								}	
-			    			]}
+			    		<TextField
+							key={uniqid()}
+							label="School Year"
+							variant="outlined"
+							defaultValue={item.schoolYear}
+							onChange={e => dispatch({ type: 'schoolYear', data: e.target.value })}
+							placeholder="Ex: 2018-2019"
+						/>
+						<Autocomplete
+							defaultValue={item.semester}
+							options={['1st', '2nd']}
+							onChange={(_, val) => dispatch({ type: 'semester', data: val })}
+							renderInput={(params) => <TextField {...params} label="Semester"/>}
 						/>
 			    	</Stack>
 			    </Box>
@@ -573,7 +570,6 @@ const GenerateInputFields = props => {
 			const list = [];
 
 			props?.data?.forEach( datum => {
-				console.log( datum?.value?.() );
 				list.push(
 					<TextField
 						key={uniqid()}
