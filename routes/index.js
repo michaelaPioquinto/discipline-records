@@ -788,7 +788,6 @@ router.post('/edit-user/admin', async( req, res ) => {
 
 
 // ============== SYSTEM ADMINISTRATOR ================
-
 router.get('/accounts/system-admin', async( req, res ) => {
     User.find({ role: 'admin' }, (err, list) => {
       if( err ) return res.sendStatus( 503 );
@@ -799,7 +798,6 @@ router.get('/accounts/system-admin', async( req, res ) => {
 
 
 // =============== ADMINISTRATOR STAFF =================
-
 router.post('/save-report', async( req, res ) => {
   Student.findOne({ studentID: req.body.studentID }, (err, doc) => {
     if( err ){ 
@@ -812,6 +810,16 @@ router.post('/save-report', async( req, res ) => {
         if( err ){ 
           console.log( err );
           return res.sendStatus( 503 );
+        }
+
+        const syList = [];
+
+        const yearStarted = Number(new Date().getFullYear().toString().slice( 0, 2 ) + props.studentID.slice( 0, 2 ));
+        let currentSchoolYear = yearStarted;
+
+        for( let i = 0; i < 4; i++ ){
+          syList.push( `${currentSchoolYear}-${currentSchoolYear + 1}` );
+          currentSchoolYear += 1;
         }
 
         /*
@@ -903,6 +911,13 @@ router.post('/save-report', async( req, res ) => {
 
               if( doc ){
                 const { schoolYear, semester } = doc;
+
+                if( !syList.includes( schoolYear ) ) 
+                  return res
+                    .status( 406 )
+                    .json({
+                      message: 'Student does not contain this school-year.'
+                    });
 
                 const updateStatistical = callback => {
                   Statistic.findOne({ year: schoolYear }, async (err, doc) => {
