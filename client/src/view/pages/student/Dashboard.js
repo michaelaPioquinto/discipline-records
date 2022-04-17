@@ -278,7 +278,7 @@ const Report = props => {
 		>
 			<div className="py-3 col-12 d-flex flex-column justify-content-center align-items-center">
 				<SkeletonizedTextfield 
-					label="Violation" 
+					label="Incident Description" 
 					data={ props.incidentDescription }
 					width="90%"
 				/>
