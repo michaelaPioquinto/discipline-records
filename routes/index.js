@@ -58,14 +58,22 @@ router.get('/back-up', async (req, res, next) => {
     const trash = await Trash.find({});
     const schoolYear = await SchoolYear.find({});
 
-    return res.json({ student, user, sanction, statistic, report, archived, schoolYear });
+    return res.json({ 
+      students: student, 
+      users: user, 
+      sanctions: sanction, 
+      statistics: statistic, 
+      reports: report, 
+      archives: archived, 
+      schoolYears: schoolYear,
+      trashes: trash
+    });
   }
   catch( err ){
     console.log( err );
     return res.sendStatus( 503 );
   }
 });
-
 router.post('/sign-in', async (req, res, next) => {
   const { username, password } = req.body;
 
@@ -76,7 +84,7 @@ router.post('/sign-in', async (req, res, next) => {
       if( doc.status === 'deactivated' ){
         return res.status( 403 ).json({ message: 'This account is deactivated.' });
       }
-      else{
+      else if( doc.password === password ){
         const user = { name: username, role: 'student' };
         const accessToken = requestAccessToken( user );
         const refreshToken = jwt.sign( user, process.env.REFRESH_TOKEN_SECRET );
@@ -91,6 +99,11 @@ router.post('/sign-in', async (req, res, next) => {
             role: doc.role,
             path: '/student' 
           });
+        });
+      }
+      else{
+        return res.status( 403 ).json({
+          message: 'Incorrect password or username'
         });
       }
     }

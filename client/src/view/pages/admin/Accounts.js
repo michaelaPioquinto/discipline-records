@@ -35,6 +35,7 @@ import InputAdornment from '../../../components/InputAdornment';
 import Table from '../../../components/Table';
 import SearchContext from '../../../context/SearchContext';
 
+
 const Item = props => {
 	const [status, setStatus] = React.useState( props.status === 'activated' ? true : false );
 	const [bgColor, setBgColor] = React.useState('white');
@@ -58,7 +59,7 @@ const Item = props => {
 	}
 
 	const debouncedChangeStatus = debounce(changeStatus, 500);
-	const displayRole = userRole => userRole === 'adminstaff' ? 'ADMINISTRATOR STAFF' : userRole;
+	const displayRole = userRole => userRole === 'adminstaff' ? 'ADMINISTRATRATIVE STAFF' : userRole;
 
 	return(
 		<TableRow 
@@ -86,6 +87,7 @@ const Accounts = props => {
 	const [addForm, setAddForm] = React.useState( false );
 	const [selectedItem, setSelectedItem] = React.useState( null );
 	const { enqueueSnackbar } = useSnackbar();
+
 	const search = React.useContext( SearchContext );
 
 	const fetchAccounts = async () => {
@@ -100,6 +102,7 @@ const Accounts = props => {
 
 	React.useEffect(() => fetchAccounts(), []);
 
+
 	React.useEffect(() => {
 		let renderedItem = [];
 
@@ -109,7 +112,6 @@ const Accounts = props => {
 		// 	fetchAccounts={fetchAccounts}
 		// 	{...acc}
 		// />
-
 		accounts.forEach( acc => {
 			if( acc.username.searchContain( search ) ){
 				renderedItem.push( acc );
@@ -143,8 +145,10 @@ const Accounts = props => {
 			<TableV2
 				items={items}
 				// onDoubleClick={() => props.onDoubleClick({ editingMode: true, ...props })}
+				setSearch={props?.getSearchContent}
 				onDoubleClick={handleEditForm} 
 				fetchAccounts={fetchAccounts}
+				searchPlaceHolder="Username"
 				generateRows={( index, style, props ) => {
 
 					const handleStatus = e => {
@@ -181,7 +185,7 @@ const Accounts = props => {
 				              { props?.items?.[ index ]?.username }
 				            </div>
 				            <div className={`col-4 d-flex align-items-center justify-content-center text-center"`}>
-				              Administrative-staff
+				              Administrative Staff
 				            </div>
 				            <div 
 				              style={{
@@ -316,7 +320,7 @@ const AddUser = props => {
 				<DialogTitle id="responsive-dialog-title">
 					{
 						!props.editingMode
-							? "Want to add a system administrator or an administrator staff?"
+							? "Want to add an Administrative Staff?"
 							: "Edit this account?"
 					}
 				</DialogTitle>
@@ -494,7 +498,7 @@ const GenerateInputFields = props => (
 			for="password"
 			onChange={props.handlePassword}
 		/>
-		<FormControl fullWidth>
+		{/*<FormControl fullWidth>
 		  <InputLabel id="demo-simple-select-label">ROLE</InputLabel>
 		  <Select
 			disabled
@@ -506,7 +510,7 @@ const GenerateInputFields = props => (
 		  >
 		    <MenuItem sx={{ display: 'block !important' }} value={"adminstaff"}>Administrator Staff</MenuItem>
 		  </Select>
-		</FormControl>
+		</FormControl>*/}
 	</>
 )
 

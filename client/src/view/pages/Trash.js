@@ -117,7 +117,7 @@ const Trash = props => {
 				return 'system administrator'.toUpperCase();
 
 			case 'adminstaff':
-				return 'administrator staff'.toUpperCase();
+				return 'administrative staff'.toUpperCase();
 
 			default:
 				return 'NO ROLE';				
@@ -151,6 +151,8 @@ const Trash = props => {
     	<TableV2
     		items={items}
     		refresh={fetchStudentData}
+    		setSearch={props?.getSearchContent}
+      	searchPlaceHolder="Username"
     		generateRows={(index, style, props) => (
     			<div 
             id={uniqid()} 
@@ -175,7 +177,7 @@ const Trash = props => {
 									<RestoreFromTrashIcon/>
 								</IconButton>
 							</Tooltip>
-				      <Tooltip title="Restore" arrow placement="bottom">
+				      <Tooltip title="Delete permanently" arrow placement="bottom">
 								<IconButton onClick={() => {
 										axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/delete-trash-permanently/id/${ props?.items?.[ index ]?.['_id'] }`)
 										.then(() => {

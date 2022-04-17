@@ -205,6 +205,7 @@ const Violation = props => {
       	items={list} 
       	userType={props?.role} 
       	setSearch={e => props?.getSearchContent?.( e )}
+      	searchPlaceHolder="Violation Name"
       	handleEdit={handleEdit}
       	handleDelete={handleDelete}
       	generateRows={( index, style, props ) => {

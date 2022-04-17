@@ -24,6 +24,10 @@ const Admin = props => {
 		debounce(() => setSearchContent( e.target.value ), 100)();
 	}
 
+	React.useEffect(() => {
+		setSearchContent( '' );
+	}, [content]);
+
 	return(
 		<div style={{ width: '100%', height: '100%'}}>
 			<Appbar 
@@ -35,7 +39,7 @@ const Admin = props => {
 					{ title: 'Dashboard', onClick: () => content.name === 'Dashboard' ? null : setContent({ name: 'Dashboard', cont: <Dashboard search={searchContent} getSearchContent={e => handleSearch( e )}/> }) },
 					{ title: 'Violation', onClick: () =>  content.name === 'Validation' ? null : setContent({ name: 'Violation', cont: <Violation role="admin" search={searchContent} getSearchContent={e => handleSearch( e )}/> })},
 					{ title: 'Account', onClick: () => content.name === 'Account' ? null : setContent({ name: 'Account', cont: <Accounts search={searchContent} getSearchContent={e => handleSearch( e )}/> }) },
-					{ title: 'S.Y & Semester', onClick: () => content.name === 'S.Y & Semester' ? null : setContent({ name: 'S.Y & Semester', cont: <SchoolYears/> }) },
+					{ title: 'S.Y & Semester', onClick: () => content.name === 'S.Y & Semester' ? null : setContent({ name: 'S.Y & Semester', cont: <SchoolYears search={searchContent} getSearchContent={e => handleSearch( e )}/> }) },
 					{ title: 'Statistical', onClick: () => content.name === 'Statistical' ? null : setContent({ name: 'Statistical', cont: <Statistical/> }) },
 					{ title: 'Handbook', onClick: () => content.name === 'Handbook' ? null : setContent({ name: 'Handbook', cont: <Handbook/> }) },
 					{ title: 'Trash', onClick: () => content.name === 'Trash' ? null : setContent({ name: 'Trash', cont: <Trash role="admin" search={searchContent} getSearchContent={e => handleSearch( e )}/> }) },

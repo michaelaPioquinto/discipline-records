@@ -121,11 +121,11 @@ const Dashboard = props => {
 			return 'N/A';
 
 		const middleName = studentData?.student?.middleName ?? '';
-
+		const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1);
 		return (
-			studentData?.student?.firstName + ' ' +
-			middleName + ' ' +
-			studentData?.student?.lastname 
+			capitalize( studentData?.student?.firstName ) + ' ' +
+			capitalize( middleName ) + ' ' +
+			capitalize( studentData?.student?.lastname ) 
 		);
 	}
 
@@ -276,12 +276,40 @@ const Report = props => {
 			}} 
 			className="d-flex flex-column justify-content-between align-items-center"
 		>
-			<div className="py-3 col-12 d-flex justify-content-center align-items-center">
+			<div className="py-3 col-12 d-flex flex-column justify-content-center align-items-center">
 				<SkeletonizedTextfield 
 					label="Violation" 
 					data={ props.incidentDescription }
 					width="90%"
 				/>
+				{
+					props?.minorProblemBehavior?.length
+						? <> 
+								<br/>
+								<SkeletonizedTextfield 
+									label="Minor Problem Behavior(s)" 
+									size="small"
+									variant="standard"
+									data={ props.minorProblemBehavior.join(', ') }
+									width="90%"
+								/>
+							</>
+						: null
+				}
+				{
+					props?.majorProblemBehavior?.length 
+					? <>
+							<br/>
+							<SkeletonizedTextfield 
+								size="small"
+								label="Major Problem Behavior(s)" 
+								variant="standard"
+								data={ props.majorProblemBehavior.join(', ') }
+								width="90%"
+							/>
+						</>
+					: null
+				}
 			</div>
 			<Divider sx={{ margin: '5px 0px 5px 0px', width: '100%' }}/>
 			<div className="col-12 p-3 d-flex justify-content-center align-items-center" style={{ height: 'fit-content' }}>
@@ -366,7 +394,8 @@ const SkeletonizedTextfield = props => {
 						<CustomizedTextField 
 							disabled={ props.disabled ?? true } 
 							label={props.label} 
-							variant="filled"
+							variant={props?.variant ?? "filled"}
+							size={props?.size}
 							value={props?.data}
 							// defaultValue={typeof props?.data === Array ? props?.data?.join?.(',') : props?.data} 
 							sx={{ width: props.width ?? '100%', border: 'none' }}
@@ -379,7 +408,8 @@ const SkeletonizedTextfield = props => {
 					<CustomizedTextField 
 						disabled={ props.disabled ?? true } 
 						label={props.label} 
-						variant="filled" 
+						variant={props?.variant ?? "filled"}
+						size={props?.size} 
 						value={props?.data}
 						// defaultValue={typeof props?.data === Array ? props?.data?.join?.(',') : props?.data} 
 						sx={{ width: props.width ?? '100%', border: 'none' }}
@@ -396,7 +426,8 @@ const SkeletonizedTextfield = props => {
 				<CustomizedTextField 
 					disabled={ props.disabled ?? true } 
 					label={props.label} 
-					variant="filled" 
+					variant={props?.variant ?? "filled"}
+					size={props?.size} 
 					// defaultValue="N/A" 
 					sx={{ width: props.width ?? '100%', border: 'none' }}
 				/>

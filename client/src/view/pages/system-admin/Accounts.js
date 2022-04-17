@@ -143,6 +143,8 @@ const Accounts = props => {
 				items={items}
 				onDoubleClick={handleEditForm} 
 				fetchAccounts={fetchAccounts}
+				setSearch={props?.getSearchContent}
+		      	searchPlaceHolder="Username"
 				generateRows={( index, style, props ) => {
 
 					const handleStatus = e => {

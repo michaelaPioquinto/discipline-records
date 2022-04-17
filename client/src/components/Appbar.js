@@ -330,9 +330,9 @@ const Appbar = props => {
 						          		.then( res => {
 						          			enqueueSnackbar( 'Downloading...', { variant: 'success' });
 
-						          			const { student, user, sanction, statistic, report, archived, schoolYear } = res.data;
-						          			const objList = [ student, user, sanction, statistic, report, archived, schoolYear ];
-						          			const names = [ 'student', 'user', 'sanction', 'statistic', 'report', 'archived', 'schoolYear' ];
+						          			const { student, user, sanction, statistic, report, archived, schoolYear, trash } = res.data;
+						          			const objList = [ student, user, sanction, statistic, report, archived, schoolYear, trash ];
+						          			const names = [ 'students', 'users', 'sanctions', 'statistics', 'reports', 'archives', 'schoolYears', 'trashes' ];
 
 						          			objList.forEach((obj, index) => {
 						          				var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify( obj ));

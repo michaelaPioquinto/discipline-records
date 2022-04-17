@@ -20,6 +20,10 @@ const SystemAdmin = props => {
 		debounce(() => setSearchContent( e.target.value ), 100)();
 	}
 
+	React.useEffect(() => {
+		setSearchContent( '' );
+	}, [content]);
+	
 	return(
 		<div style={{ width: '100%', height: '100%'}}>
 			<Appbar 

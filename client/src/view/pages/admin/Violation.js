@@ -123,6 +123,8 @@ const Violation = props => {
       <Table
         style={{ width: '100%' }}
       	maxHeight={ 500 }
+      	setSearch={props?.getSearchContent}
+      	searchPlaceHolder="Violation Name"
         head={['Violation Name', 'First Offense', 'Second Offense', 'Third Offense']}
         content={
           list.map( item => (

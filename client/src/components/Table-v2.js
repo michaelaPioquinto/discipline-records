@@ -57,7 +57,13 @@ export default function TableV2 ( props ){
 			<div className="table-v2-header border-bottom p-3 px-4 d-flex justify-content-between align-items-center">
 				<Box sx={{ display: 'flex', alignItems: 'flex-end' }}>
 					<SearchIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />
-					<TextField id="table-v2-header-search-input" label="" variant="standard" onChange={e => props?.setSearch?.( e )}/>
+					<TextField 
+						placeholder={props?.searchPlaceHolder} 
+						id="table-v2-header-search-input" 
+						label="" 
+						variant="standard" 
+						onChange={e => props?.setSearch?.( e )}
+					/>
 				</Box>
 
 				{/*<IconButton>

@@ -127,9 +127,13 @@ const Accounts = props => {
 		// 	handleDelete={handleDelete}
 		// 	{...acc}
 		// /> 
+		accounts?.sort?.(( ac1, ac2 ) => Number(ac1?.semester[ 0 ]) - Number(ac2?.semester[ 0 ]));
 		accounts?.sort?.(( ac1, ac2 ) => Number(ac1?.schoolYear?.split?.('-')?.[ 0 ]) - Number(ac2?.schoolYear?.split?.('-')?.[ 0 ]))
+
 		accounts.forEach( acc => {
-			if( acc.schoolYear.searchContain( search ) ){
+			const years = acc.schoolYear.split('-');
+
+			if( years[ 0 ].searchContain( search ) || years[ 1 ].searchContain( search ) ){
 				renderedItem.push( acc );
 			}
 		});
@@ -158,6 +162,8 @@ const Accounts = props => {
 				onDoubleClick ={handleEditForm} 
 				fetchSchoolYears={fetchSchoolYears}
 				handleDelete={handleDelete}
+				setSearch={props?.getSearchContent}
+				searchPlaceHolder="School-Year"
 				generateRows={( index, style, props ) => {
 
 					const handleStatus = e => {
@@ -195,7 +201,13 @@ const Accounts = props => {
 				            >
 				              { props?.items?.[ index ]?.schoolYear }
 				            </div>
-				            <div className={`col-4 d-flex align-items-center justify-content-center text-center"`}>
+				            <div 
+				            	style={{
+				            		color: props?.items?.[ index ]?.semester === '1st' ? "#ff0006" : '#e7a100',
+				            		fontWeight: 'bold' 
+				            	}} 
+				            	className={`col-4 d-flex align-items-center justify-content-center text-center"`}
+				            >
 				              { props?.items?.[ index ]?.semester }
 				            </div>
 				            <div 

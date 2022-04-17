@@ -130,6 +130,8 @@ const Archived = props => {
 			<TableV2
 				items={renderedStudents}
 				handleUnarchive={handleUnarchive}
+				setSearch={props?.getSearchContent}
+		      	searchPlaceHolder="Student ID"
 				generateRows={( index, style, props ) => {
 					return(
 						<div 

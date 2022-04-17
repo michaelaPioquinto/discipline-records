@@ -202,6 +202,7 @@ const Dashboard = props => {
         items={items} 
         onClick={setEditForm} 
         userType={props?.role} 
+        searchPlaceHolder="Student ID"
         setSearch={e => props?.getSearchContent?.( e )}
         generateRows={( index, style, props ) => {
           const renderFullName = item => {
@@ -285,7 +286,7 @@ const Dashboard = props => {
               <b>Full Name</b>
             </div>
             <div className={`${props?.userType === 'adminstaff' ? 'col-3' : 'col-4'} d-flex align-items-center justify-content-center text-center"`}>
-              <b>Year Section</b>
+              <b>Year & Section</b>
             </div>
             {
               props?.userType === 'adminstaff'
@@ -416,13 +417,14 @@ const StudentForm = props => {
                       rep?.semester && yearSemester?.semester
                         ? <> 
                             <TextField
-                              disabled 
+                              disabled
                               id="outlined-basic"
                               label={`Duty - ${ yearSemester?.semester } semester`} 
                               variant="outlined" 
                               defaultValue={rep?.duty?.length ? rep?.duty?.join?.(', ') : ' ' }
                             />
                             <TextField
+                              disabled={props?.role !== 'adminstaff'}
                               id="outlined-basic"
                               label={`Duty hours- ${ yearSemester?.semester } semester`} 
                               variant="outlined" 
@@ -600,22 +602,24 @@ const StudentForm = props => {
                         : null
                     }
                     <div className="container-fluid d-flex justify-content-around align-items-center">
-                      <Button 
-                        variant="outlined" 
-                        onClick={() => {
-                          window.open(`/print-student-report/${reportData?.student?.studentID}/reportIndex/${index}`, '_blank');
-                        }}
-                      >
-                        print
-                      </Button>
                       {
                         props?.role === 'adminstaff'
-                          ? <Button 
-                              variant="outlined" 
-                              onClick={() => rep ? handleArchive?.( rep ) : null}
-                            >
-                              Archive
-                            </Button>
+                          ? <>
+                              <Button 
+                                variant="outlined" 
+                                onClick={() => {
+                                  window.open(`/print-student-report/${reportData?.student?.studentID}/reportIndex/${index}`, '_blank');
+                                }}
+                              >
+                                print
+                              </Button>
+                              <Button 
+                                variant="outlined" 
+                                onClick={() => rep ? handleArchive?.( rep ) : null}
+                              >
+                                Archive
+                              </Button>
+                            </>
                           : null
                       }
                     </div>
@@ -971,7 +975,7 @@ const MakeReportForm = props => {
         state.dateOfReport.length && state.timeOfIncident.length &&
         state.location.length && state.dutyHrs.length && 
         state.specificAreaLocation.length &&
-        state.incidentDescription
+        state.incidentDescription && (state.minorProblemBehavior.length || (state.majorProblemBehavior.length && state.administrativeDecision.length))
         ){
         axios.post(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/save-report`, state)
         .then( async res => {
@@ -1188,10 +1192,14 @@ const MakeReportForm = props => {
 
               <div className="col-md-12">
                 <br/>
-                <TimeField 
-                  value="00:00" 
-                  input={<InputAdornment width="80vw" required adornment="Hours / Minutes" placeholder="0" value={state.dutyHrs} label="Duty Time" variant="standard"/>} 
-                  onChange={(e, value) => dispatch({ type: 'dutyHrs', data: value })} 
+                <InputAdornment 
+                  width="80vw" 
+                  required 
+                  adornment="Format: 00 hrs/mns" 
+                  value={state.dutyHrs ? null : state.dutyHrs} 
+                  label="Duty Time" 
+                  variant="standard"
+                  onChange={e => dispatch({ type: 'dutyHrs', data: e.target.value })} 
                 />
               </div>
 
@@ -1287,7 +1295,7 @@ const MakeReportForm = props => {
 
               <div className="px-5 row col-md-12 my-3 d-flex flex-column justify-content-center align-items-center">
                 <div className="col-12">
-                  <p className="text-uppercase">minors:</p>
+                  <p className="text-uppercase">minors: <b className="text-danger">(Required if there is no major problem behavior)</b></p>
                 </div>
 
                 <div className="row container-fluid">
@@ -1416,7 +1424,8 @@ const MakeReportForm = props => {
             </div>
             <div className="row container-fluid d-flex flex-column justify-content-center align-items-center">
               <div className="col-md-12 px-5 d-flex justify-content-start align-items-start">
-                <h5 className="text-uppercase"><b>administrative decision:</b></h5>
+                <h5 className="text-uppercase"><b>administrative decision: </b></h5>
+                <p className="text-danger mx-2">(Required if there is a major problem behavior)</p>
               </div>
               <div className="row col-md-12">
                 <div className="col-md-4">
