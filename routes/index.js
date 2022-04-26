@@ -468,7 +468,7 @@ router.put('/edit-school-year', async( req, res ) => {
     if( err ) return res.sendStatus( 503 );
 
     if( doc && doc._id.toString() !== sy._id ){
-      return res.status( 403 ).json({ message: 'School year already exists' });
+      return res.status( 403 ).json({ message: 'School-year or semester already exists' });
     } 
     else{
       SchoolYear.findOneAndUpdate({ _id: sy._id }, { ...sy }, err => {
@@ -814,7 +814,7 @@ router.post('/save-report', async( req, res ) => {
 
         const syList = [];
 
-        const yearStarted = Number(new Date().getFullYear().toString().slice( 0, 2 ) + props.studentID.slice( 0, 2 ));
+        const yearStarted = Number(new Date().getFullYear().toString().slice( 0, 2 ) + doc.studentID.slice( 0, 2 ));
         let currentSchoolYear = yearStarted;
 
         for( let i = 0; i < 4; i++ ){
@@ -1001,6 +1001,8 @@ router.post('/save-report', async( req, res ) => {
             });
           }
 
+          console.log('here');
+
           SchoolYear.findOne({ status: 'activated' }, (err, doc) => {
             if( err ){ 
               console.log( err );
@@ -1009,6 +1011,14 @@ router.post('/save-report', async( req, res ) => {
 
             if( doc ){
               const { schoolYear, semester } = doc;
+
+              console.log('here 2');
+              if( !syList.includes( schoolYear ) ) 
+                return res
+                  .status( 406 )
+                  .json({
+                    message: 'Student does not contain this school-year.'
+                  });
 
               const updateStatistical = callback => {
                 Statistic.findOne({ year: schoolYear }, async (err, doc) => {

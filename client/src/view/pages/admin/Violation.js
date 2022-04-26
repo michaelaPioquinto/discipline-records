@@ -200,7 +200,7 @@ const ValidationForm = props => {
 				aria-labelledby="responsive-dialog-title"
 			>
 				<DialogTitle id="responsive-dialog-title">
-					{"Want to add a violation?"}
+					{"Edit this violation?"}
 				</DialogTitle>
 				<DialogContent>
 					<DialogContentText>
@@ -321,11 +321,11 @@ const ValidationEditForm = props => {
 				aria-labelledby="responsive-dialog-title"
 			>
 				<DialogTitle id="responsive-dialog-title">
-					{"Want to edit a violation?"}
+					{"Edit this violation?"}
 				</DialogTitle>
 				<DialogContent>
 					<DialogContentText>
-						You can now edit this violation.
+						Please fill up this form.
 					</DialogContentText>
 					<Box
 						component="form"

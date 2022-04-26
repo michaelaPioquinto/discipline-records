@@ -23,6 +23,12 @@ const Root = styled('div')(({ theme }) => ({
   },
 }));
 
+const CustomizedTextField = styled( TextField )({
+	".css-1480iag-MuiInputBase-root-MuiInput-root.Mui-disabled:before": {
+		borderBottomStyle: 'dashed'
+	}
+});
+
 const label = { inputProps: { 'aria-label': 'Checkbox violation' } };
 
 const renderDate = date => {
@@ -118,17 +124,17 @@ const PrintPaper = props => {
 				<div className="container-fluid">
 					<Divider/>
 				</div>
-				<div className="row container-fluid d-flex justify-content-around align-items-center">
+				<div className="container-fluid d-flex justify-content-around align-items-center">
 					<div className="col-md-6 d-flex	justify-content-center align-items-center my-5">
 						<Stack spacing={2}>
-							<TextField disabled sx={{ width: '300px' }} value={studentData?.report?.[ reportIndex ]?.reportedBy ?? 'N/A'} label="Reported By" variant="standard"/>
-							<TextField disabled sx={{ width: '300px' }} value={studentData?.report?.[ reportIndex ]?.role ?? 'N/A'} label="Title/Role" variant="standard"/>
+							<CustomizedTextField disabled sx={{ width: '300px' }} value={studentData?.report?.[ reportIndex ]?.reportedBy ?? 'N/A'} label="Reported By" variant="standard"/>
+							<CustomizedTextField disabled sx={{ width: '300px' }} value={studentData?.report?.[ reportIndex ]?.role ?? 'N/A'} label="Title/Role" variant="standard"/>
 						</Stack>
 					</div>
 					<div className="col-md-6 d-flex	justify-content-center align-items-center my-5">
 						<Stack spacing={2}>
-							<TextField disabled sx={{ width: '300px' }} value={studentData?.report?.[ reportIndex ]?.dateOfReport ?? 'N/A'} variant="standard"/>
-							<TextField disabled sx={{ width: '300px' }} value={studentData?.report?.[ reportIndex ]?.incidentNo ?? 'N/A'} label="Incident no."  type="number" variant="standard"/>
+							<CustomizedTextField disabled sx={{ width: '300px' }} value={studentData?.report?.[ reportIndex ]?.dateOfReport ?? 'N/A'} variant="standard"/>
+							<CustomizedTextField disabled sx={{ width: '300px' }} value={studentData?.report?.[ reportIndex ]?.incidentNo ?? 'N/A'} label="Incident no."  type="number" variant="standard"/>
 						</Stack>
 					</div>
 				</div>
@@ -139,53 +145,53 @@ const PrintPaper = props => {
 					</h6>
 				</div>
 
-				<div className="row container-fluid d-flex justify-content-around align-items-center">
+				<div className="container-fluid d-flex justify-content-around align-items-center">
 					<div className="col-md-6 d-flex	justify-content-center align-items-center my-5">
 						<Stack spacing={2}>
-							<TextField disabled sx={{ width: '300px' }} value={studentData?.report?.[ reportIndex ]?.studentName ?? 'N/A'} label="Student Name" variant="standard"/>
-							<TextField disabled sx={{ width: '300px' }} value={renderDate(studentData?.report?.[ reportIndex ]?.dateOfIncident)} variant="standard"/>
+							<CustomizedTextField disabled sx={{ width: '300px' }} value={studentData?.report?.[ reportIndex ]?.studentName ?? 'N/A'} label="Student Name" variant="standard"/>
+							<CustomizedTextField disabled sx={{ width: '300px' }} value={renderDate(studentData?.report?.[ reportIndex ]?.dateOfIncident)} variant="standard"/>
 						</Stack>
 					</div>
 					<div className="col-md-6 d-flex	justify-content-center align-items-center my-5">
 						<Stack spacing={2}>
-							<TextField disabled sx={{ width: '300px' }} value={studentData?.courseYrSection ?? 'N/A'} label="Course / Yr / Section" variant="standard"/>
-							<TextField disabled sx={{ width: '300px' }} value={studentData?.report?.[ reportIndex ]?.timeOfIncident ?? 'N/A'} label="Time of Incident" variant="standard"/>
+							<CustomizedTextField disabled sx={{ width: '300px' }} value={studentData?.courseYrSection ?? 'N/A'} label="Course / Yr / Section" variant="standard"/>
+							<CustomizedTextField disabled sx={{ width: '300px' }} value={studentData?.report?.[ reportIndex ]?.timeOfIncident ?? 'N/A'} label="Time of Incident" variant="standard"/>
 						</Stack>
 					</div>
 				</div>
 
-				<div className="row d-flex flex-column justify-content-center align-items-center mb-5">
+				<div className="row px-5 mx-2 d-flex flex-column justify-content-center align-items-center mb-5">
 					<div className="col-md-12 p-3 d-flex justify-content-start align-items-start">
-						<TextField disabled sx={{ width: '300px', margin: '10px' }} value={studentData?.student?.studentID ?? 'N/A'} label="Student ID" variant="standard"/>
-					</div>
-
-					<div className="col-md-12 p-3 d-flex justify-content-start align-items-start">
-						<TextField disabled sx={{ width: '300px' }} value={studentData?.report?.[ reportIndex ]?.semester ?? 'N/A'} label="Semester" variant="standard"/>
+						<CustomizedTextField disabled sx={{ width: '300px' }} value={studentData?.student?.studentID ?? 'N/A'} label="Student ID" variant="standard"/>
 					</div>
 
 					<div className="col-md-12 p-3 d-flex justify-content-start align-items-start">
-						<TextField disabled sx={{ width: '300px' }} value={studentData?.report?.[ reportIndex ]?.duty?.join?.(', ') ?? 'N/A'} label="Time of Incident" variant="standard"/>
+						<CustomizedTextField disabled sx={{ width: '300px' }} value={studentData?.report?.[ reportIndex ]?.semester ?? 'N/A'} label="Semester" variant="standard"/>
+					</div>
+
+					<div className="col-md-12 p-3 d-flex justify-content-start align-items-start">
+						<CustomizedTextField disabled sx={{ width: '300px' }} value={studentData?.report?.[ reportIndex ]?.duty?.join?.(', ') ?? 'N/A'} label="Time of Incident" variant="standard"/>
 					</div>
 
 					<div className="col-md-12 d-flex justify-content-center align-items-center">
-						<TextField disabled sx={{ width: '80vw', margin: '10px' }} value={studentData?.report?.[ reportIndex ]?.location ?? 'N/A'} label="Location" variant="standard"/>
+						<CustomizedTextField disabled sx={{ width: '100%', margin: '10px' }} value={studentData?.report?.[ reportIndex ]?.location ?? 'N/A'} label="Location" variant="standard"/>
 					</div>
 
 					<div className="col-md-12 d-flex justify-content-center align-items-center">
-						<TextField disabled sx={{ width: '80vw', margin: '10px' }} value={studentData?.report?.[ reportIndex ]?.specificAreaLocation ?? 'N/A'} label="Specific Area of Location" variant="standard"/>
+						<CustomizedTextField disabled sx={{ width: '100%', margin: '10px' }} value={studentData?.report?.[ reportIndex ]?.specificAreaLocation ?? 'N/A'} label="Specific Area of Location" variant="standard"/>
 					</div>
 
 					<div className="col-md-12 d-flex justify-content-center align-items-center">
-						<TextField disabled sx={{ width: '80vw', margin: '10px' }} value={studentData?.report?.[ reportIndex ]?.additionalPersonInvolved ?? 'N/A'} label="Additional Person(s) Involved" variant="standard"/>
+						<CustomizedTextField disabled sx={{ width: '100%', margin: '10px' }} value={studentData?.report?.[ reportIndex ]?.additionalPersonInvolved ?? 'N/A'} label="Additional Person(s) Involved" variant="standard"/>
 					</div>
 
 					<div className="col-md-12 d-flex justify-content-center align-items-center">
-						<TextField disabled sx={{ width: '80vw', margin: '10px' }} value={studentData?.report?.[ reportIndex ]?.witnesses ?? 'N/A'} label="Witnesses" variant="standard"/>
+						<CustomizedTextField disabled sx={{ width: '100%', margin: '10px' }} value={studentData?.report?.[ reportIndex ]?.witnesses ?? 'N/A'} label="Witnesses" variant="standard"/>
 					</div>
 				</div>
 
 				<div className="d-flex flex-column justify-content-between align-items-center">
-					<TextField
+					<CustomizedTextField
 						disabled
 						value={studentData?.report?.[ reportIndex ]?.incidentDescription ?? 'N/A'}
 						sx={{ width: '80vw', margin: '50px' }}
@@ -200,7 +206,7 @@ const PrintPaper = props => {
 						<Divider/>
 					</Root>
 
-	        <TextField
+	        <CustomizedTextField
 						disabled
 						value={studentData?.report?.[ reportIndex ]?.descriptionOfUnacceptable ?? 'N/A'}
 						sx={{ width: '80vw', margin: '50px' }}
@@ -211,7 +217,7 @@ const PrintPaper = props => {
 						variant="filled"
 	        />
 
-	        <TextField
+	        <CustomizedTextField
 						disabled
 						value={studentData?.report?.[ reportIndex ]?.resultingActionExecuted ?? 'N/A'}
 						sx={{ width: '80vw', margin: '50px' }}
@@ -226,25 +232,25 @@ const PrintPaper = props => {
 				<div className="row container-fluid d-flex flex-column justify-content-center align-items-center">
 					<div className="row col-12 d-flex flex-row justify-content-around align-items-center m-3">
 						<div className="col-md-4 d-flex	justify-content-center	align-items-center">
-							<TextField disabled sx={{ width: '7cm', margin: '5px' }} value={studentData?.report?.[ reportIndex ]?.employeeName ?? 'N/A'}  label="Faculty / Employee Name" variant="standard"/>
+							<CustomizedTextField disabled sx={{ width: '7cm', margin: '5px' }} value={studentData?.report?.[ reportIndex ]?.employeeName ?? 'N/A'}  label="Faculty / Employee Name" variant="standard"/>
 						</div>
 
 						<div className="col-md-4 d-flex justify-content-center align-items-center">
-							<TextField disabled sx={{ width: '7cm', margin: '5px' }} value={renderDate(studentData?.report?.[ reportIndex ]?.date1)} variant="standard"/>
+							<CustomizedTextField disabled sx={{ width: '7cm', margin: '5px' }} value={renderDate(studentData?.report?.[ reportIndex ]?.date1)} variant="standard"/>
 						</div>
 					</div>
 
 					<div className="row col-12 d-flex flex-row justify-content-around align-items-center m-3">
 						<div className="col-md-5 d-flex justify-content-center align-items-center">
-							<TextField disabled sx={{ width: '7cm', margin: '5px' }} value={studentData?.report?.[ reportIndex ]?.chairpersonName}  label="Head / Chairperson Name" variant="standard"/>
+							<CustomizedTextField disabled sx={{ width: '7cm', margin: '5px' }} value={studentData?.report?.[ reportIndex ]?.chairpersonName}  label="Head / Chairperson Name" variant="standard"/>
 						</div>
 
 						<div className="col-md-5 d-flex justify-content-center align-items-center">
-							<TextField disabled sx={{ width: '7cm', margin: '5px' }} value={renderDate(studentData?.report?.[ reportIndex ]?.date2)} variant="standard"/>
+							<CustomizedTextField disabled sx={{ width: '7cm', margin: '5px' }} value={renderDate(studentData?.report?.[ reportIndex ]?.date2)} variant="standard"/>
 						</div>
 					</div>
 				</div>
-
+				{ Array( 12 ).fill( 0 ).map( elem => <br/> ) }
 				<div className="col-12">
 					<Root>
 						<Divider textAlign="left">
@@ -468,7 +474,7 @@ const PrintPaper = props => {
 				</div>
 				
 				<div className="col-12 d-flex justify-content-center align-items-center">
-					<TextField
+					<CustomizedTextField
 						disabled
 						value={studentData?.report?.[ reportIndex ]?.initialActionGiven  ?? 'N/A'}
 						sx={{ width: '80vw', margin: '50px' }}
@@ -481,7 +487,7 @@ const PrintPaper = props => {
 				</div>
 
 				<div className="col-12 d-flex justify-content-center align-items-center">
-					<TextField
+					<CustomizedTextField
 						disabled
 						value={studentData?.report?.[ reportIndex ]?.administrativeComment  ?? 'N/A'}
 						sx={{ width: '80vw', margin: '50px' }}
@@ -500,7 +506,7 @@ const OtherCheckBox = props => {
 	return(
 		<FormControlLabel
 			label={
-				<TextField 
+				<CustomizedTextField 
 					value={props.value} 
 					label="Other" 
 					variant="standard"

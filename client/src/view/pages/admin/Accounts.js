@@ -228,6 +228,7 @@ const Accounts = props => {
 				setOpen={handleAddForm}
 				setEdit={handleEditForm} 
 				fetchAccounts={fetchAccounts} 
+				title={ !selectedItem?.editingMode ? "Want to add an Administrative Staff?" : "Edit this account?" }
 				{ ...selectedItem }
 			/>
 			<div style={{ position: 'fixed', bottom: '15px', right: '15px' }}>
@@ -318,11 +319,7 @@ const AddUser = props => {
 				aria-labelledby="responsive-dialog-title"
 			>
 				<DialogTitle id="responsive-dialog-title">
-					{
-						!props.editingMode
-							? "Want to add an Administrative Staff?"
-							: "Edit this account?"
-					}
+					{ props?.open && props.title }
 				</DialogTitle>
 				<DialogContent>
 					<DialogContentText>
@@ -380,7 +377,7 @@ const AddUser = props => {
 												.then(() => {
 													props.fetchAccounts();
 													props.setOpen();
-													enqueueSnackbar('Successfully added a user', { variant: 'success' });
+													enqueueSnackbar('Successfully added an administrative staff', { variant: 'success' });
 												})
 												.catch( err => {
 													enqueueSnackbar( err.response.data.message ?? 'Please try again', { variant: 'error' });
@@ -403,7 +400,7 @@ const AddUser = props => {
 											.then(() => {
 												props.fetchAccounts();
 												props.setOpen();
-												enqueueSnackbar('Successfully deleted a user', { variant: 'success' });
+												enqueueSnackbar('Successfully deleted an administrative staff', { variant: 'success' });
 											})
 											.catch( err => {
 												enqueueSnackbar( err.response.data.message ?? 'Please try again', { variant: 'error' });
@@ -430,7 +427,7 @@ const AddUser = props => {
 												.then(() => {
 													props.fetchAccounts();
 													props.setOpen();
-													enqueueSnackbar('Successfully edited a user', { variant: 'success' });
+													enqueueSnackbar('Successfully edited an administrative staff', { variant: 'success' });
 												})
 												.catch( err => {
 													enqueueSnackbar( err.response.data.message ?? 'Please try again', { variant: 'error' });

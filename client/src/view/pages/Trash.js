@@ -111,13 +111,13 @@ const Trash = props => {
   const renderRole = role => {
 		switch( role ){
 			case 'admin':
-				return 'administrator'.toUpperCase();
+				return 'Administrator';
 
 			case 'sysadmin':
-				return 'system administrator'.toUpperCase();
+				return 'System Administrator';
 
 			case 'adminstaff':
-				return 'administrative staff'.toUpperCase();
+				return 'Administrative Staff';
 
 			default:
 				return 'NO ROLE';				

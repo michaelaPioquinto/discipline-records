@@ -550,7 +550,7 @@ const EditUser = props => {
 								.then(() => {
 									props.fetchSchoolYears();
 									props.setOpen();
-									enqueueSnackbar('Successfully edited a user', { variant: 'success' });
+									enqueueSnackbar('Successfully edited a school year and semester', { variant: 'success' });
 								})
 								.catch( err => {
 									enqueueSnackbar( err.response.data.message ?? 'Please try again', { variant: 'error' });

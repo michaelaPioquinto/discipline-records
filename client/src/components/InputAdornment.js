@@ -28,46 +28,50 @@ export default function CustomInputAdornment( props ){
 
 	return(
 		<FormControl sx={{ m: 1, width: props?.width ?? '100%' }} variant="outlined">
-          <InputLabel required={props?.required} htmlFor="input-adornment">{props.label}</InputLabel>
-          <CurrentInput
-            id="input-adornment"
-            placeholder={props?.placeholder}
-            type={props?.type === 'password' ? showPassword ? 'text' : 'password' : props.type}
-            value={props?.value}
-            onChange={props?.onChange}
-            endAdornment={
-              props?.for === 'password'
-              	? <InputAdornment position="end">
-	                <IconButton
-	                  aria-label="toggle password visibility"
-	                  onClick={() => setShowPassword( !showPassword )}
-	                  onMouseDown={() => setShowPassword( !showPassword )}
-	                  edge="end"
-	                >
-	                  {showPassword ? <VisibilityOff /> : <Visibility />}
-	                </IconButton>
-	              </InputAdornment>
-	            : props?.for === 'time'
-	            	? (
-	        			<>
-		        			<InputAdornment 
-		        				position={props?.adornmentPosition ?? 'end'}
-		        			>	
-			        			<ButtonGroup variant="standard">
-			        				<Button size="small" onClick={() => setTime?.('AM')} sx={{ color: time === 'AM' ? "red" : "unset" }} >			        			
-				        				AM
-			        				</Button>
-			        				<Button size="small" onClick={() => setTime?.('PM')} sx={{ color: time === 'PM' ? "red" : "unset" }} >
-			        					PM
-			        				</Button>
-			        			</ButtonGroup>
+        <InputLabel required={props?.required} htmlFor="input-adornment">{props.label}</InputLabel>
+        <CurrentInput
+          id="input-adornment"
+          placeholder={props?.placeholder}
+          type={props?.type === 'password' ? showPassword ? 'text' : 'password' : props.type}
+          value={props?.value}
+          onChange={props?.onChange}
+          endAdornment={
+            props?.for === 'password'
+            	? <InputAdornment position="end">
+                <IconButton
+                  aria-label="toggle password visibility"
+                  onClick={() => setShowPassword( !showPassword )}
+                  onMouseDown={() => setShowPassword( !showPassword )}
+                  edge="end"
+                >
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            : props?.for === 'time'
+            	? (
+        			<>
+	        			<InputAdornment 
+	        				position={props?.adornmentPosition ?? 'end'}
+	        			>	
+		        			{
+		        				props?.timeButtonsOff
+		        					? <InputAdornment position={props?.adornmentPosition ?? 'end'}>{ props?.adornment }</InputAdornment>
+		        					: <ButtonGroup variant="standard">
+					        				<Button size="small" onClick={() => setTime?.('AM')} sx={{ color: time === 'AM' ? "red" : "unset" }} >			        			
+						        				AM
+					        				</Button>
+					        				<Button size="small" onClick={() => setTime?.('PM')} sx={{ color: time === 'PM' ? "red" : "unset" }} >
+					        					PM
+					        				</Button>
+					        			</ButtonGroup>
+		        			}
 
-		        			</InputAdornment>
-	        			</>
-	            		)
-	            	: <InputAdornment position={props?.adornmentPosition ?? 'end'}>{ props?.adornment }</InputAdornment>
-            }
-            label="Password"
+	        			</InputAdornment>
+        			</>
+            		)
+            	: <InputAdornment position={props?.adornmentPosition ?? 'end'}>{ props?.adornment }</InputAdornment>
+          }
+          label="Password"
           />
         </FormControl>
 	);

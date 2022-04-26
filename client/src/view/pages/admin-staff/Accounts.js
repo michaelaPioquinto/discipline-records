@@ -233,10 +233,10 @@ const Accounts = props => {
 			              <b>Full name</b>
 			            </div>
 			            <div className={`col-3 d-flex align-items-center justify-content-center text-center"`}>
-			              <b>Course / Year & Section</b>
+			              <b>Course / Year / Section</b>
 			            </div>
 			            <div className={`col-3 d-flex align-items-center justify-content-center text-center"`}>
-			              <b>Status</b>
+			              <b>Action</b>
 			            </div>
 			          </>
 				)}
@@ -341,7 +341,7 @@ const AddUser = props => {
 				<DialogTitle id="responsive-dialog-title">
 					{
 						!props.editingMode
-							? null
+							? "Want to add a Student?"
 							: "Edit this account?"
 					}
 				</DialogTitle>
@@ -390,7 +390,7 @@ const AddUser = props => {
 											if( !studentID.length || !firstName.length ||
 											!lastName.length || !middleName.length ||
 											!password.length || !course.length ||
-											!yearSection.length ) return enqueueSnackbar('A field must be empty', { variant: 'error' });
+											!yearSection.length ) return enqueueSnackbar('All fields must be filled up', { variant: 'error' });
 
 											axios.post(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/create-student`, { 
 												studentID, 
@@ -404,7 +404,7 @@ const AddUser = props => {
 											.then(() => {
 												props.fetchAccounts();
 												props.setOpen();
-												enqueueSnackbar('Successfully added a user', { variant: 'success' });
+												enqueueSnackbar('Successfully added a student', { variant: 'success' });
 											})
 											.catch( err => {
 												enqueueSnackbar( err?.response?.data?.message ?? 'Please try again!', { variant: 'error' });
@@ -422,7 +422,7 @@ const AddUser = props => {
 											if( !studentID.length || !firstName.length ||
 											!lastName.length || !middleName.length ||
 											!password.length || !course.length ||
-											!yearSection.length ) return enqueueSnackbar('A field must be empty', { variant: 'error' });
+											!yearSection.length ) return enqueueSnackbar('All fields must be filled up', { variant: 'error' });
 
 											axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/edit-student/${ props._id }`, { 
 												studentID, 

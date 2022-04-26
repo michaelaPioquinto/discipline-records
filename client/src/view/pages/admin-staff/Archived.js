@@ -183,7 +183,7 @@ const Archived = props => {
 			              <b>Full name</b>
 			            </div>
 			            <div className={`col-3 d-flex align-items-center justify-content-center text-center"`}>
-			              <b>Course / Year & Section</b>
+			              <b>Course / Year / Section</b>
 			            </div>
 			            <div className={`col-3 d-flex align-items-center justify-content-center text-center"`}>
 			              <b>Status</b>

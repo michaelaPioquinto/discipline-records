@@ -19,6 +19,7 @@ import UnarchiveIcon from '@mui/icons-material/Unarchive';
 import { useSnackbar } from 'notistack';
 import SearchContext from '../../../context/SearchContext';
 import Pagination from '@mui/material/Pagination';
+import Tooltip from '@mui/material/Tooltip';
 
 
 const Report = props => {
@@ -49,15 +50,23 @@ const Report = props => {
 			{
 				props.status === 'activated'
 					? <TableCell> 
-						<IconButton onClick={() => handleArchive( props )}>
-							<ArchiveIcon/>
-						</IconButton>
+						<Tooltip title="Archive" arrow>
+							<span>
+								<IconButton onClick={() => handleArchive( props )}>
+									<ArchiveIcon/>
+								</IconButton>
+							</span>
+						</Tooltip>
 					</TableCell>
-					: <TableCell> 
-						<IconButton onClick={() => handleUnarchive( props )}>
-							<UnarchiveIcon/>
-						</IconButton>
-					</TableCell>
+					: <Tooltip title="Unarchive" arrow>
+						<span> 
+							<TableCell> 
+								<IconButton onClick={() => handleUnarchive( props )}>
+									<UnarchiveIcon/>
+								</IconButton>
+							</TableCell>
+						</span>
+					</Tooltip>
 			}
 		</TableRow>
 	);

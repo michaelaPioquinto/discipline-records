@@ -29,6 +29,7 @@ import Table from '../../components/Table';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import Pagination from '@mui/material/Pagination';
+import Tooltip from '@mui/material/Tooltip';
 
 import SearchContext from '../../context/SearchContext';
 
@@ -42,12 +43,20 @@ const Item = props => (
 	      {
 	      	props?.role === 'admin'
 	      		? <>
-		      			<IconButton onClick={() => props?.handleEdit({ ...props })}>
-		      				<EditIcon/>
-				      	</IconButton>
-				      	<IconButton onClick={() => props?.handleDelete( props?._id )}>
-				      		<DeleteIcon/>
-				      	</IconButton>
+	      				<Tooltip title="edit" arrow>
+	      					<span>
+				      			<IconButton onClick={() => props?.handleEdit({ ...props })}>
+				      				<EditIcon/>
+						      	</IconButton>
+	      					</span>
+	      				</Tooltip>
+	      				<Tooltip title="delete" arrow>
+	      					<span>
+						      	<IconButton onClick={() => props?.handleDelete( props?._id )}>
+						      		<DeleteIcon/>
+						      	</IconButton>
+	      					</span>
+	      				</Tooltip>
 				      </>
 				    : null
 	      }
@@ -98,6 +107,8 @@ const Violation = props => {
 			}
 		});
 
+		renderedItem.sort(( v1, v2 ) => v1.violationName - v2.violationName);
+
 		setList([...renderedItem]);
 	}, [violationList, search]);
 
@@ -133,6 +144,7 @@ const Violation = props => {
 		axios.delete(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/delete-violation/${id}`)
 		.then(() => {
 			fetchViolationList();
+			enqueueSnackbar('Successfully deleted a violation', { variant: 'success' });
 		})
 		.catch( err => {
 			throw err;
@@ -181,8 +193,8 @@ const Violation = props => {
 		if( deleteViol ){
 			let modifiedViolations = violationList.filter( viol => viol.id !== deleteViol.id );
 
-			if( modifiedViolations.length ){
-			}
+			// if( modifiedViolations.length ){
+			// }
 
 			setDeleteViol( null );
 		}
@@ -245,12 +257,20 @@ const Violation = props => {
 	            {
 				      	props?.userType === 'admin'
 				      		? <div style={{ borderLeft: '1px solid rgba(0, 0, 0, 0.1)' }} className="col-2 d-flex align-items-center justify-content-center text-center">
-					      			<IconButton onClick={() => props?.handleEdit({ ...props.items[ index ] })}>
-					      				<EditIcon/>
-							      	</IconButton>
-							      	<IconButton onClick={() => props?.handleDelete( props?.items[ index ]['_id'] )}>
-							      		<DeleteIcon/>
-							      	</IconButton>
+				      				<Tooltip title="Edit" arrow>
+				      					<span>
+							      			<IconButton onClick={() => props?.handleEdit({ ...props.items[ index ] })}>
+							      				<EditIcon/>
+									      	</IconButton>
+				      					</span>
+			      					</Tooltip>
+			      					<Tooltip title="Delete" arrow>
+				      					<span>
+									      	<IconButton onClick={() => props?.handleDelete( props?.items[ index ]['_id'] )}>
+									      		<DeleteIcon/>
+									      	</IconButton>
+				      					</span>
+			      					</Tooltip>
 							      </div>
 							    : null
 				      }
@@ -470,11 +490,11 @@ const ValidationEditForm = props => {
 				aria-labelledby="responsive-dialog-title"
 			>
 				<DialogTitle id="responsive-dialog-title">
-					{"Want to edit a violation?"}
+					{"Edit this violation?"}
 				</DialogTitle>
 				<DialogContent>
 					<DialogContentText>
-						You can now edit this violation.
+						Please fill up this form.
 					</DialogContentText>
 					<Box
 						component="form"
@@ -527,7 +547,7 @@ const ValidationEditForm = props => {
 								axios.delete(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/delete-violation/${props.editForm.item._id}`)
 								.then( res => {
 									props.fetchViolationList();
-									enqueueSnackbar('Successfully deleted violation', { variant: 'success' });
+									enqueueSnackbar('Successfully deleted a violation', { variant: 'success' });
 								})
 								.catch(() => {
 									enqueueSnackbar( 'Please try again!', { variant: 'error' });
@@ -556,7 +576,7 @@ const ValidationEditForm = props => {
 									})
 									.then(() => {
 										props.fetchViolationList();
-										enqueueSnackbar('Successfully edited violation', { variant: 'success' });
+										enqueueSnackbar('Successfully edited a violation', { variant: 'success' });
 									})
 									.catch( err => {
 										enqueueSnackbar( err?.response?.data?.message ?? 'Please try again!', { variant: 'error' });

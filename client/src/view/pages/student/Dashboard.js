@@ -29,10 +29,18 @@ const Root = styled('div')(({ theme }) => ({
 const CustomizedTextField = styled( TextField )({
 	backgroundColor: 'rgba(255, 255, 255, 0.9)',
 	border: 'none',
-	borderRadius: '5px',
+	borderRadius: '50px',
 	color: 'black',
 	".css-10botns-MuiInputBase-input-MuiFilledInput-input.Mui-disabled": {
 		"-webkit-text-fill-color": 'rgba(0, 0, 0, 0.8)'
+	},
+
+	".css-cio0x1-MuiInputBase-root-MuiFilledInput-root":{
+		borderRadius: '10px'
+	},
+
+	".css-cio0x1-MuiInputBase-root-MuiFilledInput-root.Mui-disabled:before": {
+		borderBottomStyle: 'unset'
 	},
 
 	".Mui-disabled": {
@@ -53,6 +61,7 @@ const Dashboard = props => {
 	const [reportPage, setReportPage] = React.useState( 1 );
 	const [duties, setDuties] = React.useState( [] );
 	const [dutyHrs, setDutyHrs] = React.useState( [] );
+	const [syData, setSyData] = React.useState( null );
 
 	const handleSwitchPage = ( _, value ) => {
 		setReportPage( value );
@@ -66,10 +75,20 @@ const Dashboard = props => {
 		});
 	}
 
+	// const fetchSyData = async () => {
+	// 	axios.get(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/get-current-school-year-semester`)
+	// 	.then( res => setSyData( res.data ))
+	// 	.catch( err => {
+	// 		throw err;
+	// 	});
+	// }
+
 	React.useEffect(() => { 
 		if( props.name ) fetchStudentData();
 	}, [props]);
 	
+	// React.useEffect(() => fetchSyData(), []);
+
 	React.useEffect(() => {
 		if( studentData && studentData?.report?.length ){
 			const reps = [];
@@ -77,7 +96,7 @@ const Dashboard = props => {
 			const dtyHrs = [];
 
 			studentData.report.forEach( rep => {
-				if( rep.status === 'deactivated' ) return;
+				// if( rep.status === 'deactivated' ) return;
 				
 				const yearStarted = Number(new Date().getFullYear().toString().slice( 0, 2 ) + studentData?.student?.studentID?.slice?.( 0, 2 ));
 
@@ -112,6 +131,7 @@ const Dashboard = props => {
 				setDutyHrs([ ...dtyHrs ]);
 			}
 
+			console.log( reps );
 			setReportsView([ ...reps ]);
 		}
 	}, [studentData, selectedYearAndSem]);
@@ -161,7 +181,7 @@ const Dashboard = props => {
 			</div>
 
 			<div className="row col-12 d-flex flex-row justify-content-between">
-				<div className="col-lg-3 my-2 d-flex justify-content-center align-items-center">
+				<div className="col-lg-4 my-2 d-flex justify-content-center align-items-center">
 					<CustomizedTextField 
 						disabled 
 						label="Student Name" 
@@ -170,7 +190,7 @@ const Dashboard = props => {
 						sx={{ width: '100%' }}
 					/>
 				</div>
-				<div className="col-lg-3 my-2 d-flex justify-content-center align-items-center">
+				<div className="col-lg-4 my-2 d-flex justify-content-center align-items-center">
 					<CustomizedTextField 
 						disabled 
 						label="Course" 
@@ -179,7 +199,7 @@ const Dashboard = props => {
 						sx={{ width: '100%' }}
 					/>
 				</div>
-				<div className="col-lg-3 my-2 d-flex justify-content-center align-items-center">
+				<div className="col-lg-4 my-2 d-flex justify-content-center align-items-center">
 					<CustomizedTextField 
 						disabled 
 						label="Year & Section"
@@ -188,7 +208,7 @@ const Dashboard = props => {
 						sx={{ width: '100%' }}
 					/>
 				</div>
-				<div className="col-lg-3 my-2 d-flex justify-content-center align-items-center">
+				{/*<div className="col-lg-3 my-2 d-flex justify-content-center align-items-center">
 					<CustomizedTextField 
 						disabled 
 						label="Semester" 
@@ -196,25 +216,7 @@ const Dashboard = props => {
 						value={studentData?.student?.semester ?? ''}
 						sx={{ width: '100%' }}
 					/>
-				</div>
-				<div className="col-md-5 my-2 d-flex justify-content-center align-items-center">
-					<CustomizedTextField 
-						disabled 
-						label="Duty / Duties"
-						variant="filled"
-						value={duties?.[ reportPage - 1 ] ?? ''}
-						sx={{ width: '100%' }}
-					/>
-				</div>
-				<div className="col-md-5 my-2 d-flex justify-content-center align-items-center">
-					<CustomizedTextField 
-						disabled 
-						label="Duty Hours"
-						variant="filled"
-						value={dutyHrs?.[ reportPage - 1 ] ?? ''}
-						sx={{ width: '100%' }}
-					/>
-				</div>
+				</div>*/}
 			</div>
 
 			<div className="col-12">
@@ -225,9 +227,29 @@ const Dashboard = props => {
 				</Root>
 			</div>
 			<div className="col-12 d-flex justify-content-center align-items-center">
-				<div style={{ position: 'relative', width: '100%', minWidth: '200px' }} className="pt-5 m-0">
+				<div style={{ position: 'relative', width: '100%', minWidth: '200px' }} className="pt-5 m-0 d-flex flex-column justify-content-center align-items-center">
+					<div className="row d-flex col-12 justify-content-center align-items-center">
+						<div className="col-md-6 my-2 d-flex justify-content-center align-items-center">
+							<CustomizedTextField 
+								disabled 
+								label="Duty / Duties"
+								variant="filled"
+								value={duties?.[ reportPage - 1 ] ?? ''}
+								sx={{ width: '100%' }}
+							/>
+						</div>
+						<div className="col-md-6 my-2 d-flex justify-content-center align-items-center">
+							<CustomizedTextField 
+								disabled 
+								label="Duty Hours"
+								variant="filled"
+								value={dutyHrs?.[ reportPage - 1 ] ?? ''}
+								sx={{ width: '100%' }}
+							/>
+						</div>
+					</div>
 					{
-						studentData && studentData?.report?.length
+						studentData && studentData?.report?.length && reportsView.length
 							? (
 									<>
 										<div className="col-12 my-3 d-flex justify-content-center align-items-center">
@@ -287,9 +309,9 @@ const Report = props => {
 						? <> 
 								<br/>
 								<SkeletonizedTextfield 
-									label="Minor Problem Behavior(s)" 
-									size="small"
-									variant="standard"
+									label="Violation Minor Problem Behavior(s)" 
+									// size="small"
+									variant="filled"
 									data={ props.minorProblemBehavior.join(', ') }
 									width="90%"
 								/>
@@ -301,9 +323,9 @@ const Report = props => {
 					? <>
 							<br/>
 							<SkeletonizedTextfield 
-								size="small"
-								label="Major Problem Behavior(s)" 
-								variant="standard"
+								// size="small"
+								label="Violation Major Problem Behavior(s)" 
+								variant="filled"
 								data={ props.majorProblemBehavior.join(', ') }
 								width="90%"
 							/>

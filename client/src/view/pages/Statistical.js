@@ -39,7 +39,7 @@ const options = {
 		},
 		title: {
 			display: true,
-			text: 'Accumulated Number of Violators'
+			text: 'Accumulated Number of Violation'
 		}
 	}
 }

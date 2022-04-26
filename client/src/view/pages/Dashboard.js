@@ -286,7 +286,7 @@ const Dashboard = props => {
               <b>Full Name</b>
             </div>
             <div className={`${props?.userType === 'adminstaff' ? 'col-3' : 'col-4'} d-flex align-items-center justify-content-center text-center"`}>
-              <b>Year & Section</b>
+              <b>Course / Year / Section</b>
             </div>
             {
               props?.userType === 'adminstaff'
@@ -301,7 +301,7 @@ const Dashboard = props => {
       <StudentForm 
         setOpen={setOpen} 
         role={props?.role}
-        item={editForm.item} 
+        item={editForm?.item} 
         isOpen={editForm.isOpen}
         restorePage={restorePage} 
       />
@@ -343,6 +343,7 @@ const StudentForm = props => {
   const [reports, setReports] = React.useState( [] );
   const [page, setPage] = React.useState( 1 );
   const [yearSemester, setYearSemester] = React.useState( null );
+  const [dutyHrs, setDutyHrs] = React.useState( props?.item?.dutyHrs );
 
   const fetchStudentReport = async () => {
     if( !props.item ) return;
@@ -378,14 +379,17 @@ const StudentForm = props => {
     });
   } 
 
-  const handleDutyUpdate = async ({ _id }, val) => {
-    axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/duty-update/${ _id }`, { dutyHrs: val })
+  const handleDutyUpdate = () => {
+    axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/duty-update/${ reportData?.report?.[ page - 1 ]?._id }`, { dutyHrs })
+    .then(() => {
+      enqueueSnackbar( 'Updated Duty', { variant: 'success' });       
+    })
     .catch( err => {
       enqueueSnackbar( 'Please try again later', { variant: 'error' });       
     });
   }
 
-  const debouncedDutyUpdate = debounce( handleDutyUpdate, 1000 );
+  // const debouncedDutyUpdate = debounce( handleDutyUpdate, 1000 );
 
   const handleArchive = async ({ _id }) => {
     axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/archive-report/${ _id }`)
@@ -410,30 +414,33 @@ const StudentForm = props => {
         //   return;
 
         if( rep.status === 'activated' ){
+          setDutyHrs( rep?.dutyHrs );
           reports.push(
               <div key={uniqid()}>
                   <Stack direction="column" spacing={2}>
-                    {
-                      rep?.semester && yearSemester?.semester
-                        ? <> 
-                            <TextField
-                              disabled
-                              id="outlined-basic"
-                              label={`Duty - ${ yearSemester?.semester } semester`} 
-                              variant="outlined" 
-                              defaultValue={rep?.duty?.length ? rep?.duty?.join?.(', ') : ' ' }
-                            />
-                            <TextField
-                              disabled={props?.role !== 'adminstaff'}
-                              id="outlined-basic"
-                              label={`Duty hours- ${ yearSemester?.semester } semester`} 
-                              variant="outlined" 
-                              defaultValue={rep?.dutyHrs ? rep?.dutyHrs : '0' }
-                              onChange={e => rep ? debouncedDutyUpdate( rep, e.target.value ) : null}
-                            /> 
-                          </>
-                        : null
+                    { rep?.duty?.length && yearSemester?.semester &&
+                      <TextField
+                        disabled
+                        id="outlined-basic"
+                        label={`Duty - ${ yearSemester?.semester } semester`} 
+                        variant="outlined" 
+                        defaultValue={rep?.duty?.length ? rep?.duty?.join?.(', ') : ' ' }
+                      />
                     }
+                    <TimeField 
+                      value={rep?.dutyHrs} 
+                      className="p-0"
+                      input={
+                        <InputAdornment 
+                          required 
+                          timeButtonsOff 
+                          variant="outlined" 
+                          for="time"
+                          label="Duty hours"
+                        />
+                      } 
+                      onChange={(_, value) => setDutyHrs( value )} 
+                    />
                     {
                       rep?.semester 
                         ? <TextField
@@ -656,7 +663,7 @@ const StudentForm = props => {
       </DialogTitle>
       <DialogContent>
         <DialogContentText>
-          You are not allowed to modify these data.
+          You can edit the duty hours.
         </DialogContentText>
         <Box
           component="form"
@@ -688,14 +695,6 @@ const StudentForm = props => {
                       <TextField
                         disabled 
                         id="outlined-basic" 
-                        label="Semester" 
-                        variant="outlined" 
-                        defaultValue={yearSemester?.semester}
-                      />
-
-                      <TextField
-                        disabled 
-                        id="outlined-basic" 
                         label="School Year" 
                         variant="outlined" 
                         defaultValue={yearSemester?.schoolYear}
@@ -721,6 +720,11 @@ const StudentForm = props => {
           </Box>
       </DialogContent>
       <DialogActions>
+        <Button 
+          onClick={() => handleDutyUpdate()}
+        >
+          Save
+        </Button>
         <Button 
           autoFocus 
           onClick={() => {
@@ -803,7 +807,7 @@ const MakeReportForm = props => {
     courseYrSection: renderCourseYrSection() ?? '', 
     timeOfIncident: `00:00 ${currentTime}`, 
     location: '',
-    dutyHrs: '0', 
+    dutyHrs: '00:00', 
     specificAreaLocation: '', 
     additionalPersonInvolved: '', 
     witnesses: '', 
@@ -1048,6 +1052,13 @@ const MakeReportForm = props => {
     }, 1000);
   }
 
+  const makeVisibleStyle = {
+    color: 'black',
+    "input:disabled": {
+      color: 'black !important'
+    },
+  };
+
   const handleMajorProblemBehavior = (e, value) => {
     const label = e.target.labels[0].innerText;
     const labelExists = state.majorProblemBehavior.includes( label );
@@ -1145,8 +1156,16 @@ const MakeReportForm = props => {
               </div>
               <div className="col-md-6 d-flex justify-content-center align-items-center my-5">
                 <Stack spacing={2}>
-                  <TextField required sx={{ width: '300px' }} defaultValue={today} disabled helperText="Date of Report" onChange={e => dispatch({ type: 'dateOfReport', data: e.target.value })} type="date" variant="standard"/>
-                  <TextField disabled sx={{ width: '300px' }} defaultValue={state.incidentNo} label="Incident no." onChange={e => dispatch({ type: 'incidentNo', data: e.target.value })} type="number" variant="standard"/>
+                  <TextField 
+                    required 
+                    sx={{ width: '300px', ...makeVisibleStyle }} 
+                    defaultValue={today} 
+                    disabled 
+                    helperText="Date of Report" 
+                    onChange={e => dispatch({ type: 'dateOfReport', data: e.target.value })} 
+                    type="date" variant="standard"
+                  />
+                  <TextField disabled sx={{ width: '300px', ...makeVisibleStyle }} defaultValue={state.incidentNo} label="Incident no." onChange={e => dispatch({ type: 'incidentNo', data: e.target.value })} type="number" variant="standard"/>
                 </Stack>
               </div>
             </div>
@@ -1160,13 +1179,13 @@ const MakeReportForm = props => {
             <div className="row container-fluid d-flex justify-content-around align-items-center">
               <div className="col-md-6 d-flex justify-content-center align-items-center my-5">
                 <Stack spacing={2}>
-                  <TextField disabled sx={{ width: '300px' }} defaultValue={state.studentName} onChange={e => dispatch({ type: 'studentName', data: e.target.value })} label="Student Name" variant="standard"/>
+                  <TextField disabled sx={{ width: '300px', ...makeVisibleStyle }} defaultValue={state.studentName} onChange={e => dispatch({ type: 'studentName', data: e.target.value })} label="Student Name" variant="standard"/>
                   <TextField required sx={{ width: '300px' }} onChange={e => dispatch({ type: 'dateOfIncident', data: e.target.value })} helperText="Date of Incident" type="date" variant="standard"/>
                 </Stack>
               </div>
               <div className="col-md-6 d-flex justify-content-center align-items-center my-5">
                 <Stack spacing={2}>
-                  <TextField required disabled sx={{ width: '300px' }} defaultValue={state.courseYrSection} onChange={e => dispatch({ type: 'courseYrSection', data: e.target.value })} label="Course / Yr / Section" variant="standard"/>
+                  <TextField required disabled sx={{ width: '300px', ...makeVisibleStyle }} defaultValue={state.courseYrSection} onChange={e => dispatch({ type: 'courseYrSection', data: e.target.value })} label="Course / Yr / Section" variant="standard"/>
                   <TimeField 
                     value="00:00" 
                     input={<InputAdornment required getTime={time => setCurrentTime( time )} for="time" label="Time of Incident"/>} 
@@ -1192,7 +1211,13 @@ const MakeReportForm = props => {
 
               <div className="col-md-12">
                 <br/>
-                <InputAdornment 
+                <TimeField 
+                  value="00:00" 
+                  className="p-0"
+                  input={<InputAdornment required timeButtonsOff for="time" adornment="23hrs max" label="Duty Time"/>} 
+                  onChange={(_, value) => dispatch({ type: 'dutyHrs', data: value })} 
+                />
+                {/*<InputAdornment 
                   width="80vw" 
                   required 
                   adornment="Format: 00 hrs/mns" 
@@ -1200,7 +1225,7 @@ const MakeReportForm = props => {
                   label="Duty Time" 
                   variant="standard"
                   onChange={e => dispatch({ type: 'dutyHrs', data: e.target.value })} 
-                />
+                />*/}
               </div>
 
               <div className="col-md-12 d-flex justify-content-center align-items-center">
