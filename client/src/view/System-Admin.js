@@ -14,7 +14,7 @@ const Trash = React.lazy(() => import('./pages/Trash'));
 
 const SystemAdmin = props => {
 	const [searchContent, setSearchContent] = React.useState('');
-	const [content, setContent] = React.useState({ name: 'Dashboard', cont: <Dashboard search={searchContent} getSearchContent={e => handleSearch( e )}/> });
+	const [content, setContent] = React.useState({ name: 'Dashboard', cont: <Dashboard search={searchContent} getSearchContent={e => handleSearch( e )} tools={props.tools}/> });
 
 	const handleSearch = e => {
 		debounce(() => setSearchContent( e.target.value ), 100)();
@@ -32,7 +32,7 @@ const SystemAdmin = props => {
 				openSearchOn={['Dashboard', 'Violation', 'Account', 'Trash']}
 				getSearchContent={e => handleSearch( e )}
 				listItems={[
-					{ title: 'Dashboard', onClick: () => content.name === 'Dashboard' ? null : setContent({ name: 'Dashboard', cont: <Dashboard search={searchContent} getSearchContent={e => handleSearch( e )}/> }) },
+					{ title: 'Dashboard', onClick: () => content.name === 'Dashboard' ? null : setContent({ name: 'Dashboard', cont: <Dashboard search={searchContent} getSearchContent={e => handleSearch( e )} tools={props.tools}/> }) },
 					{ title: 'Violation', onClick: () =>  content.name === 'Validation' ? null : setContent({ name: 'Violation', cont: <Violation role="sysadmin" search={searchContent} getSearchContent={e => handleSearch( e )}/> })},
 					{ title: 'Account', onClick: () => content.name === 'Account' ? null : setContent({ name: 'Account', cont: <Accounts search={searchContent} getSearchContent={e => handleSearch( e )}/> }) },
 					{ title: 'Statistical', onClick: () => content.name === 'Statistical' ? null : setContent({ name: 'Statistical', cont: <Statistical/> }) },

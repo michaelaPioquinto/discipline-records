@@ -105,7 +105,7 @@ const Accounts = props => {
 	}
 
 	const handleDelete = id => {
-		axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/delete-school-year-and-semester/${id}`)
+		axios.delete(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/delete-school-year-and-semester/${id}`)
 		.then( res => {
 			fetchSchoolYears();
 		})
@@ -206,7 +206,7 @@ const Accounts = props => {
 				            		color: props?.items?.[ index ]?.semester === '1st' ? "#ff0006" : '#e7a100',
 				            		fontWeight: 'bold' 
 				            	}} 
-				            	className={`col-4 d-flex align-items-center justify-content-center text-center"`}
+				            	className={`col-3 d-flex align-items-center justify-content-center text-center"`}
 				            >
 				              { props?.items?.[ index ]?.semester }
 				            </div>
@@ -214,7 +214,7 @@ const Accounts = props => {
 				              style={{
 				                borderLeft: '1px solid rgba(0, 0, 0, 0.1)'
 				              }} 
-				              className={`col-4 text-capitalize d-flex align-items-center justify-content-center text-center"`}
+				              className={`col-3 text-capitalize d-flex align-items-center justify-content-center text-center"`}
 				            >
 								<FormControlLabel
 									onDoubleClick={e => e.stopPropagation()} 
@@ -228,6 +228,16 @@ const Accounts = props => {
 									label={ props?.items?.[ index ]?.status }
 								/>
 				            </div>
+				            <div 
+				            	style={{
+					                borderLeft: '1px solid rgba(0, 0, 0, 0.1)'
+					              }}
+					            className="col-2 text-capitalize d-flex align-items-center justify-content-center text-center"
+					        >
+				            	<IconButton onClick={() => handleDelete( props?.items?.[ index ]?._id )}>
+				            		<DeleteIcon/>
+				            	</IconButton>
+				            </div>
 			          </div>
 			         )
 				}}
@@ -237,11 +247,14 @@ const Accounts = props => {
 			            <div className={`col-4 d-flex align-items-center justify-content-center text-center"`}>
 			              <b>School Year</b>
 			            </div>
-			            <div className={`col-4 d-flex align-items-center justify-content-center text-center"`}>
+			            <div className={`col-3 d-flex align-items-center justify-content-center text-center"`}>
 			              <b>Semester</b>
 			            </div>
-			            <div className={`col-4 d-flex align-items-center justify-content-center text-center"`}>
+			            <div className={`col-3 d-flex align-items-center justify-content-center text-center"`}>
 			              <b>Status</b>
+			            </div>
+			            <div className={`col-2 d-flex align-items-center justify-content-center text-center"`}>
+			              <b>Action</b>
 			            </div>
 			          </>
 				)}
@@ -458,7 +471,7 @@ const EditUser = props => {
 	const [item, dispatch] = React.useReducer( reducer, initState );
 
 	const verifySchoolYear = value => {
-		if( !value ) return 'School Year is empty';
+		if( !value ) return 'School year is empty';
 
 		try{
 			const currentYear = new Date().getFullYear();

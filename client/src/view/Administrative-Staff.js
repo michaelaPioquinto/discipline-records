@@ -18,7 +18,7 @@ const Archived = React.lazy(() => import('./pages/admin-staff/Archived'));
 
 const AdminStaff = props => {
 	const [searchContent, setSearchContent] = React.useState('');
-	const [content, setContent] = React.useState({ name: 'Dashboard', cont: <Dashboard role="adminstaff" search={searchContent} getSearchContent={e => handleSearch( e )}/> });
+	const [content, setContent] = React.useState({ name: 'Dashboard', cont: <Dashboard role="adminstaff" search={searchContent} getSearchContent={e => handleSearch( e )} tools={props.tools}/> });
 
 	const handleSearch = e => {
 		debounce(() => setSearchContent( e.target.value ), 100)();
@@ -36,7 +36,7 @@ const AdminStaff = props => {
 				openSearchOn={['Dashboard', 'Violation', 'Account', 'Reports', 'Deactivated Students']}
 				getSearchContent={e => handleSearch( e )}
 				listItems={[
-					{ title: 'Dashboard', onClick: () => content.name === 'Dashboard' ? null : setContent({ name: 'Dashboard', cont: <Dashboard role="adminstaff" search={searchContent} getSearchContent={e => handleSearch( e )}/> }) },
+					{ title: 'Dashboard', onClick: () => content.name === 'Dashboard' ? null : setContent({ name: 'Dashboard', cont: <Dashboard role="adminstaff" search={searchContent} getSearchContent={e => handleSearch( e )} tools={props.tools}/> }) },
 					{ title: 'Violation', onClick: () =>  content.name === 'Validation' ? null : setContent({ name: 'Violation', cont: <Violation role="adminstaff" search={searchContent} getSearchContent={e => handleSearch( e )}/> })},
 					{ title: 'Account', onClick: () => content.name === 'Account' ? null : setContent({ name: 'Account', cont: <Accounts search={searchContent} getSearchContent={e => handleSearch( e )}/> }) },
 					{ title: 'Deactivated Students', onClick: () => content.name === 'Deactivated Students' ? null : setContent({ name: 'Deactivated Students', cont: <Archived search={searchContent} getSearchContent={e => handleSearch( e )}/> }) },

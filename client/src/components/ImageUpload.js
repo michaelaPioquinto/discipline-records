@@ -11,6 +11,7 @@ import DoNotTouchIcon from '@mui/icons-material/DoNotTouch';
 const ImageUpload = props => {
 	const { imageLimit } = props;
 
+	const allowedFileExtension = ['jpeg', 'jpg', 'png'];
 	const [imageChips, setImageChips] = React.useState( [] );
 	const [images, setImages] = React.useState( [] );
 
@@ -27,16 +28,25 @@ const ImageUpload = props => {
 
 		fileInput.addEventListener('input', e => {
 			if( e?.target?.files ){
-				const fileNameList = Object.values( e?.target?.files )?.map?.( file => file.name );
-				const filteredFiles = [];
+				const files = Object.values( e.target.files )?.filter?.( file => {
+					const fileExtension = file.name.split('.')[ 1 ]?.toLowerCase();
 
-				fileNameList.forEach(( name, index ) => {
-					if( !imageChips.includes( name ) ){
-						filteredFiles.push( e.target.files[ index ] );
-					}
+					return allowedFileExtension.includes( fileExtension );
 				});
 
-				setImages( images => [ ...images, ...filteredFiles ] );
+
+				if( files?.length ){
+					const fileNameList = files?.map?.( file => file.name );
+					const filteredFiles = [];
+
+					fileNameList.forEach(( name, index ) => {
+						if( !imageChips.includes( name ) ){
+							filteredFiles.push( files[ index ] );
+						}
+					});
+
+					setImages( images => [ ...images, ...filteredFiles ] );
+				}
 			}
 		});
 

@@ -299,6 +299,7 @@ const Dashboard = props => {
         )}
       />
       <StudentForm 
+        role={props?.tools?.role}
         setOpen={setOpen} 
         role={props?.role}
         item={editForm?.item} 
@@ -418,7 +419,7 @@ const StudentForm = props => {
           reports.push(
               <div key={uniqid()}>
                   <Stack direction="column" spacing={2}>
-                    { rep?.duty?.length && yearSemester?.semester &&
+                    { yearSemester?.semester &&
                       <TextField
                         disabled
                         id="outlined-basic"
@@ -427,20 +428,26 @@ const StudentForm = props => {
                         defaultValue={rep?.duty?.length ? rep?.duty?.join?.(', ') : ' ' }
                       />
                     }
-                    <TimeField 
-                      value={rep?.dutyHrs} 
-                      className="p-0"
-                      input={
-                        <InputAdornment 
-                          required 
-                          timeButtonsOff 
-                          variant="outlined" 
-                          for="time"
-                          label="Duty hours"
-                        />
-                      } 
-                      onChange={(_, value) => setDutyHrs( value )} 
-                    />
+                    {
+                      props?.role === 'adminstaff'
+                        ?  <TimeField 
+                            value={rep?.dutyHrs} 
+                            className="p-0"
+                            input={
+                              <InputAdornment 
+                                required 
+                                timeButtonsOff 
+                                variant="outlined" 
+                                for="time"
+                                label="Duty hours"
+                                disabled
+                              />
+                            } 
+                            onChange={(_, value) => setDutyHrs( value )} 
+                          />
+                        : <TextField label="Duty hours" disabled value={rep?.dutyHrs}/>
+                    }
+                    
                     {
                       rep?.semester 
                         ? <TextField
@@ -642,7 +649,7 @@ const StudentForm = props => {
     else{
       setReports( [] );
     }
-  }, [reportData]);
+  }, [reportData, yearSemester]);
 
   React.useEffect(() => fetchStudentReport(), [props.item]);
 
@@ -663,7 +670,11 @@ const StudentForm = props => {
       </DialogTitle>
       <DialogContent>
         <DialogContentText>
-          You can edit the duty hours.
+          {
+            props?.role === 'adminstaff'
+              ? 'You can modify these data'
+              : 'You are not allowed to edit these data'
+          }
         </DialogContentText>
         <Box
           component="form"
@@ -720,11 +731,15 @@ const StudentForm = props => {
           </Box>
       </DialogContent>
       <DialogActions>
-        <Button 
-          onClick={() => handleDutyUpdate()}
-        >
-          Save
-        </Button>
+        {
+          props?.role === 'adminstaff'
+            ? <Button 
+                onClick={() => handleDutyUpdate()}
+              >
+                Save
+              </Button>
+            : null
+        }
         <Button 
           autoFocus 
           onClick={() => {

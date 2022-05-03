@@ -430,7 +430,7 @@ router.get('/school-year-and-semester', async( req, res ) => {
 });
 
 
-router.put('/delete-school-year-and-semester/:id', async( req, res, next ) => {
+router.delete('/delete-school-year-and-semester/:id', async( req, res, next ) => {
   if( !req.params.id ) return res.sendStatus( 403 );
    
   SchoolYear.deleteOne({ _id: req.params.id }, err => {

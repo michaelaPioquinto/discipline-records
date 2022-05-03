@@ -341,7 +341,7 @@ const AddUser = props => {
 				<DialogTitle id="responsive-dialog-title">
 					{
 						!props.editingMode
-							? "Want to add a Student?"
+							? "Edit this account?"
 							: "Edit this account?"
 					}
 				</DialogTitle>
