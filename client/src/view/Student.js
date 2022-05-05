@@ -9,6 +9,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 import SchoolYearAndSemester from '../context/SchoolYearAndSemester.js';
 
 const Dashboard = React.lazy(() => import('./pages/student/Dashboard'));
+const ChangePassword = React.lazy(() => import('./pages/student/ChangePassword'));
 const Handbook = React.lazy(() => import('./pages/Handbook'));
 
 
@@ -36,6 +37,7 @@ const Student = props => {
 					setSelectedYearAndSem={setSelectedYearAndSem}
 					listItems={[
 						{ title: 'Dashboard', onClick: () => content.name === 'Dashboard' ? null : setContent({ name: 'Dashboard', cont: <Dashboard name={ props.tools.name } selectedYearAndSem={selectedYearAndSem}/> }) },
+						{ title: 'Change-Password', onClick: () => content.name === 'Change-Password' ? null : setContent({ name: 'Change-Password', cont: <ChangePassword name={ props.tools.name } selectedYearAndSem={selectedYearAndSem}/> }) },
 						{ title: 'Handbook', onClick: () => content.name === 'Handbook' ? null : setContent({ name: 'Handbook', cont: <Handbook/> }) },
 					]}
 				>

@@ -673,7 +673,7 @@ const StudentForm = props => {
           {
             props?.role === 'adminstaff'
               ? 'You can modify these data'
-              : 'You are not allowed to edit these data'
+              : 'You are not allowed to modify these data'
           }
         </DialogContentText>
         <Box

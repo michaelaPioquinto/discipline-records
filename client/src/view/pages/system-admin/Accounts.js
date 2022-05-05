@@ -367,7 +367,7 @@ const AddUser = props => {
 												.then(() => {
 													props.fetchAccounts();
 													props.setOpen();
-													enqueueSnackbar('Successfully added a user', { variant: 'success' });
+													enqueueSnackbar('Successfully added an administrator', { variant: 'success' });
 												})
 												.catch( err => {
 													enqueueSnackbar( err.response.data.message ?? 'Please try again', { variant: 'error' });
@@ -390,7 +390,7 @@ const AddUser = props => {
 											.then(() => {
 												props.fetchAccounts();
 												props.setOpen();
-												enqueueSnackbar('Successfully deleted a user', { variant: 'success' });
+												enqueueSnackbar('Successfully deleted an administrator', { variant: 'success' });
 											})
 											.catch(() => {
 												enqueueSnackbar('Please try again', { variant: 'error' });
@@ -416,7 +416,7 @@ const AddUser = props => {
 												.then(() => {
 													props.fetchAccounts();
 													props.setOpen();
-													enqueueSnackbar('Successfully edited a user', { variant: 'success' });
+													enqueueSnackbar('Successfully edited an administrator', { variant: 'success' });
 												})
 												.catch( err => {
 													enqueueSnackbar( err.response.data.message ?? 'Please try again', { variant: 'error' });
