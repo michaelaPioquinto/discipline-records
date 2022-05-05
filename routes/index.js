@@ -430,38 +430,7 @@ router.get('/school-year-and-semester', async( req, res ) => {
 });
 
 
-router.put('/change-student-password/id/:id', async ( req, res, next ) => {
-  const { id } = req.params;
-  const { currPassword, newPassword } = req.body;
 
-  if( !id || !newPassword || !currPassword ) return res.sendStatus( 404 );
-
-  Student.findOne({ _id: id }, (err, doc) => {
-    if( err ) return res.sendStatus( 403 );
-
-    if( doc ){
-      if( doc.password === currPassword ){
-        doc.password = newPassword;
-
-        doc.save( err => {
-          if( err ) return res.sendStatus( 403 );
-
-          return res.status( 200 ).json({
-            message: 'Successfully changed password!'
-          });
-        });
-      }
-      else{
-        return res.status( 406 ).json({
-          message: 'Incorrect password!'
-        });
-      }
-    }
-    else{
-      return res.sendStatus( 404 )
-    }
-  });
-});
 
 router.delete('/delete-school-year-and-semester/:id', async( req, res, next ) => {
   if( !req.params.id ) return res.sendStatus( 403 );
@@ -748,6 +717,43 @@ router.delete('/delete-user/id/:id', async( req, res ) => {
     }    
     else{
       return res.end();
+    }
+  });
+});
+
+router.put('/change-student-password/id/:id', async ( req, res, next ) => {
+  const { id } = req.params;
+  const { currPass, newPass } = req.body;
+
+  if( !id || !newPass || !currPass ) return res.sendStatus( 404 );
+
+  Student.findOne({ studentID: id }, (err, doc) => {
+    if( err ) return res.sendStatus( 403 );
+
+    if( doc ){
+      console.log( doc.password, currPass );
+      console.log( typeof doc.password, typeof currPass );
+
+      if( doc.password === currPass ){
+        doc.password = newPass;
+
+        doc.save( err => {
+          if( err ) return res.sendStatus( 403 );
+
+          return res.status( 200 ).json({
+            message: 'Successfully changed password!'
+          });
+        });
+      }
+      else{
+        return res.status( 406 ).json({
+          message: 'Incorrect password!'
+        });
+      }
+    }
+    else{
+      console.log( 'here2' );
+      return res.sendStatus( 404 )
     }
   });
 });
