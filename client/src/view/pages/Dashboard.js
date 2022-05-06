@@ -534,20 +534,21 @@ const StudentForm = props => {
                             disabled
                             rows={10}
                             variant="outlined" 
-                            defaultValue={rep?.minorProblemBehavior?.map?.( offense => {
-                              if( rep?.thirdOffenses?.includes( offense ) ){
-                                return `${offense}-(Third Offense)`;             
-                              }
-                              else if( rep?.secondOffenses?.includes( offense ) ){
-                                return `${offense}-(Second Offense)`;
-                              }
-                              else if( rep?.firstOffenses?.includes( offense ) ){
-                                return `${offense}-(First Offense)`;
-                              }
-                              else{
-                                return offense;
-                              }
-                            })?.join?.(', ')}
+                            // defaultValue={rep?.minorProblemBehavior?.map?.( offense => {
+                            //   if( rep?.thirdOffenses?.includes( offense ) ){
+                            //     return `${offense}-(Third Offense)`;             
+                            //   }
+                            //   else if( rep?.secondOffenses?.includes( offense ) ){
+                            //     return `${offense}-(Second Offense)`;
+                            //   }
+                            //   else if( rep?.firstOffenses?.includes( offense ) ){
+                            //     return `${offense}-(First Offense)`;
+                            //   }
+                            //   else{
+                            //     return offense;
+                            //   }
+                            // })?.join?.(', ')}
+                            defaultValue={rep?.minorProblemBehavior}
                           />
                         : null
                     }
