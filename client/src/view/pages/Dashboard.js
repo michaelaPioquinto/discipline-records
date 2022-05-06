@@ -219,11 +219,15 @@ const Dashboard = props => {
           }
 
           const renderCourseYrSection = item => {
-            if( !item?.course || !item?.yearSection)
-              return null;
+            // if( !item?.course || !item?.yearSection)
+            //   return null;
 
-            return item?.course + ' ' + item?.yearSection;
+            // return item?.course + ' ' + item?.yearSection;
+            if( !item?.course ) return null;
+
+            return item?.course;
           }
+
           return (
             <div 
               id={uniqid()} 
@@ -797,10 +801,14 @@ const MakeReportForm = props => {
   }
 
   const renderCourseYrSection = () => {
-    if( !props?.data?.course || !props?.data?.yearSection)
+    if( !props?.data?.course )
       return null;
 
-    return props?.data?.course + ' ' + props?.data?.yearSection;
+    return props?.data?.course;
+    // if( !props?.data?.course || !props?.data?.yearSection)
+    //   return null;
+
+    // return props?.data?.course + ' ' + props?.data?.yearSection;
   }
 
   const initState = {
@@ -1194,7 +1202,7 @@ const MakeReportForm = props => {
               </div>
               <div className="col-md-6 d-flex justify-content-center align-items-center my-5">
                 <Stack spacing={2}>
-                  {/*<TextField required disabled sx={{ width: '300px', ...makeVisibleStyle }} defaultValue={state.courseYrSection} onChange={e => dispatch({ type: 'courseYrSection', data: e.target.value })} label="Course / Yr / Section" variant="standard"/>*/}
+                  <TextField required disabled sx={{ width: '300px', ...makeVisibleStyle }} defaultValue={state.courseYrSection} onChange={e => dispatch({ type: 'courseYrSection', data: e.target.value })} label="Course" variant="standard"/>
                   <TimeField 
                     value="00:00" 
                     input={<InputAdornment required getTime={time => setCurrentTime( time )} for="time" label="Time of Incident"/>} 
