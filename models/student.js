@@ -9,7 +9,7 @@ const studentSchema = new Schema({
 	password: { type: String, required: true },
 	course: { type: String, required: true },
 	semester: { type: String, default: '1st' },
-	yearSection: { type: String, required: true },
+	// yearSection: { type: String, required: true },
 	status: { type: Object, default: 'activated' },
 	dateArchived: String
 });

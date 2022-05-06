@@ -224,25 +224,25 @@ const Violation = props => {
       		return (
       			<div 
 	            id={uniqid()} 
-	            style={{ ...style }} 
+	            style={{ ...style, overflow: 'hidden' }} 
 	            className="table-v2-row col-12 d-flex"
 	          > 
 	            <div 
 	              style={{
 	                borderRight: '1px solid rgba(0, 0, 0, 0.1)'
 	              }} 
-	              className={`${props?.userType === 'admin' ? 'col-3' : 'col-3'} d-flex align-items-center justify-content-center text-center"`}
+	              className={`${props?.userType === 'admin' ? 'col-3' : 'col-3'} p-1 d-flex align-items-center justify-content-center text-center"`}
 	            >
 	              { props?.items?.[ index ]?.violationName }
 	            </div>
-	            <div className={`${props?.userType === 'admin' ? 'col-2' : 'col-3'} d-flex align-items-center justify-content-center text-center"`}>
+	            <div className={`${props?.userType === 'admin' ? 'col-2' : 'col-3'} p-1 d-flex align-items-center justify-content-center text-center"`}>
 	              { props?.items?.[ index ]?.firstOffense }
 	            </div>
 	            <div 
 	              style={{
 	                borderLeft: '1px solid rgba(0, 0, 0, 0.1)'
 	              }} 
-	              className={`${props?.userType === 'admin' ? 'col-2' : 'col-3'} d-flex align-items-center justify-content-center text-center"`}
+	              className={`${props?.userType === 'admin' ? 'col-2' : 'col-3'} p-1 d-flex align-items-center justify-content-center text-center"`}
 	            >
 	              { props?.items?.[ index ]?.secondOffense }
 	            </div>
@@ -250,7 +250,7 @@ const Violation = props => {
 	              style={{
 	                borderLeft: '1px solid rgba(0, 0, 0, 0.1)'
 	              }} 
-	              className={`${props?.userType === 'admin' ? 'col-3' : 'col-3'} d-flex align-items-center justify-content-center text-center"`}
+	              className={`${props?.userType === 'admin' ? 'col-3' : 'col-3'} p-1 d-flex align-items-center justify-content-center text-center"`}
 	            >
 	              { props?.items?.[ index ]?.thirdOffense }
 	            </div>

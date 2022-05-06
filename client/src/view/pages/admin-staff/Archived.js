@@ -156,7 +156,7 @@ const Archived = props => {
 				              { `${props.items[ index ].lastname}, ${props.items[ index ].firstName} ${props.items[ index ].middleName}` }
 				            </div>
 				            <div className={`col-3 d-flex align-items-center justify-content-center text-center"`}>
-				              { `${props.items[ index ].course} ${props.items[ index ].yearSection}` }
+				              { `${props.items[ index ].course}` }
 				            </div>
 				            <div 
 				              style={{
@@ -183,7 +183,7 @@ const Archived = props => {
 			              <b>Full name</b>
 			            </div>
 			            <div className={`col-3 d-flex align-items-center justify-content-center text-center"`}>
-			              <b>Course / Year / Section</b>
+			              <b>Course</b>
 			            </div>
 			            <div className={`col-3 d-flex align-items-center justify-content-center text-center"`}>
 			              <b>Status</b>

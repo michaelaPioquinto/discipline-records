@@ -431,7 +431,7 @@ const AccountView = props => {
 				<div 
 					id={uniqid()} 
 					style={{...style, backgroundColor: index % 2 === 0 ? 'white' : '#f6f6f6'}} 
-					className="account-view-item px-4 d-flex justify-content-between align-items-center"
+					className="account-view-item px-4 d-flex justify-content-between align-items-center overflow-hidden"
 				>
 					{
 						props?.renderItemsKey?.map?.(( key, index ) => (

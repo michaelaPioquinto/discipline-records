@@ -248,7 +248,7 @@ const Dashboard = props => {
                 }} 
                 className={`${props?.userType === 'adminstaff' ? 'col-3' : 'col-4'} d-flex align-items-center justify-content-center text-center"`}
               >
-                { renderCourseYrSection( props?.items?.[ index ] ) }
+                { props?.items?.[ index ]?.course }
               </div>
               {
                 props?.userType === 'adminstaff'
@@ -286,7 +286,7 @@ const Dashboard = props => {
               <b>Full Name</b>
             </div>
             <div className={`${props?.userType === 'adminstaff' ? 'col-3' : 'col-4'} d-flex align-items-center justify-content-center text-center"`}>
-              <b>Course / Year / Section</b>
+              <b>Course</b>
             </div>
             {
               props?.userType === 'adminstaff'
@@ -502,7 +502,7 @@ const StudentForm = props => {
                           )
                     }
 
-                    {
+                    {/*{
                       yearSemester?.semester 
                         ? <TextField
                             disabled 
@@ -512,7 +512,7 @@ const StudentForm = props => {
                             defaultValue={yearSemester?.semester}
                           />
                         : null
-                    }
+                    }*/}
 
                     {
                       rep?.majorProblemBehavior?.length && yearSemester?.semester
@@ -695,13 +695,6 @@ const StudentForm = props => {
                         label="Student ID" 
                         variant="outlined" 
                         defaultValue={reportData?.student?.studentID}
-                      />
-                      <TextField
-                        disabled 
-                        id="outlined-basic" 
-                        label="Year" 
-                        variant="outlined" 
-                        defaultValue={reportData?.student?.yearSection}
                       />
                       <TextField
                         disabled 
@@ -1200,7 +1193,7 @@ const MakeReportForm = props => {
               </div>
               <div className="col-md-6 d-flex justify-content-center align-items-center my-5">
                 <Stack spacing={2}>
-                  <TextField required disabled sx={{ width: '300px', ...makeVisibleStyle }} defaultValue={state.courseYrSection} onChange={e => dispatch({ type: 'courseYrSection', data: e.target.value })} label="Course / Yr / Section" variant="standard"/>
+                  {/*<TextField required disabled sx={{ width: '300px', ...makeVisibleStyle }} defaultValue={state.courseYrSection} onChange={e => dispatch({ type: 'courseYrSection', data: e.target.value })} label="Course / Yr / Section" variant="standard"/>*/}
                   <TimeField 
                     value="00:00" 
                     input={<InputAdornment required getTime={time => setCurrentTime( time )} for="time" label="Time of Incident"/>} 

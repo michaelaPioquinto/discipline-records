@@ -130,7 +130,7 @@ const Accounts = props => {
 					acc?.firstName?.toLowerCase?.()?.includes?.( search?.toLowerCase?.() ) ||
 					acc?.lastname?.toLowerCase?.()?.includes?.( search?.toLowerCase?.() ) ||
 					acc?.middleName?.toLowerCase?.()?.includes?.( search?.toLowerCase?.() ) ||
-					acc?.yearSection?.toLowerCase?.()?.includes?.( search?.toLowerCase?.() ) ||
+					// acc?.yearSection?.toLowerCase?.()?.includes?.( search?.toLowerCase?.() ) ||
 					acc?.course?.toLowerCase?.()?.includes?.( search?.toLowerCase?.() )
 				 ){
 					renderedItem.push( acc );
@@ -204,7 +204,7 @@ const Accounts = props => {
 				              { `${props.items[ index ].lastname}, ${props.items[ index ].firstName} ${props.items[ index ].middleName}` }
 				            </div>
 				            <div className={`col-3 d-flex align-items-center justify-content-center text-center"`}>
-				              { `${props.items[ index ].course} ${props.items[ index ].yearSection}` }
+				              { `${props.items[ index ].course}` }
 				            </div>
 				            <div 
 				              style={{
@@ -233,7 +233,7 @@ const Accounts = props => {
 			              <b>Full name</b>
 			            </div>
 			            <div className={`col-3 d-flex align-items-center justify-content-center text-center"`}>
-			              <b>Course / Year / Section</b>
+			              <b>Course</b>
 			            </div>
 			            <div className={`col-3 d-flex align-items-center justify-content-center text-center"`}>
 			              <b>Action</b>
@@ -272,7 +272,7 @@ const AddUser = props => {
 	const [lastName, setLastName] = React.useState( props.lastname ?? '' );
 	const [middleName, setMiddleName] = React.useState( props.middleName ?? '' );
 	const [password, setPassword] = React.useState( props.password ?? '' );
-	const [yearSection, setYearSection] = React.useState( props.yearSection ?? '' );
+	// const [yearSection, setYearSection] = React.useState( props.yearSection ?? '' );
 	const [course, setCourse] = React.useState( props.course ?? '' );
 	// const [archived, setArchived] = React.useState( props.archived ?? { isArchived: false, date: new Date().getFullYear() });
 
@@ -294,9 +294,9 @@ const AddUser = props => {
 		setMiddleName( e.target.value );
 	}
 
-	const handleYearSection = async e => {
-		setYearSection( e.target.value );
-	}
+	// const handleYearSection = async e => {
+	// 	setYearSection( e.target.value );
+	// }
 
 	const handleCourse = async e => {
 		setCourse( e.target.value );
@@ -313,7 +313,7 @@ const AddUser = props => {
 			setLastName( props.lastname );
 			setMiddleName( props.middleName );
 			setPassword( props.password );
-			setYearSection( props.yearSection );
+			// setYearSection( props.yearSection );
 			setCourse( props.course );
 		}
 		else{
@@ -322,7 +322,7 @@ const AddUser = props => {
 			setLastName( '' );
 			setMiddleName( '' );
 			setPassword( '' );
-			setYearSection( '' );
+			// setYearSection( '' );
 			setCourse( '' );
 		}
 	}, [props]);
@@ -364,14 +364,14 @@ const AddUser = props => {
 				    			lastName={lastName}
 				    			middleName={middleName}
 				    			course={course}
-				    			yearSection={yearSection}
+				    			// yearSection={yearSection}
 				    			password={password}
 				    			handleStudentID={handleStudentID}
 				    			handleFirstName={handleFirstName}
 				    			handleLastName={handleLastName}
 				    			handleMiddleName={handleMiddleName}
 				    			handleCourse={handleCourse}
-				    			handleYearSection={handleYearSection}
+				    			// handleYearSection={handleYearSection}
 				    			handlePassword={handlePassword}
 	    					/>
 				    	</Stack>
@@ -389,8 +389,8 @@ const AddUser = props => {
 										onClick={() => {
 											if( !studentID.length || !firstName.length ||
 											!lastName.length || !middleName.length ||
-											!password.length || !course.length ||
-											!yearSection.length ) return enqueueSnackbar('All fields must be filled up', { variant: 'error' });
+											!password.length || !course.length /*||
+											!yearSection.length*/ ) return enqueueSnackbar('All fields must be filled up', { variant: 'error' });
 
 											axios.post(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/create-student`, { 
 												studentID, 
@@ -399,7 +399,7 @@ const AddUser = props => {
 												middleName, 
 												password, 
 												course, 
-												yearSection
+												// yearSection
 											})
 											.then(() => {
 												props.fetchAccounts();
@@ -421,8 +421,8 @@ const AddUser = props => {
 										onClick={() => {
 											if( !studentID.length || !firstName.length ||
 											!lastName.length || !middleName.length ||
-											!password.length || !course.length ||
-											!yearSection.length ) return enqueueSnackbar('All fields must be filled up', { variant: 'error' });
+											!password.length || !course.length /*||
+											!yearSection.length*/ ) return enqueueSnackbar('All fields must be filled up', { variant: 'error' });
 
 											axios.put(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/edit-student/${ props._id }`, { 
 												studentID, 
@@ -431,7 +431,7 @@ const AddUser = props => {
 												middleName, 
 												password, 
 												course, 
-												yearSection
+												// yearSection
 											})
 											.then(() => {
 												props.fetchAccounts();
@@ -500,13 +500,13 @@ const GenerateInputFields = props => (
 			value={props.course}
 			onChange={props.handleCourse}
 		/>
-		<TextField 
+		{/*<TextField 
 			id="outlined-basic" 
 			label="Year and Section" 
 			variant="outlined"
 			value={props.yearSection}
 			onChange={props.handleYearSection}
-		/>
+		/>*/}
 	</>
 )
 
