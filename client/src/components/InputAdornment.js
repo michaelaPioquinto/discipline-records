@@ -13,6 +13,7 @@ import FilledInput from '@mui/material/FilledInput';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
+import FormHelperText from '@mui/material/FormHelperText';
 
 export default function CustomInputAdornment( props ){
 	const [showPassword, setShowPassword] = React.useState( false );
@@ -73,6 +74,9 @@ export default function CustomInputAdornment( props ){
           }
           label="Password"
           />
+          <FormHelperText>
+          	{ props?.helperText }
+          </FormHelperText>
         </FormControl>
 	);
 }

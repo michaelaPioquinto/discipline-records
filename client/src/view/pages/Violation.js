@@ -254,22 +254,26 @@ const Violation = props => {
 	            >
 	              { props?.items?.[ index ]?.thirdOffense }
 	            </div>
-	            <div style={{ borderLeft: '1px solid rgba(0, 0, 0, 0.1)' }} className="col-2 d-flex align-items-center justify-content-center text-center">
-	      				<Tooltip title="Edit" arrow>
-	      					<span>
-				      			<IconButton disabled={props?.userType !== 'admin'} onClick={() => props?.handleEdit({ ...props.items[ index ] })}>
-				      				<EditIcon/>
-						      	</IconButton>
-	      					</span>
-      					</Tooltip>
-      					<Tooltip title="Delete" arrow>
-	      					<span>
-						      	<IconButton disabled={props?.userType !== 'admin'} onClick={() => props?.handleDelete( props?.items[ index ]['_id'] )}>
-						      		<DeleteIcon/>
-						      	</IconButton>
-	      					</span>
-      					</Tooltip>
-				      </div>
+	            {
+	            	props?.userType === 'admin'
+	            		? <div style={{ borderLeft: '1px solid rgba(0, 0, 0, 0.1)' }} className="col-2 d-flex align-items-center justify-content-center text-center">
+				      				<Tooltip title="Edit" arrow>
+				      					<span>
+							      			<IconButton disabled={props?.userType !== 'admin'} onClick={() => props?.handleEdit({ ...props.items[ index ] })}>
+							      				<EditIcon/>
+									      	</IconButton>
+				      					</span>
+			      					</Tooltip>
+			      					<Tooltip title="Delete" arrow>
+				      					<span>
+									      	<IconButton disabled={props?.userType !== 'admin'} onClick={() => props?.handleDelete( props?.items[ index ]['_id'] )}>
+									      		<DeleteIcon/>
+									      	</IconButton>
+				      					</span>
+			      					</Tooltip>
+							      </div>
+							    : null
+	            }
 	          </div>
 	        )
       	}}
@@ -288,9 +292,13 @@ const Violation = props => {
             <div className={`table-cell d-flex align-items-center justify-content-center text-center"`}>
               <b>Third Offense</b>
             </div>
-            <div className="table-cell d-flex align-items-center justify-content-center">
-              <b>Action</b>
-            </div>
+            {
+            	props?.userType === 'admin'
+            		? <div className="table-cell d-flex align-items-center justify-content-center">
+			              <b>Action</b>
+			            </div>
+			          : null
+            }
           </>
       	)}
       />
