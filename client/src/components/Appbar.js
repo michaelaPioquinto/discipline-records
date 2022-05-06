@@ -380,13 +380,16 @@ const Appbar = props => {
 							</Breadcrumbs>
 						</div>
 						<div style={{ width: 'fit-content' }} className="d-flex justify-content-around align-items-center">
-							{/*<div className="app-bar-search-bar px-2 d-flex align-items-center">
-								<SearchIcon sx={{ color: 'rgba(0, 0, 0, 0.2)' }} fontSize="small"/>
-								<div className="flex-grow-1">
-									<input onChange={props?.getSearchContent} className="app-bar-search-bar-input" placeholder="Search..."/>
-									<div className="app-bar-search-bar-input-2"/>
+							{
+								props?.openSearchBar &&
+								<div className="app-bar-search-bar px-2 d-flex align-items-center">
+									<SearchIcon sx={{ color: 'rgba(0, 0, 0, 0.2)' }} fontSize="small"/>
+									<div className="flex-grow-1">
+										<input onChange={props?.getSearchContent} className="app-bar-search-bar-input" placeholder="Search..."/>
+										<div className="app-bar-search-bar-input-2"/>
+									</div>
 								</div>
-							</div>*/}
+							}
 							<IconButton onClick={handleSignout}>
 								<PowerSettingsNewIcon style={{ color: 'red' }} fontSize="small"/>
 							</IconButton>

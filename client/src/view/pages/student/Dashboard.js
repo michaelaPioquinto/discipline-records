@@ -181,7 +181,7 @@ const Dashboard = props => {
 			</div>
 
 			<div className="row col-12 d-flex flex-row justify-content-between">
-				<div className="col-lg-4 my-2 d-flex justify-content-center align-items-center">
+				<div className="col-lg-6 my-2 d-flex justify-content-center align-items-center">
 					<CustomizedTextField 
 						disabled 
 						label="Student Name" 
@@ -190,7 +190,7 @@ const Dashboard = props => {
 						sx={{ width: '100%' }}
 					/>
 				</div>
-				<div className="col-lg-4 my-2 d-flex justify-content-center align-items-center">
+				<div className="col-lg-6 my-2 d-flex justify-content-center align-items-center">
 					<CustomizedTextField 
 						disabled 
 						label="Course" 
@@ -199,7 +199,7 @@ const Dashboard = props => {
 						sx={{ width: '100%' }}
 					/>
 				</div>
-				<div className="col-lg-4 my-2 d-flex justify-content-center align-items-center">
+				{/*<div className="col-lg-4 my-2 d-flex justify-content-center align-items-center">
 					<CustomizedTextField 
 						disabled 
 						label="Year & Section"
@@ -207,7 +207,7 @@ const Dashboard = props => {
 						value={studentData?.student?.yearSection ?? ''}
 						sx={{ width: '100%' }}
 					/>
-				</div>
+				</div>*/}
 				{/*<div className="col-lg-3 my-2 d-flex justify-content-center align-items-center">
 					<CustomizedTextField 
 						disabled 

@@ -7,6 +7,7 @@ import Button from '@mui/material/Button';
 import Alert from '@mui/material/Alert';
 import { useSnackbar } from 'notistack';
 
+import InputAdornment from '../../../components/InputAdornment';
 
 const ChangePassword = props => {
 	const initlMsg = { text: '', type: '' };
@@ -34,6 +35,10 @@ const ChangePassword = props => {
 				{ newPass, currPass }
 			)
 			.then( res => {
+				setcurrPass('');
+				setNewPass('');
+				setRepeatPass('');
+
 				setMsg({ 
 					text: res?.data?.message ?? 'Successfully changed password!',
 					type: 'success' 
@@ -65,29 +70,35 @@ const ChangePassword = props => {
 				<br/>
 				<br/>
 				<div className="col-12 px-3 d-flex flex-column justify-content-around align-items-center">
-					<TextField 
-						fullWidth 
+					<InputAdornment 
+						width="100%"
 						label="Current Password" 
 						value={currPass} 
 						type="password"
 						onChange={handleSetcurrPass}
+						for="password"
+						variant="filled"
 					/>
 					<br/>
-					<TextField 
-						fullWidth 
+					<InputAdornment 
+						width="100%"
 						label="New Password" 
 						value={newPass} 
 						type="password"
 						onChange={handleSetNewPass}
+						for="password"
+						variant="filled"
 						helperText="Length must be greater than 8"
 					/>
 					<br/>
-					<TextField 
-						fullWidth 
+					<InputAdornment 
+						width="100%"
 						label="Repeat Password" 
 						value={repeatPass} 
 						type="password"
 						onChange={handleSetRepeatPass}
+						for="password"
+						variant="filled"
 						error={repeatPass.length && !arePasswordsMatch}
 						helperText={repeatPass.length && !arePasswordsMatch ? "Passwords did not match" : ''}
 					/>

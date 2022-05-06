@@ -33,8 +33,8 @@ const AdminStaff = props => {
 			<Appbar 
 				tools={props.tools}
 				title="Administrative Staff"
-				openSearchOn={['Dashboard', 'Violation', 'Account', 'Reports', 'Deactivated Students']}
 				getSearchContent={e => handleSearch( e )}
+				openSearchBar={content?.name === 'Reports'}
 				listItems={[
 					{ title: 'Dashboard', onClick: () => content.name === 'Dashboard' ? null : setContent({ name: 'Dashboard', cont: <Dashboard role="adminstaff" search={searchContent} getSearchContent={e => handleSearch( e )} tools={props.tools}/> }) },
 					{ title: 'Violation', onClick: () =>  content.name === 'Validation' ? null : setContent({ name: 'Violation', cont: <Violation role="adminstaff" search={searchContent} getSearchContent={e => handleSearch( e )}/> })},

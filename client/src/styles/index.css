@@ -272,6 +272,10 @@ code {
   height: 100%;
 }
 
+.table-cell{
+  width: calc( 100% / 4 );
+}
+
 .table-v2-row{
   transition: .2s ease-in-out;
 }
