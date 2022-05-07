@@ -88,7 +88,7 @@ const ChangePassword = props => {
 						onChange={handleSetNewPass}
 						for="password"
 						variant="filled"
-						helperText="Length must be greater than 8"
+						helperText="Minimum of 8 characters"
 					/>
 					<br/>
 					<InputAdornment 
