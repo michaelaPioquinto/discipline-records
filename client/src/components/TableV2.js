@@ -70,6 +70,7 @@ import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
+import Fade from '@mui/material/Fade';
 
 // import DialogForm from './DialogForm';
 
@@ -428,47 +429,48 @@ const AccountView = props => {
 			const keys = Object.keys(filteredItems[ index1 ]);
 
 			return( 
-				<div 
-					id={uniqid()} 
-					style={{...style, backgroundColor: index % 2 === 0 ? 'white' : '#f6f6f6'}} 
-					className="account-view-item px-4 d-flex justify-content-between align-items-center overflow-hidden"
-				>
-					{
-						props?.renderItemsKey?.map?.(( key, index ) => (
-							props?.statusSwitchOn && key === 'status'
-								? <div key={uniqid()}className="qams-row col-sm d-flex justify-content-center text-capitalize"> 
-									<FormGroup>
-										<FormControlLabel 
-											control={
-												<Switch 
-													checked={
-														filteredItems[ index1 ][ key ] === 'activated' 
-															? true 
-															: false
-														}
-													onChange={e => handleRowSwitch(e, filteredItems[ index1 ]._id)}
-													size="small"
-													color="default"
-												/>
-											} 
-											label={filteredItems[ index1 ][ key ] === 'activated' ? 'active' : 'inactive'}
-										/>
-								    </FormGroup>
-							    </div>
-							    : <div 
-							    	key={uniqid()} 
-							    	id={filteredItems[ index1 ][ key ]} 
-							    	className={`qams-row text-capitalize d-flex justify-content-${index === 0 ? 'start' : 'center'} col-sm`}
-							    >
-									{ 
-										filteredItems[ index1 ][ key ] instanceof Array 
-											? filteredItems[ index1 ][ key ].join(', ') 
-											: filteredItems[ index1 ][ key ] 
-									}
-								</div>
-						))
-					}
-				</div>
+				<Fade id={uniqid()} in={true} timeout={1000 * index} mountOnEnter unmountOnExit>
+					<div 
+						style={{...style, backgroundColor: index % 2 === 0 ? 'white' : '#f6f6f6'}} 
+						className="account-view-item px-4 d-flex justify-content-between align-items-center overflow-hidden"
+					>
+						{
+							props?.renderItemsKey?.map?.(( key, index ) => (
+								props?.statusSwitchOn && key === 'status'
+									? <div key={uniqid()}className="qams-row col-sm d-flex justify-content-center text-capitalize"> 
+										<FormGroup>
+											<FormControlLabel 
+												control={
+													<Switch 
+														checked={
+															filteredItems[ index1 ][ key ] === 'activated' 
+																? true 
+																: false
+															}
+														onChange={e => handleRowSwitch(e, filteredItems[ index1 ]._id)}
+														size="small"
+														color="default"
+													/>
+												} 
+												label={filteredItems[ index1 ][ key ] === 'activated' ? 'active' : 'inactive'}
+											/>
+									    </FormGroup>
+								    </div>
+								    : <div 
+								    	key={uniqid()} 
+								    	id={filteredItems[ index1 ][ key ]} 
+								    	className={`qams-row text-capitalize d-flex justify-content-${index === 0 ? 'start' : 'center'} col-sm`}
+								    >
+										{ 
+											filteredItems[ index1 ][ key ] instanceof Array 
+												? filteredItems[ index1 ][ key ].join(', ') 
+												: filteredItems[ index1 ][ key ] 
+										}
+									</div>
+							))
+						}
+					</div>
+				</Fade>
 			)
 		});
 

@@ -20,7 +20,7 @@ import { useSnackbar } from 'notistack';
 import SearchContext from '../../../context/SearchContext';
 import Pagination from '@mui/material/Pagination';
 import Tooltip from '@mui/material/Tooltip';
-
+import Fade from '@mui/material/Fade';
 
 const Report = props => {
 	const { handleArchive, handleUnarchive } = props;
@@ -40,35 +40,37 @@ const Report = props => {
 	// }, [behaviors]);
 
 	return(
-		<TableRow>
-			<TableCell> { props.studentID } </TableCell>
-			<TableCell> { props.studentName } </TableCell>
-			<TableCell> { props.incidentDescription } </TableCell>
-			<TableCell> { props.reportedBy } </TableCell>
-			<TableCell> { props.dateOfReport } </TableCell>
-			<TableCell> { behaviors?.join?.(', ') } </TableCell>
-			{
-				props.status === 'activated'
-					? <TableCell> 
-						<Tooltip title="Archive" arrow>
-							<span>
-								<IconButton onClick={() => handleArchive( props )}>
-									<ArchiveIcon/>
-								</IconButton>
+		<Fade in={true} timeout={500 * props?.index} mountOnEnter unmountOnExit>
+			<TableRow>
+				<TableCell> { props.studentID } </TableCell>
+				<TableCell> { props.studentName } </TableCell>
+				<TableCell> { props.incidentDescription } </TableCell>
+				<TableCell> { props.reportedBy } </TableCell>
+				<TableCell> { props.dateOfReport } </TableCell>
+				<TableCell> { behaviors?.join?.(', ') } </TableCell>
+				{
+					props.status === 'activated'
+						? <TableCell> 
+							<Tooltip title="Archive" arrow>
+								<span>
+									<IconButton onClick={() => handleArchive( props )}>
+										<ArchiveIcon/>
+									</IconButton>
+								</span>
+							</Tooltip>
+						</TableCell>
+						: <Tooltip title="Unarchive" arrow>
+							<span> 
+								<TableCell> 
+									<IconButton onClick={() => handleUnarchive( props )}>
+										<UnarchiveIcon/>
+									</IconButton>
+								</TableCell>
 							</span>
 						</Tooltip>
-					</TableCell>
-					: <Tooltip title="Unarchive" arrow>
-						<span> 
-							<TableCell> 
-								<IconButton onClick={() => handleUnarchive( props )}>
-									<UnarchiveIcon/>
-								</IconButton>
-							</TableCell>
-						</span>
-					</Tooltip>
-			}
-		</TableRow>
+				}
+			</TableRow>
+		</Fade>
 	);
 }
 
@@ -125,11 +127,14 @@ const Archived = props => {
 		let chunkSet = [];
 		const chunksLimit = 5;
 
-		const addToFilteredItems = item => filtered.push( <Report key={uniqid()} {...item} handleArchive={handleArchive} handleUnarchive={handleUnarchive}/> );
+		const addToFilteredItems = (item, index) => 
+			filtered.push( 
+				<Report key={uniqid()} index={index} {...item} handleArchive={handleArchive} handleUnarchive={handleUnarchive}/> 
+			);
 
-		reports?.forEach?.( item => {
+		reports?.forEach?.(( item, index ) => {
 			if( item?.studentID?.searchContain?.( search ) && item?.status === currentView ){
-				addToFilteredItems( item );
+				addToFilteredItems( item, index );
 			}
 		});
 

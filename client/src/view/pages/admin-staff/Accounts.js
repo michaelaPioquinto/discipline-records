@@ -182,7 +182,7 @@ const Accounts = props => {
 
 					return(
 						<div 
-				            id={uniqid()} 
+				            // id={uniqid()} 
 				            style={{ ...style }} 
 				            className="table-v2-row col-12 d-flex"
 							onDoubleClick={() => props.onDoubleClick({ editingMode: true, ...props.items[ index ] })}

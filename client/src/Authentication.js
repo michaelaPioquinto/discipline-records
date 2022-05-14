@@ -157,7 +157,7 @@ const Authentication = props => {
 
 	return(
 		<SnackbarProvider maxSnack={3}>
-	      <div className="App">
+	      <div className="App transition-all duration-700 ease-in-out">
 	        <React.Suspense fallback={<Loading/>}>      
 	          <Switch>
 	            {

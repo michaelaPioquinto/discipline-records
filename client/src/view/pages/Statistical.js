@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import uniqid from 'uniqid';
 
 import Paper from '@mui/material/Paper';
 import { Line } from 'react-chartjs-2'; 
@@ -106,7 +107,7 @@ const Statistical = props => {
 
 			data.forEach( datum => {
 				tempStatsHistory.push(
-					<TableRow>
+					<TableRow key={uniqid()}>
 						<TableCell align="left"> { datum.year } </TableCell>
 						<TableCell align="right"> { datum.semester1 } </TableCell>
 						<TableCell align="right"> { datum.semester2 } </TableCell>

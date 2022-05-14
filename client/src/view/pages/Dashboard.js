@@ -230,7 +230,7 @@ const Dashboard = props => {
 
           return (
             <div 
-              id={uniqid()} 
+              // id={uniqid()} 
               style={{ ...style }} 
               onClick={() => props.onClick({ isOpen: true, item: { ...props?.items?.[ index ] }})}
               className="table-v2-row col-12 d-flex"
@@ -1280,10 +1280,13 @@ const MakeReportForm = props => {
                 </Divider>
               </Root>
               
-              <ImageUpload imageLimit={Infinity} getImages={ data => {
-                dispatch({ type: 'images', data: data });
-                setImage( data );
-              }}/>  
+              <ImageUpload 
+                imageLimit={5} 
+                getImages={ data => {
+                  dispatch({ type: 'images', data: data });
+                  setImage( data );
+                }}
+              />  
               <br/>
 
               <Root>

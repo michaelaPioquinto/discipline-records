@@ -30,6 +30,8 @@ import ReportGmailerrorredIcon from '@mui/icons-material/ReportGmailerrorred';
 import ReorderIcon from '@mui/icons-material/Reorder';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import Fade from '@mui/material/Fade';
+
 // import KeyIcon from '@mui/icons-material/Key';
 // import CakeIcon from '@mui/icons-material/Cake';
 // import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
@@ -49,7 +51,11 @@ import FilterAltIcon from '@mui/icons-material/FilterAlt';
 
 
 export default function TableV2 ( props ){
-	const Row = React.useCallback(({ index, style }) => props?.generateRows?.( index, style, props, [ ] ));
+	const Row = React.useCallback(({ index, style }) => (
+		<Fade id={uniqid()} in={true} timeout={500 * index} mountOnEnter unmountOnExit>
+			{ props?.generateRows?.( index, style, props, [ ] ) }
+		</Fade>
+	));
 
 	return(
 		<div className="table-v2 d-flex flex-column border rounded shadow">

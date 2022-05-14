@@ -38,6 +38,9 @@ import { useSnackbar } from 'notistack';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
 
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
+import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
+
 import Chip from '@mui/material/Chip';
 import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
 import cctLogo from '../images/cct-logo.ico';
@@ -253,8 +256,8 @@ const Appbar = props => {
 	);
 	
 	return(
-		<div className="app-bar d-flex">
-			<div style={{ display: isMenuOpen ? 'unset' : 'none' }} className="app-bar-left">
+		<div className="app-bar d-flex transition-all duration-700 ease-in-out">
+			<div style={{ display: isMenuOpen ? 'unset' : 'none' }} className="app-bar-left transition-all duration-700 ease-in-out">
 				<div className="app-bar-menu d-flex flex-column justify-content-center">
 					<div className="app-bar-menu-button col-12 p-2 ">
 						<IconButton onClick={() => setIsMenuOpen( !isMenuOpen )}>
@@ -363,14 +366,19 @@ const Appbar = props => {
 				</div>
 			</div>
 			<div className="app-bar-right d-flex flex-column">
-				<div style={{ display: isMenuOpen ? 'flex' : 'none' }} className="app-bar-title">
+				<div style={{ display: isMenuOpen ? 'flex' : 'none' }} className="app-bar-title transition-all duration-700 ease-in-out">
 					<h3 className="m-0 px-2">discipline record management</h3>
 				</div>
-				<div style={{ borderRadius: isMenuOpen ? '15px' : '0' }} className="app-bar-content-box p-2">
+				<div style={{ borderRadius: isMenuOpen ? '15px' : '0' }} className="app-bar-content-box p-2 transition-all duration-700 ease-in-out">
 					{/* Contents go here */}
 					<div className="app-bar-menu-bar px-2 d-flex justify-content-between align-items-center">
 						<IconButton onClick={() => setIsMenuOpen( !isMenuOpen )}>
 							<MenuIcon fontSize="small"/>
+							{/*{
+								isMenuOpen
+									? <FullscreenIcon/>
+									:	<FullscreenExitIcon/>
+							}*/}
 						</IconButton>
 
 						<div className="app-bar-menu-label flex-grow-1 px-3 d-flex justify-content-start" role="presentation" style={{ width: 'fit-content' }}>
@@ -385,7 +393,7 @@ const Appbar = props => {
 								<div className="app-bar-search-bar px-2 d-flex align-items-center">
 									<SearchIcon sx={{ color: 'rgba(0, 0, 0, 0.2)' }} fontSize="small"/>
 									<div className="flex-grow-1">
-										<input onChange={props?.getSearchContent} className="app-bar-search-bar-input" placeholder="Search..."/>
+										<input onChange={props?.getSearchContent} className="app-bar-search-bar-input" placeholder={ props?.searchPlaceHolder ?? "Search..." }/>
 										<div className="app-bar-search-bar-input-2"/>
 									</div>
 								</div>

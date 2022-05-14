@@ -223,7 +223,7 @@ const Violation = props => {
       	generateRows={( index, style, props ) => {
       		return (
       			<div 
-	            id={uniqid()} 
+	            // id={uniqid()} 
 	            style={{ ...style, overflow: 'hidden' }} 
 	            className="table-v2-row col-12 d-flex"
 	          > 

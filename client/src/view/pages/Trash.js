@@ -155,7 +155,7 @@ const Trash = props => {
       	searchPlaceHolder="Username"
     		generateRows={(index, style, props) => (
     			<div 
-            id={uniqid()} 
+            // id={uniqid()} 
             style={{ ...style }} 
             className="table-v2-row col-12 d-flex"
           > 
