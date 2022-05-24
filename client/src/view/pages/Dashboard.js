@@ -1222,29 +1222,6 @@ const MakeReportForm = props => {
                 <TextField disabled sx={{ width: '300px', margin: '10px' }} defaultValue={state.semester} required onChange={e => dispatch({ type: 'semester', data: e.target.value })} label="Semester" variant="standard"/>
               </div>
 
-              <div className="col-md-12">
-                <TextField required sx={{ width: '80vw', margin: '10px' }} onChange={e => dispatch({ type: 'duty', data: e.target.value })} label="Duty" variant="standard"/>
-              </div>
-
-              <div className="col-md-12">
-                <br/>
-                <TimeField 
-                  value="00:00" 
-                  className="p-0"
-                  input={<InputAdornment required timeButtonsOff for="time" adornment="23hrs max" label="Duty Time"/>} 
-                  onChange={(_, value) => dispatch({ type: 'dutyHrs', data: value })} 
-                />
-                {/*<InputAdornment 
-                  width="80vw" 
-                  required 
-                  adornment="Format: 00 hrs/mns" 
-                  value={state.dutyHrs ? null : state.dutyHrs} 
-                  label="Duty Time" 
-                  variant="standard"
-                  onChange={e => dispatch({ type: 'dutyHrs', data: e.target.value })} 
-                />*/}
-              </div>
-
               <div className="col-md-12 d-flex justify-content-center align-items-center">
                 <TextField required sx={{ width: '80vw', margin: '10px' }} onChange={e => dispatch({ type: 'location', data: e.target.value })} label="Location" variant="standard"/>
               </div>
@@ -1553,7 +1530,29 @@ const MakeReportForm = props => {
                       <OtherCheckBox onChange={value => setOtherMajor( value )}/>
                     </div>*/}
                   </div>
-                </RadioGroup>              
+                </RadioGroup>
+                <div className="col-md-12">
+                  <TextField required sx={{ width: '80vw', margin: '10px' }} onChange={e => dispatch({ type: 'duty', data: e.target.value })} label="Duty" variant="standard"/>
+                </div>
+
+                <div className="col-md-12">
+                  <br/>
+                  <TimeField 
+                    value="00:00" 
+                    className="p-0"
+                    input={<InputAdornment required timeButtonsOff for="time" adornment="23hrs max" label="Duty Time"/>} 
+                    onChange={(_, value) => dispatch({ type: 'dutyHrs', data: value })} 
+                  />
+                  {/*<InputAdornment 
+                    width="80vw" 
+                    required 
+                    adornment="Format: 00 hrs/mns" 
+                    value={state.dutyHrs ? null : state.dutyHrs} 
+                    label="Duty Time" 
+                    variant="standard"
+                    onChange={e => dispatch({ type: 'dutyHrs', data: e.target.value })} 
+                  />*/}
+                </div>              
               </div>      
             </div>
             <div className="row container-fluid d-flex flex-column justify-content-center align-items-center">
@@ -1631,6 +1630,7 @@ const MakeReportForm = props => {
                 <div className="col-5">
                   <OtherCheckBox disabled={isAdminDecisionCheckboxDisabled} onChange={value => setOtherDecision( value )}/>
                 </div>
+
                 {/*<div className="col-md-4">
                   <FormControlLabel
                     label="Conference w/ student"
