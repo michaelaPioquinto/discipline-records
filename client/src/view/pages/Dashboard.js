@@ -1534,7 +1534,6 @@ const MakeReportForm = props => {
                 <div className="col-md-12">
                   <TextField required sx={{ width: '80vw', margin: '10px' }} onChange={e => dispatch({ type: 'duty', data: e.target.value })} label="Duty" variant="standard"/>
                 </div>
-
                 <div className="col-md-12">
                   <br/>
                   <TimeField 
