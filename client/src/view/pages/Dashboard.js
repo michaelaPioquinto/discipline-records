@@ -48,9 +48,9 @@ import { styled } from '@mui/material/styles';
 import ReportGmailerrorredIcon from '@mui/icons-material/ReportGmailerrorred';
 
 import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
+import RadioGroup from '@mui/material/RadioGroup';
 
 import TableV2 from '../../components/Table-v2';
 import InputAdornment from '../../components/InputAdornment';
@@ -1093,19 +1093,19 @@ const MakeReportForm = props => {
   }
 
   const handleMinorProblemBehavior = (e, value) => {
-   const label = e.target.labels[0].innerText;
-   const labelExists = state.minorProblemBehavior.includes( label );
+    const label = e.target.labels[0].innerText;
+    const labelExists = state.minorProblemBehavior.includes( label );
 
-   if( labelExists && !value ){
-     const newList = state.minorProblemBehavior.filter( val => val !== label );
-     dispatch({ type: 'minorProblemBehavior', data: newList });
-   }
-   else if( !labelExists && value ){
-     const newList = state.minorProblemBehavior;
-     newList.push( label );
+    if( labelExists && !value ){
+      const newList = state.minorProblemBehavior.filter( val => val !== label );
+      dispatch({ type: 'minorProblemBehavior', data: newList });
+    }
+    else if( !labelExists && value ){
+      const newList = state.minorProblemBehavior;
+      newList.push( label );
 
-     dispatch({ type: 'minorProblemBehavior', data: newList });
-   }
+      dispatch({ type: 'minorProblemBehavior', data: newList });
+    }
   }
 
   const handleAdministrativeDecision = (e, value) => {
@@ -1280,8 +1280,8 @@ const MakeReportForm = props => {
                 </Divider>
               </Root>
               
-              <ImageUpload 
-                imageLimit={5} 
+              <ImageUpload
+                imageLimit={5}
                 getImages={ data => {
                   dispatch({ type: 'images', data: data });
                   setImage( data );
@@ -1343,59 +1343,100 @@ const MakeReportForm = props => {
                   <p className="text-uppercase">minors: <b className="text-danger">(Required if there is no major problem behavior)</b></p>
                 </div>
 
-                <div className="row container-fluid">
-                  <div className="col-md-6">  
-                    <FormControlLabel
-                      label="Not wearing prescribed school uniform"
-                      control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
-                    />
+                <RadioGroup defaultValue={state.minorProblemBehavior} onChange={handleMinorProblemBehavior}>
+                  <div className="row container-fluid">
+                    <div className="col-md-6">
+                      <FormControlLabel 
+                        control={<Radio/>} 
+                        label="Not wearing prescribed school uniform"
+                        value="Not wearing prescribed school uniform"
+                      />
+                      {/*<FormControlLabel
+                        label="Not wearing prescribed school uniform"
+                        control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
+                      />*/}
+                    </div>
+                    <div className="col-md-6">  
+                      <FormControlLabel 
+                        control={<Radio/>} 
+                        label="Not wearing I.D"
+                        value="Not wearing I.D"
+                      />
+                      {/*<FormControlLabel
+                        label="Not wearing I.D"
+                        control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
+                      />*/}
+                    </div>
+                    <div className="col-md-6">  
+                      {/*<FormControlLabel
+                        label="Dress Code"
+                        control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
+                      />*/}
+                      <FormControlLabel 
+                        control={<Radio/>} 
+                        label="Dress Code"
+                        value="Dress Code"
+                      />
+                    </div>
+                    <div className="col-md-6">  
+                      <FormControlLabel 
+                        control={<Radio/>} 
+                        label="Using vulgar words and rough behavior"
+                        value="Using vulgar words and rough behavior"
+                      />
+                      {/*<FormControlLabel
+                        control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
+                      />*/}
+                    </div>
+                    <div className="col-md-6">  
+                      {/*<FormControlLabel
+                        label="Dress Code"
+                        control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
+                      />*/}
+                      <FormControlLabel 
+                        label="Loitering"
+                        value="Loitering"
+                        control={<Radio/>} 
+                      />
+                    </div>
+                    <div className="col-md-6"> 
+                      <FormControlLabel 
+                        control={<Radio/>} 
+                        label="Littering"
+                        value="Littering"
+                      /> 
+                      {/*<FormControlLabel
+                        label="Dress Code"
+                        control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
+                      />*/}
+                    </div>
+                    <div className="col-md-6">  
+                      {/*<FormControlLabel
+                        label="Careless / unauthorized use of school property"
+                        control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
+                      />*/}
+                      <FormControlLabel 
+                        control={<Radio/>} 
+                        label="Careless / unauthorized use of school property"
+                        value="Careless / unauthorized use of school property"
+                      /> 
+                    </div>
+                    <div className="col-md-6">
+                      <FormControlLabel
+                        control={<Radio/>}
+                        label="Unauthorized posting of announcements, posters and notices."
+                        value="Unauthorized posting of announcements, posters and notices."
+                      />
+                      {/*<FormControlLabel
+                        label="Littering"
+                        control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
+                      />*/}
+                    </div>
+                    {/*<div className="col-md-6">
+                      <OtherCheckBox onChange={value => setOtherMinor( value )}/>
+                    </div>*/}
                   </div>
-                  <div className="col-md-6">  
-                    <FormControlLabel
-                      label="Not wearing I.D"
-                      control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
-                    />
-                  </div>
-                  <div className="col-md-6">  
-                    <FormControlLabel
-                      label="Dress Code"
-                      control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
-                    />
-                  </div>
-                  <div className="col-md-6">  
-                    <FormControlLabel
-                      label="Using vulgar words and rough behavior"
-                      control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
-                    />
-                  </div>
-                  <div className="col-md-6">  
-                    <FormControlLabel
-                      label="Loitering"
-                      control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
-                    />
-                  </div>
-                  <div className="col-md-6">  
-                    <FormControlLabel
-                      label="Littering"
-                      control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
-                    />
-                  </div>
-                  <div className="col-md-6">  
-                    <FormControlLabel
-                      label="Careless / unauthorized use of school property "
-                      control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
-                    />
-                  </div>
-                  <div className="col-md-6">  
-                    <FormControlLabel
-                      label="Unauthorized posting of announcements, posters and notices."
-                      control={<Checkbox onChange={handleMinorProblemBehavior} {...label}/>}
-                    />
-                  </div>
-                  <div className="col-md-6">  
-                    <OtherCheckBox onChange={value => setOtherMinor( value )}/>
-                  </div>
-                </div>
+                </RadioGroup>
               </div>
 
               {/*================================================================================*/}
@@ -1405,66 +1446,114 @@ const MakeReportForm = props => {
                   <p className="text-uppercase">majors: (Automatic Office Referral)</p>
                 </div>
 
-                <div className="row container-fluid">
-                  <div className="col-md-6">
-                    <FormControlLabel
-                      label="Using another persons, ID/COR, lending of ID/COR"
-                      control={<Checkbox onChange={handleMajorProblemBehavior} {...label}/>}
-                    />
-                  </div>
+                <RadioGroup defaultValue={state.minorProblemBehavior} onChange={handleMinorProblemBehavior}>
+                  <div className="row container-fluid">
+                    <div className="col-md-6">
+                      {/*<FormControlLabel
+                        label="Unauthorized posting of announcements, posters and notices."
+                        control={<Checkbox onChange={handleMajorProblemBehavior} {...label}/>}
+                      />*/}
+                      <FormControlLabel 
+                        label="Using another persons, ID/COR, lending of ID/COR"
+                        value="Using another persons, ID/COR, lending of ID/COR"
+                        control={<Radio/>} 
+                      />
+                    </div>
 
-                  <div className="col-md-6">
-                    <FormControlLabel
-                      label="Forging, Falsifying or Tampering of any Academic, Official Records of Documents"
-                      control={<Checkbox onChange={handleMajorProblemBehavior} {...label}/>}
-                    />
+                    <div className="col-md-6">
+                      {/*here*/}
+                      {/*<FormControlLabel
+                        control={<Checkbox onChange={handleMajorProblemBehavior} {...label}/>}
+                        label="Unauthorized posting of announcements, posters and notices."
+                      />*/}
+                      <FormControlLabel 
+                        control={<Radio/>} 
+                        label="Forging, Falsifying or Tampering of any Academic, Official Records of Documents"
+                        value="Forging, Falsifying or Tampering of any Academic, Official Records of Documents"
+                      />
+                    </div>
+                    <div className="col-md-6">
+                      <FormControlLabel 
+                        control={<Radio/>} 
+                        label="Unauthorized possession of examination materials, and other documents"
+                        value="Unauthorized possession of examination materials, and other documents"
+                      />
+                      {/*<FormControlLabel
+                        label="Forging, Falsifying or Tampering of any Academic, Official Records of Documents"
+                        control={<Checkbox onChange={handleMajorProblemBehavior} {...label}/>}
+                      />*/}
+                    </div>
+                    <div className="col-md-6">
+                      <FormControlLabel 
+                        control={<Radio/>} 
+                        label="Having somebody else take an examination for another"
+                        value="Having somebody else take an examination for another"
+                      />
+                      {/*<FormControlLabel
+                        label="Unauthorized possession of examination materials, and other documents"
+                        control={<Checkbox onChange={handleMajorProblemBehavior} {...label}/>}
+                      />*/}
+                    </div>
+                    <div className="col-md-6">
+                      <FormControlLabel 
+                        control={<Radio/>} 
+                        label="Cheating during examination"
+                        value="Cheating during examination"
+                      />
+                      {/*<FormControlLabel
+                        label="Having somebody else take an examination for another"
+                        control={<Checkbox onChange={handleMajorProblemBehavior} {...label}/>}
+                      />*/}
+                    </div>
+                    <div className="col-md-6">
+                      <FormControlLabel 
+                        control={<Radio/>} 
+                        label="Plagiarism"
+                        value="Plagiarism"
+                      />
+                      {/*<FormControlLabel
+                        label="Plagiarism"
+                        control={<Checkbox onChange={handleMajorProblemBehavior} {...label}/>}
+                      />*/}
+                    </div>
+                    <div className="col-md-6">
+                      <FormControlLabel 
+                        control={<Radio/>} 
+                        label="Grave act of disrespect"
+                        value="Grave act of disrespect"
+                      />
+                      {/*<FormControlLabel
+                        label="Cheating during examination"
+                        control={<Checkbox onChange={handleMajorProblemBehavior} {...label}/>}
+                      />*/}
+                    </div>
+                    <div className="col-md-6">
+                      <FormControlLabel 
+                        control={<Radio/>} 
+                        label="Involvement in any form of attack to other person"
+                        value="Involvement in any form of attack to other person"
+                      />
+                      {/*<FormControlLabel
+                        label="Grave act of disrespect"
+                        control={<Checkbox onChange={handleMajorProblemBehavior}{...label}/>}
+                      />*/}
+                    </div>
+                    <div className="col-md-6">
+                      <FormControlLabel 
+                        control={<Radio/>} 
+                        label="Bullying in any form"
+                        value="Bullying in any form"
+                      />
+                      {/*<FormControlLabel
+                        label="Involvement in any form of attack to other person"
+                        control={<Checkbox onChange={handleMajorProblemBehavior}{...label}/>}
+                      />*/}
+                    </div>
+                    {/*<div className="col-md-6">
+                      <OtherCheckBox onChange={value => setOtherMajor( value )}/>
+                    </div>*/}
                   </div>
-                  <div className="col-md-6">
-                    <FormControlLabel
-                      label="Unauthorized possession of examination materials, and other documents"
-                      control={<Checkbox onChange={handleMajorProblemBehavior} {...label}/>}
-                    />
-                  </div>
-                  <div className="col-md-6">
-                    <FormControlLabel
-                      label="Having somebody else take an examination for another"
-                      control={<Checkbox onChange={handleMajorProblemBehavior} {...label}/>}
-                    />
-                  </div>
-                  <div className="col-md-6">
-                    <FormControlLabel
-                      label="Cheating during examination"
-                      control={<Checkbox onChange={handleMajorProblemBehavior} {...label}/>}
-                    />
-                  </div>
-                  <div className="col-md-6">
-                    <FormControlLabel
-                      label="Plagiarism"
-                      control={<Checkbox onChange={handleMajorProblemBehavior} {...label}/>}
-                    />
-                  </div>
-                  <div className="col-md-6">
-                    <FormControlLabel
-                      label="Grave act of disrespect"
-                      control={<Checkbox onChange={handleMajorProblemBehavior} {...label}/>}
-                    />
-                  </div>
-                  <div className="col-md-6">
-                    <FormControlLabel
-                      label="Involvement in any form of attack to other person"
-                      control={<Checkbox onChange={handleMajorProblemBehavior}{...label}/>}
-                    />
-                  </div>
-                  <div className="col-md-6">
-                    <FormControlLabel
-                      label="Bullying in any form"
-                      control={<Checkbox onChange={handleMajorProblemBehavior}{...label}/>}
-                    />
-                  </div>
-                  <div className="col-md-6">
-                    <OtherCheckBox onChange={value => setOtherMajor( value )}/>
-                  </div>
-                </div>
+                </RadioGroup>              
               </div>      
             </div>
             <div className="row container-fluid d-flex flex-column justify-content-center align-items-center">
@@ -1690,6 +1779,58 @@ const MakeReportForm = props => {
     </Dialog>
   );
 }
+
+// const OtherCheckBox = props => {
+//   const [isChecked, setIsChecked] = React.useState( false );
+//   const [value, setValue] = React.useState('');
+//   const [key, setKey] = React.useState( props?.key );
+
+//   const handleChecked = e => {
+//     setIsChecked( e.target.checked );
+//   }
+
+//   const handleOnChange = e => {
+//     setValue( e.target.value );
+//   }
+
+//   const debouncedValuePassing = debounce(props?.onChange, 50);
+
+//   React.useEffect(() => {
+//     if( !isChecked ){
+//       setValue( '' );
+//     }
+
+//     if( props.disabled ){
+//       setIsChecked( false );
+//     }
+
+//     if( !value.length ){
+//       props?.isEmpty?.( true );
+//     }
+//     else if( value.length ){
+//       props?.isEmpty?.( false );
+//     }
+
+//     debouncedValuePassing?.( value, key );
+//   }, [isChecked, value, props]);
+
+//   return(
+//     <FormControlLabel
+//       label={
+//         <TextField 
+//           value={value} 
+//           onChange={handleOnChange} 
+//           label="Other"
+//           variant="standard"
+//           helperText={'Enter text here'}
+//         />
+//       }
+//       value={value}
+//       control={<Radio/>}
+//     />
+//   );
+// }
+
 
 const OtherCheckBox = props => {
   const [isChecked, setIsChecked] = React.useState( false );

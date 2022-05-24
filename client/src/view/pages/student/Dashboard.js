@@ -2,6 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import uniqid from 'uniqid';
 import debounce from 'lodash.debounce';
+import Webcam from "react-webcam";
 
 import { styled } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
@@ -11,9 +12,15 @@ import Divider from '@mui/material/Divider';
 import Chip from '@mui/material/Chip';
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
+import Menu from '@mui/material/Menu';
+import Box from '@mui/material/Box';
+import Popover from '@mui/material/Popover';
 
+import Fab from '@mui/material/Fab';
 import SummarizeIcon from '@mui/icons-material/Summarize';
 import ContactMailIcon from '@mui/icons-material/ContactMail';
+import CameraIcon from '@mui/icons-material/Camera';
+import CameraAltIcon from '@mui/icons-material/CameraAlt';
 
 import SchoolYearAndSemester from '../../../context/SchoolYearAndSemester.js';
 
@@ -62,6 +69,8 @@ const Dashboard = props => {
 	const [duties, setDuties] = React.useState( [] );
 	const [dutyHrs, setDutyHrs] = React.useState( [] );
 	const [syData, setSyData] = React.useState( null );
+	// const [socketMessageBoxAnchor, setSocketMessageBoxAnchor] = React.useState( null );
+	// const isSocketMessageBoxOpen = React.useMemo(() => !!socketMessageBoxAnchor, [socketMessageBoxAnchor]);
 
 	const handleSwitchPage = ( _, value ) => {
 		setReportPage( value );
@@ -81,6 +90,10 @@ const Dashboard = props => {
 	// 	.catch( err => {
 	// 		throw err;
 	// 	});
+	// }
+
+	// const handleOpenSocketMessageBox = e => {
+	// 	setSocketMessageBoxAnchor( e.currentTarget );
 	// }
 
 	React.useEffect(() => { 
@@ -279,11 +292,59 @@ const Dashboard = props => {
 									</div>
 								)
 					}	
+					{/*<ReportSocketBox onClick={handleOpenSocketMessageBox}/>
+					<ReportSocketMessageBox 
+						anchorEl={socketMessageBoxAnchor} 
+						onClose={() => setSocketMessageBoxAnchor( null )} 
+						open={isSocketMessageBoxOpen}
+					/>*/}
 				</div>
 			</div>
 		</div>
 	);
 }
+
+// const ReportSocketBox = props => {	
+
+// 	return(
+// 		<div className="position-fixed bottom-0 end-0 m-5">
+// 			<Fab onClick={props?.onClick}>
+// 				<CameraIcon/>
+// 			</Fab>
+// 		</div>
+// 	);
+// }
+
+
+// const ReportSocketMessageBox = props => {
+// 	return(
+// 		<Popover
+//       open={props?.open}
+//       anchorEl={props?.anchorEl}
+// 		  anchorOrigin={{
+// 		    vertical: 'top',
+// 		    horizontal: 'left',
+// 		  }}
+// 		  transformOrigin={{
+// 		    vertical: 'bottom',
+// 		    horizontal: 'right',
+// 		  }}
+// 		  onClose={props?.onClose}
+// 		>
+//       <Box 
+//       	sx={{
+//       		width: 300,
+//       		height: 400
+//       	}}
+//       	className="p-3"
+//       >
+//       	<div className="w-100 h-100 d-flex">
+      		
+//       	</div>
+//       </Box>
+// 		</Popover>
+// 	);
+// }
 
 const Report = props => {
 	return(

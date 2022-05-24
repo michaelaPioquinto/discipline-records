@@ -10,6 +10,7 @@ import SchoolYearAndSemester from '../context/SchoolYearAndSemester.js';
 
 const Dashboard = React.lazy(() => import('./pages/student/Dashboard'));
 const ChangePassword = React.lazy(() => import('./pages/student/ChangePassword'));
+const DutyReport = React.lazy(() => import('./pages/student/DutyReport'));
 const Handbook = React.lazy(() => import('./pages/Handbook'));
 
 
@@ -38,6 +39,7 @@ const Student = props => {
 					listItems={[
 						{ title: 'Dashboard', onClick: () => content.name === 'Dashboard' ? null : setContent({ name: 'Dashboard', cont: <Dashboard name={ props.tools.name } selectedYearAndSem={selectedYearAndSem}/> }) },
 						{ title: 'Change-Password', onClick: () => content.name === 'Change-Password' ? null : setContent({ name: 'Change-Password', cont: <ChangePassword name={ props.tools.name } selectedYearAndSem={selectedYearAndSem}/> }) },
+						{ title: 'Duty Reporting', onClick: () => content.name === 'Duty Reporting' ? null : setContent({ name: 'Duty Reporting', cont: <DutyReport name={ props.tools.name } selectedYearAndSem={selectedYearAndSem}/> }) },
 						{ title: 'Handbook', onClick: () => content.name === 'Handbook' ? null : setContent({ name: 'Handbook', cont: <Handbook/> }) },
 					]}
 				>

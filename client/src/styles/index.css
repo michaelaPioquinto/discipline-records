@@ -1,3 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
 @font-face{
   font-family: Poppins-Black;
   src: url('../fonts/Poppins/Poppins-Black.ttf');
@@ -292,6 +297,28 @@ code {
   height: fit-content;
 }
 
+
+/*=======================
+
+        Duty Report
+
+========================*/
+.report{
+  width: 80%;
+  min-width: 200px;
+  height: fit-content; 
+}
+
+.report img{
+  width: 100%;
+  height: auto;
+}
+
+.report p{
+  color: rgba(0, 0, 0, 0.4);
+}
+
+
 /*
 .v1-row{
   font-size: 13px;
@@ -336,6 +363,9 @@ code {
   align-content: center;
 }
 */
+
+
+
 
 @media screen and (max-width: 1000px){
   .sign-in-box{

@@ -15,6 +15,7 @@ var Archived = require('../models/archived');
 var Token = require('../models/token');
 var Trash = require('../models/trash');
 var SchoolYear = require('../models/schoolYear');
+var DutyReport = require('../models/DutyReport');
 
 
 // var yearTrackerPath = path.join( __dirname, '../data/year-tracker.json');
@@ -1185,7 +1186,6 @@ router.post('/save-report-image', async( req, res ) => {
       }
     }
     catch( err ){
-      console.log( err );
       return res.sendStatus( 503 );
     }
   }
@@ -1312,6 +1312,100 @@ router.get('/incident-number', async( req, res ) => {
     return res.json( count );
   });
 });
+
+
+
+router.post('/save-duty-report-image', async ( req, res ) => {
+  if( !req.files ) return res.sendStatus( 404 );
+  
+  const imagesPath = path.join( __dirname, '../client/public/images/duty-reports' );
+  const createPath = ({ name }) => path.join( imagesPath, name );
+
+  const image = req.files['reportImage[]'];
+
+  if( image instanceof Array ){
+    const destination = image.map( img => createPath( img ));
+    try{
+      const accumulatedImages = fs.readdirSync( imagesPath );
+
+      image.forEach( async (img, index) => {
+        try{
+          if( accumulatedImages && accumulatedImages.length && accumulatedImages.includes( img.name )){
+            if( index === image.length - 1 ){
+              return res.sendStatus( 200 );
+            }
+            else{
+              return;
+            }
+          };
+      
+          await img.mv( destination[ index ] );
+
+          if( index === image.length - 1 ){
+            return res.sendStatus( 200 );
+          }
+        }
+        catch( err ){
+          console.log( err );
+        }
+      });
+    }
+    catch( err ){
+      console.log( err );
+      return res.sendStatus( 503 );
+    }
+  }
+  else{
+    try{
+      const accumulatedImages = fs.readdirSync( imagesPath );
+
+      try{
+        if( accumulatedImages && accumulatedImages.length && accumulatedImages.includes( image.name )){
+          return res.sendStatus( 200 );
+        };
+    
+        await image.mv( createPath( image ) );
+
+        return res.sendStatus( 200 );
+      }
+      catch( err ){
+        console.log( err );
+      }
+    }
+    catch( err ){
+      console.log( err );
+      return res.sendStatus( 503 );
+    }
+  }
+});
+
+
+router.post('/duty-report', async ( req, res ) => {
+  DutyReport.create({ ...req.body }, err => {
+    if( err ) return res.sendStatus( 503 );
+
+    return res.sendStatus( 200 );
+  });  
+});
+
+
+router.get('/duty-report/id/:id', async ( req, res ) => {
+  DutyReport.find({ studentID: req.params.id }, ( err, doc ) => {
+    if( err ) return res.sendStatus( 503 );
+
+    return res.json( doc );
+  });
+});
+
+
+router.get('/get-duty-report', async ( req, res ) => {
+  DutyReport.find({}, ( err, doc ) => {
+    if( err ) return res.sendStatus( 503 );
+
+    return res.json( doc );
+  });
+});
+
 
 const incrementYearTracker = tracker => {
   return tracker.map( year => year += 1 );
