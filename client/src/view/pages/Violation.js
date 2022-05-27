@@ -264,19 +264,19 @@ const Violation = props => {
 									      	</IconButton>
 				      					</span>
 			      					</Tooltip>
-			      					<Tooltip title="Delete" arrow>
-				      					<span>
-									      	<IconButton disabled={props?.userType !== 'admin'} onClick={() => props?.handleDelete( props?.items[ index ]['_id'] )}>
-									      		<DeleteIcon/>
-									      	</IconButton>
-				      					</span>
-			      					</Tooltip>
 							      </div>
 							    : null
 	            }
 	          </div>
 	        )
       	}}
+			      					// <Tooltip title="Delete" arrow>
+				      				// 	<span>
+									     //  	<IconButton disabled={props?.userType !== 'admin'} onClick={() => props?.handleDelete( props?.items[ index ]['_id'] )}>
+									     //  		<DeleteIcon/>
+									     //  	</IconButton>
+				      				// 	</span>
+			      					// </Tooltip>
 
       	generateHeader={props => (
       		<>
