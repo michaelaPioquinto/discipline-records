@@ -50,19 +50,19 @@ const Item = props => (
 						      	</IconButton>
 	      					</span>
 	      				</Tooltip>
-	      				<Tooltip title="delete" arrow>
-	      					<span>
-						      	<IconButton onClick={() => props?.handleDelete( props?._id )}>
-						      		<DeleteIcon/>
-						      	</IconButton>
-	      					</span>
-	      				</Tooltip>
 				      </>
 				    : null
 	      }
   		</TableCell>
   </TableRow>
 );
+	      				// <Tooltip title="delete" arrow>
+	      				// 	<span>
+						     //  	<IconButton onClick={() => props?.handleDelete( props?._id )}>
+						     //  		<DeleteIcon/>
+						     //  	</IconButton>
+	      				// 	</span>
+	      				// </Tooltip>
 
 const Violation = props => {
 	const [violationList, setViolationList] = React.useState( [] );
@@ -537,7 +537,7 @@ const ValidationEditForm = props => {
 				    </Box>
 				</DialogContent>
 				<DialogActions>
-					<Button 
+					{/*<Button 
 						autoFocus 
 						onClick={() => {
 							props.setDelete( props.editForm.item );
@@ -558,7 +558,7 @@ const ValidationEditForm = props => {
 						}}
 					>
 						Delete
-					</Button>
+					</Button>*/}
 					<Button autoFocus onClick={ props.setOpen }>
 						Discard
 					</Button>
