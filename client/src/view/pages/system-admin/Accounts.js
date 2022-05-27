@@ -383,22 +383,7 @@ const AddUser = props => {
 							)
 							: (
 								<>
-									<Button 
-										autoFocus
-										onClick={() => {
-											axios.delete(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/delete-user/id/${ id }`)
-											.then(() => {
-												props.fetchAccounts();
-												props.setOpen();
-												enqueueSnackbar('Successfully deleted an administrator', { variant: 'success' });
-											})
-											.catch(() => {
-												enqueueSnackbar('Please try again', { variant: 'error' });
-											});
-										}}
-									>
-										Delete
-									</Button>
+									
 									<Button 
 										autoFocus
 										onClick={() => {
@@ -438,7 +423,22 @@ const AddUser = props => {
 	);
 }
 
-
+// <Button 
+// 										autoFocus
+// 										onClick={() => {
+// 											axios.delete(`http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/delete-user/id/${ id }`)
+// 											.then(() => {
+// 												props.fetchAccounts();
+// 												props.setOpen();
+// 												enqueueSnackbar('Successfully deleted an administrator', { variant: 'success' });
+// 											})
+// 											.catch(() => {
+// 												enqueueSnackbar('Please try again', { variant: 'error' });
+// 											});
+// 										}}
+// 									>
+// 										Delete
+// 									</Button>
 const GenerateInputFields = props => (
 	<>
 		<TextField 
