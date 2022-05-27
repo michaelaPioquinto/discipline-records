@@ -42,7 +42,7 @@ const Admin = props => {
 					{ title: 'S.Y & Semester', onClick: () => content.name === 'S.Y & Semester' ? null : setContent({ name: 'S.Y & Semester', cont: <SchoolYears search={searchContent} getSearchContent={e => handleSearch( e )}/> }) },
 					{ title: 'Statistical', onClick: () => content.name === 'Statistical' ? null : setContent({ name: 'Statistical', cont: <Statistical/> }) },
 					{ title: 'Handbook', onClick: () => content.name === 'Handbook' ? null : setContent({ name: 'Handbook', cont: <Handbook/> }) },
-					{ title: 'Trash', onClick: () => content.name === 'Trash' ? null : setContent({ name: 'Trash', cont: <Trash role="admin" search={searchContent} getSearchContent={e => handleSearch( e )}/> }) },
+					// { title: 'Trash', onClick: () => content.name === 'Trash' ? null : setContent({ name: 'Trash', cont: <Trash role="admin" search={searchContent} getSearchContent={e => handleSearch( e )}/> }) },
 				]}
 			>
 				<SearchContext.Provider value={searchContent}>

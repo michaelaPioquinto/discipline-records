@@ -368,7 +368,7 @@ const ValidationEditForm = props => {
 				    </Box>
 				</DialogContent>
 				<DialogActions>
-					<Button 
+					{/*<Button 
 						autoFocus 
 						onClick={() => {
 							props.setDelete( props.editForm.item );
@@ -389,7 +389,7 @@ const ValidationEditForm = props => {
 						}}
 					>
 						Delete
-					</Button>
+					</Button>*/}
 					<Button autoFocus onClick={ props.setOpen }>
 						Discard
 					</Button>

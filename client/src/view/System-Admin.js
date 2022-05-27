@@ -37,7 +37,7 @@ const SystemAdmin = props => {
 					{ title: 'Account', onClick: () => content.name === 'Account' ? null : setContent({ name: 'Account', cont: <Accounts search={searchContent} getSearchContent={e => handleSearch( e )}/> }) },
 					{ title: 'Statistical', onClick: () => content.name === 'Statistical' ? null : setContent({ name: 'Statistical', cont: <Statistical/> }) },
 					{ title: 'Handbook', onClick: () => content.name === 'Handbook' ? null : setContent({ name: 'Handbook', cont: <Handbook/> }) },
-					{ title: 'Trash', onClick: () => content.name === 'Trash' ? null : setContent({ name: 'Trash', cont: <Trash role="sysadmin" search={searchContent} getSearchContent={e => handleSearch( e )}/> }) },
+					// { title: 'Trash', onClick: () => content.name === 'Trash' ? null : setContent({ name: 'Trash', cont: <Trash role="sysadmin" search={searchContent} getSearchContent={e => handleSearch( e )}/> }) },
 				]}
 			>
 				<SearchContext.Provider value={searchContent}>
